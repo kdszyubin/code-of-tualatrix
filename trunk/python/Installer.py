@@ -49,42 +49,14 @@ class Installer(gtk.Window):
 		sw.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
 		vbox.pack_start(sw)
 
-		# create tree model
-		model = self.__create_model()
-
 		# create tree view
-		treeview = gtk.TreeView(model)
+		treeview = self.create_treeview()
 		treeview.set_rules_hint(True)
 		treeview.set_search_column(COLUMN_NAME)
 
 		sw.add(treeview)
 
-		# add columns to the tree view
-		self.__add_columns(treeview)
-
 		self.show_all()
-
-	def __create_model(self):
-		lstore = gtk.ListStore(
-			gobject.TYPE_BOOLEAN,
-			gtk.gdk.Pixbuf,
-			gobject.TYPE_STRING)
-		
-		icon = gtk.icon_theme_get_default()
-
-		for item in data:
-			iter = lstore.append()
-			try:
-				pixbuf = icon.load_icon(item[COLUMN_NAME], 24, 0)
-			except gobject.GError:
-				pixbuf = icon.load_icon(gtk.STOCK_MISSING_IMAGE, 24, 0)
-			lstore.set(iter,
-				COLUMN_INSTALLED, self.check_install(item[COLUMN_NAME]),
-				COLUMN_ICON, pixbuf,
-				COLUMN_NAME, "<b>%s</b>\n%s" % (self.getName(item[COLUMN_NAME]), self.getComment(item[COLUMN_NAME]))
-			)
-
-		return lstore
 
 	def check_install(self, name):
 		pkgiter = self.cache[name]
@@ -118,12 +90,16 @@ class Installer(gtk.Window):
 		# set new value
 		model.set(iter, COLUMN_INSTALLED, fixed)
 
-	def __add_columns(self, treeview):
-		model = treeview.get_model()
+	def create_treeview(self):
+		lstore = gtk.ListStore(
+			gobject.TYPE_BOOLEAN,
+			gtk.gdk.Pixbuf,
+			gobject.TYPE_STRING)
+		treeview = gtk.TreeView()
 
 		# column for fixed toggles
 		renderer = gtk.CellRendererToggle()
-		renderer.connect('toggled', self.fixed_toggled, model)
+		renderer.connect('toggled', self.fixed_toggled, lstore)
 
 		column = gtk.TreeViewColumn(' ', renderer, active=COLUMN_INSTALLED)
 
@@ -138,8 +114,26 @@ class Installer(gtk.Window):
 
 		renderer = gtk.CellRendererText()
 		column.pack_start(renderer, True)
-		column.set_attributes(renderer, text = COLUMN_NAME)
+		#column.set_attributes(renderer, text = COLUMN_NAME)
+		column.add_attribute(renderer, "markup", COLUMN_NAME)
 		treeview.append_column(column)
+		
+		icon = gtk.icon_theme_get_default()
+
+		for item in data:
+			try:
+				pixbuf = icon.load_icon(item[COLUMN_NAME], 24, 0)
+			except gobject.GError:
+				pixbuf = icon.load_icon(gtk.STOCK_MISSING_IMAGE, 24, 0)
+
+			lstore.append((self.check_install(item[COLUMN_NAME]),
+					pixbuf,
+					"<big><b>%s</b></big>\n%s" % (self.getName(item[COLUMN_NAME]), self.getComment(item[COLUMN_NAME])),
+					))
+		
+		treeview.set_model(lstore)
+
+		return treeview
 
 def main():
 	Installer()
