@@ -20,7 +20,10 @@ data = \
 (
 	(False, "/usr/share/ubuntu-tweak/pixmaps/computer.png", 'pidgin'),
 	(False, "/usr/share/ubuntu-tweak/pixmaps/computer.png", 'firefox'),
-	(False, "/usr/share/ubuntu-tweak/pixmaps/startup.png", 'amsn')
+	(False, "/usr/share/ubuntu-tweak/pixmaps/startup.png", 'amsn'),
+	(False, "/usr/share/ubuntu-tweak/pixmaps/startup.png", 'stardict'),
+	(False, "/usr/share/ubuntu-tweak/pixmaps/startup.png", 'gftp'),
+	(False, "/usr/share/ubuntu-tweak/pixmaps/startup.png", 'rar'),
 )
 
 class Installer(gtk.Window):
@@ -66,13 +69,19 @@ class Installer(gtk.Window):
 			gobject.TYPE_BOOLEAN,
 			gtk.gdk.Pixbuf,
 			gobject.TYPE_STRING)
+		
+		icon = gtk.icon_theme_get_default()
 
 		for item in data:
 			iter = lstore.append()
+			try:
+				pixbuf = icon.load_icon(item[COLUMN_NAME], 24, 0)
+			except gobject.GError:
+				pixbuf = icon.load_icon(gtk.STOCK_MISSING_IMAGE, 24, 0)
 			lstore.set(iter,
 				COLUMN_INSTALLED, self.check_install(item[COLUMN_NAME]),
-				COLUMN_ICON, gtk.gdk.pixbuf_new_from_file(item[COLUMN_ICON]),
-				COLUMN_NAME, self.getName(item[COLUMN_NAME])
+				COLUMN_ICON, pixbuf,
+				COLUMN_NAME, "<b>%s</b>\n%s" % (self.getName(item[COLUMN_NAME]), self.getComment(item[COLUMN_NAME]))
 			)
 
 		return lstore
@@ -82,6 +91,11 @@ class Installer(gtk.Window):
 		pkg = Package(self.cache, self.depcache, self.records, self.sourcelist, None, pkgiter)
 
 		return pkg.isInstalled
+
+	def getComment(self, name):
+		app = DesktopEntry(DESKTOP_DIR + name + ".desktop")
+		return app.getComment()
+
 	def getName(self, name):
 		app = DesktopEntry(DESKTOP_DIR + name + ".desktop")
 		return app.getName()
@@ -125,7 +139,6 @@ class Installer(gtk.Window):
 		renderer = gtk.CellRendererText()
 		column.pack_start(renderer, True)
 		column.set_attributes(renderer, text = COLUMN_NAME)
-
 		treeview.append_column(column)
 
 def main():
