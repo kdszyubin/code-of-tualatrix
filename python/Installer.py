@@ -53,8 +53,14 @@ class Installer(gtk.Window):
 		treeview = self.create_treeview()
 		treeview.set_rules_hint(True)
 		treeview.set_search_column(COLUMN_NAME)
-
 		sw.add(treeview)
+
+		# button
+		hbox = gtk.HBox(False, 0)
+		vbox.pack_end(hbox, False ,False, 0)
+
+		button = gtk.Button("Apply")
+		hbox.pack_end(button, False, False, 0)
 
 		self.show_all()
 
@@ -114,7 +120,6 @@ class Installer(gtk.Window):
 
 		renderer = gtk.CellRendererText()
 		column.pack_start(renderer, True)
-		#column.set_attributes(renderer, text = COLUMN_NAME)
 		column.add_attribute(renderer, "markup", COLUMN_NAME)
 		treeview.append_column(column)
 		
