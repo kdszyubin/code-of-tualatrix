@@ -30,9 +30,9 @@ if __name__ == "__main__":
 	for book in books:
 		for word in file(book):
 			if word.find("[W]"+sys.argv[1]+"[T]") >= 0:
-				tualatrix = open(os.path.join(os.path.expanduser("~"),".reciteword/books/txwords-3.bok"), "a")
+				tualatrix = open(os.path.join(os.path.expanduser("~"),".reciteword/books/txwords-4.bok"), "a")
 				tualatrix.write(word)
 				tualatrix.close()
 				print "找到了！把'" + sys.argv[1]+ "'加到你的生词库里了！"
 				sys.exit(0)
-		print "找完了第%d本，找不到！" % books.index(book)
+		print "找完了第%d本，找不到！" % (books.index(book) + 1)
