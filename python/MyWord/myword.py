@@ -35,11 +35,11 @@ class MyWord(gtk.Window):
 		for book in books:
 			for word in file(book):
 				if word.find("[W]" + widget.get_text() + "[T]") >= 0:
-					tualatrix = open(os.path.join(os.path.expanduser("~"),".reciteword/books/txwords-4.bok"), "a")
+					tualatrix = open(os.path.join(os.path.expanduser("~"),".reciteword/books/txwords-5.bok"), "a")
 					tualatrix.write(word)
 					tualatrix.close()
 					buffer = gtk.TextBuffer()
-					buffer.set_text("正在搜寻第%d本...找到'%s'并已加入生词本" % ((books.index(book) + 1), widget.get_text()))
+					buffer.set_text("正在搜寻第%d本...找到'%s: %s'并已加入生词本" % ((books.index(book) + 1), widget.get_text(), word.split('[W]')[1].split('[T]')[1].split('[M]')[1].strip()))
 					self.textview.set_buffer(buffer)
 					added = True
 					break
