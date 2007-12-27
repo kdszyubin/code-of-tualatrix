@@ -23,7 +23,7 @@ class MyWord(gtk.Window):
 
 		self.textview = gtk.TextView()
 		buffer = gtk.TextBuffer()
-		buffer.set_text("I'm Ready")
+		buffer.set_text("3b'tru:siv")
 		self.textview.set_buffer(buffer)
 		vbox.pack_end(self.textview, False, False)
 
