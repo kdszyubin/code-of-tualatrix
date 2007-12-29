@@ -11,7 +11,7 @@ class FileInfo(UserDict):
 
 class DictFile(FileInfo):
 	"""A book with many words"""
-	separate = ["[C]", "[R]", "[P]"]
+	separate = ["[C]", "[R]", "[P]", "[A]"]
 	description = ["TITLE", "NUM", "AUTHOR", "OTHER"]
 
 	def __parse(self, filename):
@@ -19,10 +19,11 @@ class DictFile(FileInfo):
 		dictinfo = file.readline()
 		dictinfo = dictinfo.split("[N]")[1]
 		self["INFO"] = {}
+
 		for sep in self.separate:
 			self["INFO"][self.description[self.separate.index(sep)]] = dictinfo.split(sep)[0]
-			if self.separate.index(sep) == 3:
-				self[self.description[3]] = dictinfo.split(sep)[0]
+			if self.separate.index(sep) == 2:
+				self[self.description[3]] = dictinfo.split(sep)[1]
 			else:
 				dictinfo = dictinfo.split(sep)[1]
 		dictcontent = file.readlines()
