@@ -4,6 +4,8 @@ import gtk
 import gobject
 import os
 
+from dictfile import DictFile
+
 class BookList(gtk.TreeView):
 	def __init__(self, dir):
 		gtk.TreeView.__init__(self)
@@ -22,22 +24,12 @@ class BookList(gtk.TreeView):
 			if os.path.isdir(fullname):
 				child_iter = model.append(iter)
 				dirnamefile = os.path.join(fullname, "dirname")
-				print "    Set father:%s\n " % dirnamefile
-				model.set(child_iter, 0, dirnamefile)
+				model.set(child_iter, 0, file(dirnamefile).read().strip())
 
-				for subitem in os.listdir(fullname):
-					subfullname = os.path.join(fullname, subitem)
-					if os.path.isdir(subfullname):
-						child_iter = model.append(iter)
-						self.__create_model(subfullname, model, child_iter)
-#					elif os.path.basename(subfullname) != "dirname":
-#						child_iter = model.append(iter)
-#						print "    (nodirname)Set child: %s" % subitem
-#						model.set(child_iter, 0, subfullname)
-			else:
+				self.__create_model(fullname, model, child_iter)
+			elif os.path.basename(fullname) != "dirname":
 				child_iter = model.append(iter)
-				print "    Set child: %s\n" % fullname 
-				model.set(child_iter, 0, fullname)
+				model.set(child_iter, 0, DictFile(fullname)["INFO"]["TITLE"])
 
 	def __add_columns(self):
 		model = self.get_model()
