@@ -16,16 +16,17 @@ class MyWord(gtk.Window):
 		vbox = gtk.VBox(False, 0)
 		self.add(vbox)
 
-		entry = gtk.Entry()
-		entry.connect("activate", self.activate_cb)
-		entry.connect("backspace", self.backspace_cb)
-		vbox.pack_start(entry)
+		button = gtk.Button("Choose book")
+		vbox.pack_start(button)
 
-		self.textview = gtk.TextView()
-		buffer = gtk.TextBuffer()
-		buffer.set_text("3b'tru:siv")
-		self.textview.set_buffer(buffer)
-		vbox.pack_end(self.textview, False, False)
+		button = gtk.Button("First Recite")
+		vbox.pack_start(button)
+
+		button = gtk.Button("Revise Word")
+		vbox.pack_start(button)
+
+		button = gtk.Button("My Result")
+		vbox.pack_start(button)
 
 		self.show_all()
 
