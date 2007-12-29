@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# coding: utf-8
 
 import gtk
 import gobject
@@ -6,11 +7,20 @@ import os
 
 from dictfile import DictFile
 
+(
+	COLUMN_TITLE,
+	COLUMN_NUM,
+	COLUMN_AUTHOR,
+) = range(3)
+
 class BookList(gtk.TreeView):
 	def __init__(self, dir):
 		gtk.TreeView.__init__(self)
 
-		model = gtk.TreeStore(gobject.TYPE_STRING)
+		model = gtk.TreeStore(
+			gobject.TYPE_STRING,
+			gobject.TYPE_STRING,
+			gobject.TYPE_STRING)
 		iter = model.append(None)
 		self.__create_model(dir, model, iter)
 
@@ -20,23 +30,33 @@ class BookList(gtk.TreeView):
 	def __create_model(self, dir, model, iter):
 		for item in os.listdir(dir):
 			fullname = os.path.join(dir, item)
-			print fullname
 			if os.path.isdir(fullname):
 				child_iter = model.append(iter)
 				dirnamefile = os.path.join(fullname, "dirname")
-				model.set(child_iter, 0, file(dirnamefile).read().strip())
+				model.set(child_iter, COLUMN_TITLE, file(dirnamefile).read().strip())
 
 				self.__create_model(fullname, model, child_iter)
 			elif os.path.basename(fullname) != "dirname":
 				child_iter = model.append(iter)
-				model.set(child_iter, 0, DictFile(fullname)["INFO"]["TITLE"])
+				dict = DictFile(fullname)
+				model.set(child_iter,
+					COLUMN_TITLE, dict["INFO"]["TITLE"],
+					COLUMN_NUM, dict["INFO"]["NUM"],
+					COLUMN_AUTHOR, dict["INFO"]["AUTHOR"])
 
 	def __add_columns(self):
 		model = self.get_model()
 
 		renderer = gtk.CellRendererText()
-		column = gtk.TreeViewColumn("Directory", renderer, text = 0)
+		column = gtk.TreeViewColumn("Directory", renderer, text = COLUMN_TITLE)
+		self.append_column(column)
 
+		renderer = gtk.CellRendererText()
+		column = gtk.TreeViewColumn("NUM", renderer, text = COLUMN_NUM)
+		self.append_column(column)
+
+		renderer = gtk.CellRendererText()
+		column = gtk.TreeViewColumn("AUTHOR", renderer, text = COLUMN_AUTHOR)
 		self.append_column(column)
 
 if __name__ == "__main__":
