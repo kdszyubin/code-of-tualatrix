@@ -6,7 +6,6 @@ import os
 import glob
 from UserList import UserList
 
-
 class BookList(UserList):
         def __init__(self, path):
                 UserList.__init__(self)
@@ -30,9 +29,9 @@ if __name__ == "__main__":
 	for book in books:
 		for word in file(book):
 			if word.find("[W]"+sys.argv[1]+"[T]") >= 0:
-				tualatrix = open(os.path.join(os.path.expanduser("~"),".reciteword/books/txwords-4.bok"), "a")
+				tualatrix = open(os.path.join(os.path.expanduser("~"),".reciteword/books/txwords-1.bok"), "a")
 				tualatrix.write(word)
 				tualatrix.close()
-				print "找到了！把'" + sys.argv[1]+ "'加到你的生词库里了！"
+				print "正在搜寻第%d本...找到'%s: %s'并已加入生词本" % ((books.index(book) + 1), sys.argv[1], word.split('[W]')[1].split('[T]')[1].split('[M]')[1].strip())
 				sys.exit(0)
 		print "找完了第%d本，找不到！" % (books.index(book) + 1)
