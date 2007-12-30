@@ -22,10 +22,15 @@ class BookList(gtk.TreeView):
 			gobject.TYPE_STRING,
 			gobject.TYPE_STRING)
 		iter = model.append(None)
+		model.set(iter, COLUMN_TITLE, "单词库")
+		child_iter = model.append(iter)
+		model.set(child_iter, COLUMN_TITLE, "我的生词库")
+		self.__create_model(os.path.join(os.path.expanduser("~"),".reciteword/books"), model, child_iter)
 		self.__create_model(dir, model, iter)
 
 		self.set_model(model)
 		self.__add_columns()
+		self.expand_all()
 
 	def __create_model(self, dir, model, iter):
 		for item in os.listdir(dir):
@@ -38,7 +43,7 @@ class BookList(gtk.TreeView):
 				self.__create_model(fullname, model, child_iter)
 			elif os.path.basename(fullname) != "dirname":
 				child_iter = model.append(iter)
-				dict = DictFile(fullname)
+				dict = DictFile(fullname, light = True)
 				model.set(child_iter,
 					COLUMN_TITLE, dict["INFO"]["TITLE"],
 					COLUMN_NUM, dict["INFO"]["NUM"],

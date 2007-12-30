@@ -16,16 +16,16 @@ class MyWord(gtk.Window):
 		vbox = gtk.VBox(False, 0)
 		self.add(vbox)
 
-		button = gtk.Button("Choose book")
+		button = gtk.Button("选书")
 		vbox.pack_start(button)
 
-		button = gtk.Button("First Recite")
+		button = gtk.Button("单词初记")
 		vbox.pack_start(button)
 
-		button = gtk.Button("Revise Word")
+		button = gtk.Button("单词复习")
 		vbox.pack_start(button)
 
-		button = gtk.Button("My Result")
+		button = gtk.Button("成绩")
 		vbox.pack_start(button)
 
 		self.show_all()

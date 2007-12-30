@@ -14,7 +14,13 @@ class DictFile(FileInfo):
 	separate = ["[C]", "[R]", "[P]", "[A]"]
 	description = ["TITLE", "NUM", "AUTHOR", "OTHER"]
 
-	def __parse(self, filename):
+	#继承自FileInfo，light参数用于决定是否只取得词典的描述
+	def __init__(self, filename, light = False):
+		FileInfo.__init__(self, filename)
+		self.__parse(filename, light)
+
+	#解析词典，分两步：第一步，获取词典的信息;第二步，获取词典的正文
+	def __parse(self, filename, light):
 		file = open(filename)
 		dictinfo = file.readline()
 		dictinfo = dictinfo.split("[N]")[1]
@@ -26,16 +32,13 @@ class DictFile(FileInfo):
 				self[self.description[3]] = dictinfo.split(sep)[1]
 			else:
 				dictinfo = dictinfo.split(sep)[1]
-		dictcontent = file.readlines()
-		for word in dictcontent:
-			if word.find("[M]") != -1:
-				word = word.split("[W]")[1]
-				if word.find("[T]") != -1:
-					self[word.split("[T]")[0]] = word.split("[M]")[1]
-				else:
-					self[word.split("[M]")[0]] = word.split("[M]")[1]
-
-	def __setitem__(self, key, item):
-		if key == "FILE" and item:
-			self.__parse(item)
-		FileInfo.__setitem__(self, key, item)
+		if not light:
+			dictcontent = file.readlines()
+			for word in dictcontent:
+				if word.find("[M]") != -1:
+					word = word.split("[W]")[1]
+					if word.find("[T]") != -1:
+						self[word.split("[T]")[0]] = word.split("[M]")[1]
+					else:
+						self[word.split("[M]")[0]] = word.split("[M]")[1]
+		file.close()
