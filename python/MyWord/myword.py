@@ -3,7 +3,7 @@
 
 import gtk
 import os
-from choosebook import BookList
+from choosebook import ChooseBook
 
 class MyWord(gtk.Window):
 	def __init__(self):
@@ -24,13 +24,8 @@ class MyWord(gtk.Window):
 		label = gtk.Label("欢迎")
 		book.append_page(button, label)
 
-		sw = gtk.ScrolledWindow()
-		sw.set_shadow_type(gtk.SHADOW_ETCHED_IN)
-		sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-		treeview = BookList("/usr/share/reciteword/books")
-		sw.add(treeview)
 		label = gtk.Label("选书")
-		book.append_page(sw, label)
+		book.append_page(ChooseBook(), label)
 
 		button = gtk.Button("Welcome")
 		label = gtk.Label("初记")
