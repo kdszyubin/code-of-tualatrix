@@ -3,30 +3,46 @@
 
 import gtk
 import os
-from addword import BookList
+from choosebook import BookList
 
 class MyWord(gtk.Window):
 	def __init__(self):
 		gtk.Window.__init__(self)
 
 		self.set_title("MyWord")
-		self.set_size_request(400, 200)
+		self.set_size_request(600, 400)
 		self.connect("destroy", lambda *w: gtk.main_quit())
 
 		vbox = gtk.VBox(False, 0)
 		self.add(vbox)
 
-		button = gtk.Button("选书")
-		vbox.pack_start(button)
+		book = gtk.Notebook()
+		book.set_tab_pos(gtk.POS_LEFT)
+		vbox.pack_start(book)
 
-		button = gtk.Button("单词初记")
-		vbox.pack_start(button)
+		button = gtk.Button("Welcome")
+		label = gtk.Label("欢迎")
+		book.append_page(button, label)
 
-		button = gtk.Button("单词复习")
-		vbox.pack_start(button)
+		sw = gtk.ScrolledWindow()
+		sw.set_shadow_type(gtk.SHADOW_ETCHED_IN)
+		sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+		treeview = BookList("/usr/share/reciteword/books")
+		sw.add(treeview)
+		label = gtk.Label("选书")
+		book.append_page(sw, label)
 
-		button = gtk.Button("成绩")
-		vbox.pack_start(button)
+		button = gtk.Button("Welcome")
+		label = gtk.Label("初记")
+		book.append_page(button, label)
+
+		button = gtk.Button("Welcome")
+		label = gtk.Label("复习")
+		book.append_page(button, label)
+
+		button = gtk.Button("Welcome")
+		label = gtk.Label("成绩")
+		book.append_page(button, label)
 
 		self.show_all()
 
