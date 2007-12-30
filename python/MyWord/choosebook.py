@@ -11,7 +11,8 @@ from dictfile import DictFile
 	COLUMN_TITLE,
 	COLUMN_NUM,
 	COLUMN_AUTHOR,
-) = range(3)
+	COLUMN_BOOKPATH,
+) = range(4)
 
 (
 	COLUMN_DIR,
@@ -25,12 +26,25 @@ class BookList(gtk.TreeView):
 		model = gtk.ListStore(
 			gobject.TYPE_STRING,
 			gobject.TYPE_STRING,
+			gobject.TYPE_STRING,
 			gobject.TYPE_STRING)
 
 		self.set_model(model)
 		self.__add_columns()
 
 		self.set_rules_hint(True)
+
+		selection = self.get_selection()
+		selection.set_mode(gtk.SELECTION_SINGLE)
+		selection.connect("changed", self.selection_changed)
+
+	def selection_changed(self, widget, data = None):
+		model = widget.get_selected()[0]
+		iter = widget.get_selected()[1]
+		if iter:
+			path = model.get_value(iter, COLUMN_BOOKPATH)
+			CurrentBook = path
+			print path
 
 	def create_list(self, dir, model):
 		for item in os.listdir(dir):
@@ -44,7 +58,8 @@ class BookList(gtk.TreeView):
 				model.set(iter,
 					COLUMN_TITLE, dict["INFO"]["TITLE"],
 					COLUMN_NUM, dict["INFO"]["NUM"],
-					COLUMN_AUTHOR, dict["INFO"]["AUTHOR"])
+					COLUMN_AUTHOR, dict["INFO"]["AUTHOR"],
+					COLUMN_BOOKPATH, fullname)
 
 	def __add_columns(self):
 		model = self.get_model()
@@ -140,15 +155,6 @@ class ChooseBook(gtk.VBox):
 		hpaned.pack2(sw)
 
 		sw.add(listview)
-
-		hbox = gtk.HBox(False, 10)
-		self.pack_end(hbox, False, False, 0)
-
-		button = gtk.Button(stock = gtk.STOCK_GO_BACK)
-		hbox.pack_end(button, False, False ,0)
-
-		button = gtk.Button(stock = gtk.STOCK_OK)
-		hbox.pack_end(button, False, False ,0)
 
 if __name__ == "__main__":
 	win = gtk.Window()
