@@ -50,15 +50,15 @@ class BookList(gtk.TreeView):
 		model = self.get_model()
 
 		renderer = gtk.CellRendererText()
-		column = gtk.TreeViewColumn("Directory", renderer, text = COLUMN_TITLE)
+		column = gtk.TreeViewColumn("书名", renderer, text = COLUMN_TITLE)
 		self.append_column(column)
 
 		renderer = gtk.CellRendererText()
-		column = gtk.TreeViewColumn("NUM", renderer, text = COLUMN_NUM)
+		column = gtk.TreeViewColumn("单词数", renderer, text = COLUMN_NUM)
 		self.append_column(column)
 
 		renderer = gtk.CellRendererText()
-		column = gtk.TreeViewColumn("AUTHOR", renderer, text = COLUMN_AUTHOR)
+		column = gtk.TreeViewColumn("作者", renderer, text = COLUMN_AUTHOR)
 		self.append_column(column)
 
 class DirList(gtk.TreeView):
