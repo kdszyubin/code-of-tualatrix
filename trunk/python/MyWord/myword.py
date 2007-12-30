@@ -24,8 +24,9 @@ class MyWord(gtk.Window):
 		label = gtk.Label("欢迎")
 		book.append_page(button, label)
 
+		#page 选书
 		label = gtk.Label("选书")
-		book.append_page(ChooseBook(), label)
+		book.append_page(self.choosebook(), label)
 
 		button = gtk.Button("Welcome")
 		label = gtk.Label("初记")
@@ -40,6 +41,27 @@ class MyWord(gtk.Window):
 		book.append_page(button, label)
 
 		self.show_all()
+
+	def choosebook(self):
+		vbox = gtk.VBox(False, 10)
+
+		book = ChooseBook()
+		vbox.pack_start(book)
+
+		hbox = gtk.HBox(False, 10)
+		vbox.pack_end(hbox, False, False, 0)
+
+		button = gtk.Button(stock = gtk.STOCK_GO_BACK)
+		hbox.pack_end(button, False, False ,0)
+
+		button = gtk.Button(stock = gtk.STOCK_OK)
+		button.connect("clicked", self.button_clicked_cb, book)
+		hbox.pack_end(button, False, False ,0)
+
+		return vbox
+
+	def button_clicked_cb(self, widget, data = None):
+		print data
 
 	def activate_cb(self, widget, data = None):
 		books = BookList("/usr/share/reciteword/books") 
