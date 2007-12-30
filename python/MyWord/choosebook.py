@@ -20,7 +20,7 @@ from dictfile import DictFile
 ) = range(2)
 
 class BookList(gtk.TreeView):
-	def __init__(self):
+	def __init__(self, parent = None):
 		gtk.TreeView.__init__(self)
 
 		model = gtk.ListStore(
@@ -36,15 +36,14 @@ class BookList(gtk.TreeView):
 
 		selection = self.get_selection()
 		selection.set_mode(gtk.SELECTION_SINGLE)
-		selection.connect("changed", self.selection_changed)
+		selection.connect("changed", self.selection_changed, parent)
 
 	def selection_changed(self, widget, data = None):
 		model = widget.get_selected()[0]
 		iter = widget.get_selected()[1]
 		if iter:
 			path = model.get_value(iter, COLUMN_BOOKPATH)
-			CurrentBook = path
-			print path
+			data.select_book = path
 
 	def create_list(self, dir, model):
 		for item in os.listdir(dir):
@@ -136,10 +135,12 @@ class ChooseBook(gtk.VBox):
 	def __init__(self):
 		gtk.VBox.__init__(self, False, 10)
 
+		self.select_book = None
+
 		hpaned = gtk.HPaned()
 		self.pack_start(hpaned)
 
-		listview = BookList()
+		listview = BookList(self)
 
 		sw = gtk.ScrolledWindow()
 		sw.set_shadow_type(gtk.SHADOW_ETCHED_IN)
