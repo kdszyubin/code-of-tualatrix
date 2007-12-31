@@ -55,9 +55,9 @@ class BookList(gtk.TreeView):
 				dict = DictFile(fullname, light = True)
 				iter = model.append()
 				model.set(iter,
-					COLUMN_TITLE, dict["INFO"]["TITLE"],
-					COLUMN_NUM, dict["INFO"]["NUM"],
-					COLUMN_AUTHOR, dict["INFO"]["AUTHOR"],
+					COLUMN_TITLE, dict.INFO["TITLE"],
+					COLUMN_NUM, dict.INFO["NUM"],
+					COLUMN_AUTHOR, dict.INFO["AUTHOR"],
 					COLUMN_BOOKPATH, fullname)
 
 	def __add_columns(self):
