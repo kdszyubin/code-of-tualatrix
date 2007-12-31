@@ -7,7 +7,7 @@ class FileInfo(UserDict):
     "store file metadata"
     def __init__(self, filename=None):
         UserDict.__init__(self)
-	self["FILE"] = filename
+	self.FILE = filename
 
 class DictFile(FileInfo):
 	"""A book with many words"""
@@ -24,12 +24,12 @@ class DictFile(FileInfo):
 		file = open(filename)
 		dictinfo = file.readline()
 		dictinfo = dictinfo.split("[N]")[1]
-		self["INFO"] = {}
+		self.INFO = {}
 
 		for sep in self.separate:
-			self["INFO"][self.description[self.separate.index(sep)]] = dictinfo.split(sep)[0]
+			self.INFO[self.description[self.separate.index(sep)]] = dictinfo.split(sep)[0]
 			if self.separate.index(sep) == 2:
-				self[self.description[3]] = dictinfo.split(sep)[1]
+				self.INFO[self.description[3]] = dictinfo.split(sep)[1]
 			else:
 				dictinfo = dictinfo.split(sep)[1]
 		if not light:
@@ -42,3 +42,6 @@ class DictFile(FileInfo):
 					else:
 						self[word.split("[M]")[0]] = word.split("[M]")[1]
 		file.close()
+
+	def to_string(self):
+		return "".join(["%s\t%s" % (k, v) for k, v in self.data.items()])

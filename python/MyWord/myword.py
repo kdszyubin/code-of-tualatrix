@@ -5,11 +5,18 @@ import gtk
 import os
 from choosebook import ChooseBook
 
+def show_info(message, title = "提示", parent = None):
+	dialog = gtk.MessageDialog(None, gtk.DIALOG_MODAL, gtk.MESSAGE_INFO, gtk.BUTTONS_OK)
+	dialog.set_title(title)
+	dialog.set_markup(message)
+	dialog.run()
+	dialog.destroy()
+
 class MyWord(gtk.Window):
 	def __init__(self):
 		gtk.Window.__init__(self)
 
-		self.set_title("MyWord")
+		self.set_title("TXRecite")
 		self.set_size_request(600, 400)
 		self.connect("destroy", lambda *w: gtk.main_quit())
 
@@ -60,9 +67,15 @@ class MyWord(gtk.Window):
 
 		return vbox
 
+	def firstrecite(self):
+		vbox = gtk.VBox(False, 10)
+
 	def button_clicked_cb(self, widget, data = None):
-		print data.select_book
-		self.book.set_current_page(2)
+		if data.select_book:
+			print data.select_book
+			self.book.set_current_page(2)
+		else:
+			show_info("你没有选择任何词典")
 
 	def activate_cb(self, widget, data = None):
 		books = BookList("/usr/share/reciteword/books") 
