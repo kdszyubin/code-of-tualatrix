@@ -7,6 +7,7 @@ import gobject
 
 from dictfile import DictFile
 from reciterecord import ReciteRecord
+from readword import readword
 
 class FirstRecite(gtk.VBox):
 	def __init__(self, book):
@@ -15,14 +16,14 @@ class FirstRecite(gtk.VBox):
 		self.show()
 
 		# Stage 1, Confirm WordList
-		self.wordlist = self.create_wordlist()
-		self.pack_start(self.wordlist)
-
-		# Stage 2, Word Preview
-		self.preview = self.create_wordpreview()
+		self.preview = self.create_preview()
 		self.pack_start(self.preview)
+
+		# Stage 2, te
+		self.wordtest = self.create_test()
+		self.pack_start(self.wordtest)
 		
-	def create_wordlist(self):
+	def create_preview(self):
 		hpaned = gtk.HPaned()
 		hpaned.show()
 
@@ -53,21 +54,26 @@ class FirstRecite(gtk.VBox):
 
 		return hpaned
 
-	def create_wordpreview(self):
+	def create_test(self):
 		vbox = gtk.VBox(False, 0)
 
-		en = gtk.Label("EN")
-		en.show()
-		vbox.pack_start(en)
 		cn = gtk.Label("CN")
 		cn.show()
 		vbox.pack_start(cn)
 
+		entry = gtk.Entry()
+		entry.connect("key-press-event", self.type_cb)
+		entry.show()
+		vbox.pack_start(entry)
+
 		return vbox
 
+	def type_cb(self, widget, data = None):
+		readword(type = True)
+
 	def button_clicked_cb(self, widget, data = None):
-		self.wordlist.hide()
-		self.preview.show()
+		self.preview.hide()
+		self.wordtest.show()
 
 	def create_listview(self):
 		listview = gtk.TreeView()
@@ -95,7 +101,17 @@ class FirstRecite(gtk.VBox):
 		column = gtk.TreeViewColumn("中文解释", renderer, text = 1)
 		listview.append_column(column)
 
+		selection = listview.get_selection()
+		selection.set_mode(gtk.SELECTION_SINGLE)
+		selection.connect("changed", self.selection_changed)
+
 		return listview, record
+
+	def selection_changed(self, widget, data = None):
+		model = widget.get_selected()[0]
+		iter = widget.get_selected()[1]
+		if iter:
+			readword(model.get_value(iter, 0))
 
 if __name__ == "__main__":
 	win = gtk.Window()
