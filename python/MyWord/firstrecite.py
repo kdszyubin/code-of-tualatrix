@@ -7,7 +7,7 @@ import gobject
 
 from dictfile import DictFile
 from reciterecord import ReciteRecord
-from readword import readword
+from readword import readword, typeword, delword
 
 class FirstRecite(gtk.VBox):
 	def __init__(self, book):
@@ -57,19 +57,27 @@ class FirstRecite(gtk.VBox):
 	def create_test(self):
 		vbox = gtk.VBox(False, 0)
 
-		cn = gtk.Label("CN")
+		cn = gtk.Label(self.rr.dict[self.rr.words[0]])
 		cn.show()
 		vbox.pack_start(cn)
 
 		entry = gtk.Entry()
-		entry.connect("key-press-event", self.type_cb)
+		entry.connect("activate", self.check_cb)
+		entry.connect("insert-text", self.type_cb)
+		entry.connect("backspace", self.backspace_cb)
 		entry.show()
 		vbox.pack_start(entry)
 
 		return vbox
 
-	def type_cb(self, widget, data = None):
-		readword(type = True)
+	def type_cb(self, widget, new_text, new_text_length, position, data = None):
+		typeword()
+
+	def backspace_cb(self, widget, data = None):
+		delword()
+
+	def check_cb(self, widget, data = None):
+		pass
 
 	def button_clicked_cb(self, widget, data = None):
 		self.preview.hide()
