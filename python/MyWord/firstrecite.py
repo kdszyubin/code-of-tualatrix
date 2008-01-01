@@ -4,12 +4,13 @@
 import os
 import gtk
 import datetime 
+import time
 import cPickle as pickle
 from dictfile import DictFile
 
 class ReciteRecord:
-	def __init__(self, path, count = 25):
-		self.dict = DictFile(path)
+	def __init__(self, book, count = 25):
+		self.dict = DictFile(book)
 		self.INTERVAL = (0, 1, 1, 2, 3, 7)
 		self.words = []
 		self.exclude = []
@@ -31,6 +32,7 @@ class ReciteRecord:
 			else:
 				if rr.dict.INFO["TITLE"] == self.dict.INFO["TITLE"]:
 					self.exclude.extend(rr.words)
+		f.close()
 
 		for k in self.dict.keys():
 			if k in self.exclude:
@@ -55,12 +57,15 @@ class ReciteRecord:
 		 return "".join(["%s\t%s" % (word, self.dict[word]) for word in self.words])
 
 class FirstRecite(gtk.VBox):
-	def __init__(self, path):
+	def __init__(self, book = None):
 		gtk.VBox.__init__(self)
-		self.path = path
+		if book:
+			self.book = book
+			self.create_words_list()
 
-		hpaned = gtk.HPaned()
-		self.pack_start(hpaned)
+	def create_words_list(self):
+		self.hpaned = gtk.HPaned()
+		self.pack_start(self.hpaned)
 
 		sw = gtk.ScrolledWindow()
 		sw.set_size_request(200, -1)
@@ -70,22 +75,36 @@ class FirstRecite(gtk.VBox):
 		textview, self.rr = self.create_textview()
 		sw.add(textview)
 
-		hpaned.pack1(sw)
+		self.hpaned.pack1(sw)
 
 		vbox = gtk.VBox(False, 10)
 		button = gtk.Button("确定")
+		button.connect("clicked", self.button_clicked_cb)
 		vbox.pack_end(button, False, False, 0)
 
 		button = gtk.Button("返回")
 		vbox.pack_end(button, False, False, 0)
 
-		hpaned.pack2(vbox)
+		self.hpaned.pack2(vbox)
+
+	def button_clicked_cb(self, widget, data = None):
+		self.hpaned.destroy()
+		self.create_wordpreview()
+
+	def create_wordpreview(self):
+		en = gtk.Label("")
+		self.pack_start(en)
+		cn = gtk.Label("")
+		self.pack_start(cn)
+		for word in self.rr.words:
+			en.set_text(word)
+			cn.set_text(self.rr.dict[word])
 
 	def create_textview(self):
 		textview = gtk.TextView()
 		buffer = gtk.TextBuffer()
 		
-		record = ReciteRecord(self.path)
+		record = ReciteRecord(self.book)
 		buffer.set_text(record.list_word())
 
 		textview.set_buffer(buffer)
@@ -99,6 +118,7 @@ if __name__ == "__main__":
         win.set_default_size(300, 300)
         win.set_border_width(8)
 
+#        vbox = FirstRecite()
         vbox = FirstRecite("/usr/share/reciteword/books/qqssbdc/cykych/ck-kq.bok")
         win.add(vbox)
 

@@ -4,6 +4,7 @@
 import gtk
 import os
 from choosebook import ChooseBook
+from firstrecite import FirstRecite
 
 def show_info(message, title = "提示", parent = None):
 	dialog = gtk.MessageDialog(None, gtk.DIALOG_MODAL, gtk.MESSAGE_INFO, gtk.BUTTONS_OK)
@@ -33,11 +34,12 @@ class MyWord(gtk.Window):
 
 		#page 选书
 		label = gtk.Label("选书")
-		self.book.append_page(self.choosebook(), label)
+		self.book.append_page(self.create_choosebook(), label)
 
-		button = gtk.Button("Welcome")
+		#初记
+		self.firstrecite = self.create_firstrecite()
 		label = gtk.Label("初记")
-		self.book.append_page(button, label)
+		self.book.append_page(self.firstrecite, label)
 
 		button = gtk.Button("Welcome")
 		label = gtk.Label("复习")
@@ -49,7 +51,7 @@ class MyWord(gtk.Window):
 
 		self.show_all()
 
-	def choosebook(self):
+	def create_choosebook(self):
 		vbox = gtk.VBox(False, 10)
 
 		book = ChooseBook()
@@ -62,18 +64,19 @@ class MyWord(gtk.Window):
 		hbox.pack_end(button, False, False ,0)
 
 		button = gtk.Button(stock = gtk.STOCK_OK)
-		button.connect("clicked", self.button_clicked_cb, book)
+		button.connect("clicked", self.select_book_cb, book)
 		hbox.pack_end(button, False, False ,0)
 
 		return vbox
 
-	def firstrecite(self):
-		vbox = gtk.VBox(False, 10)
+	def create_firstrecite(self, book = None):
+		return FirstRecite(book)
 
-	def button_clicked_cb(self, widget, data = None):
+	def select_book_cb(self, widget, data = None):
 		if data.select_book:
 			print data.select_book
-			self.book.set_current_page(2)
+			self.firstrecite.book = data.select_book
+			self.firstrecite.start_recite()
 		else:
 			show_info("你没有选择任何词典")
 
