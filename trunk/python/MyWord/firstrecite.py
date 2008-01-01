@@ -57,16 +57,21 @@ class FirstRecite(gtk.VBox):
 	def create_test(self):
 		vbox = gtk.VBox(False, 0)
 
-		cn = gtk.Label(self.rr.dict[self.rr.words[0]])
-		cn.show()
-		vbox.pack_start(cn)
+		self.cn = gtk.Label(self.rr.dict[self.rr.words[0]])
+		self.cn.set_alignment(0, 0)
+		self.cn.show()
+		vbox.pack_start(self.cn, False, False, 0)
 
-		entry = gtk.Entry()
-		entry.connect("activate", self.check_cb)
-		entry.connect("insert-text", self.type_cb)
-		entry.connect("backspace", self.backspace_cb)
-		entry.show()
-		vbox.pack_start(entry)
+		self.entry = gtk.Entry()
+		self.entry.connect("activate", self.check_cb)
+		self.entry.connect("insert-text", self.type_cb)
+		self.entry.connect("backspace", self.backspace_cb)
+		self.entry.show()
+		vbox.pack_start(self.entry, False, False, 0)
+
+		self.result = gtk.Label()
+		self.result.set_alignment(0, 0)
+		vbox.pack_start(self.result, False, False, 0)
 
 		return vbox
 
@@ -77,7 +82,8 @@ class FirstRecite(gtk.VBox):
 		delword()
 
 	def check_cb(self, widget, data = None):
-		pass
+		self.result.show()
+		self.result.set_text("Hello")
 
 	def button_clicked_cb(self, widget, data = None):
 		self.preview.hide()
