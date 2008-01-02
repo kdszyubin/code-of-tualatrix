@@ -8,13 +8,19 @@ import gobject
 from dictfile import DictFile
 from reciterecord import ReciteRecord
 from playsound import read, play
+from widgets import show_info
 
 class FirstRecite(gtk.VBox):
 	def __init__(self, book):
 		gtk.VBox.__init__(self)
+		self.show()
+
 		self.book = book
 		self.pause = False
-		self.show()
+		self.passed = []
+		self.failed = []
+		self.correct = False
+		self.second = False
 
 		# Stage 1, Confirm WordList
 		self.preview = self.create_preview()
@@ -39,7 +45,7 @@ class FirstRecite(gtk.VBox):
 
 		hpaned.pack1(sw)
 
-		vbox = gtk.VBox(False, 10)
+		vbox = gtk.VBox(False, 5)
 		vbox.show()
 
 		button = gtk.Button("确定")
@@ -79,20 +85,83 @@ class FirstRecite(gtk.VBox):
 
 	def check_cb(self, widget, data = None):
 		if self.pause == True:
-			self.result.hide()
-			self.result.set_text("")
-			self.entry.set_text("")
-			self.pause = False
+			if self.correct:
+				sum = len(self.failed)
+				print "正在改正，还有%d题" % sum
+				if len(self.failed) > 0:
+					self.now = self.failed[len(self.failed) - 1]
+					self.cn.set_text(self.rr.dict[self.now])
+					self.result.hide()
+					self.result.set_text("")
+					self.entry.set_text("")
+					self.pause = False
+				else:
+					if self.second:
+						show_info("初记完成了！下次再提醒你复习！")
+					else:
+						self.second = True
+						self.correct = False
+						self.passed = []
+						self.failed = []
+
+						self.now = self.rr.words[0]
+						self.cn.set_text(self.rr.dict[self.now])
+						self.result.hide()
+						self.result.set_text("")
+						self.entry.set_text("")
+						self.pause = False
+						show_info("做了好几遍才做好啊！再复习一遍")
+			else:
+				sum = len(self.passed) + len(self.failed)
+				print "已经答了%d" % sum
+				if sum < len(self.rr.words):
+					self.now = self.rr.words[sum]
+	#				self.cn.set_text(self.now)
+					self.cn.set_text(self.rr.dict[self.now])
+					self.result.hide()
+					self.result.set_text("")
+					self.entry.set_text("")
+					self.pause = False
+				else:
+					if len(self.failed) == 0:
+						if self.second:
+							show_info("好了！等我提醒你复习吧！")
+						else:
+							show_info("答完了！再复习一遍")
+							self.second = True
+							self.correct= False
+							self.passed = []
+							self.failed = []
+
+							self.now = self.rr.words[0]
+							self.cn.set_text(self.rr.dict[self.now])
+							self.result.hide()
+							self.result.set_text("")
+							self.entry.set_text("")
+							self.pause = False
+					else:
+						self.correct = True
+						self.now = self.failed[len(self.failed) - 1]
+						self.cn.set_text(self.rr.dict[self.now])
+						self.result.hide()
+						self.result.set_text("")
+						self.entry.set_text("")
+						self.pause = False
 		else:
 			self.pause = True
 			if self.now == self.entry.get_text():
 				self.result.show()
 				self.result.set_text("正确.按任意键继续.")
 				play("answerok")
+				if self.now in self.failed:
+					self.failed.remove(self.now)
+				self.passed.append(self.now)
 			else:
 				self.result.show()
 				self.result.set_text("错误.正确的应该是%s.按任意键继续" % self.now)
 				play("answerno")
+				if not self.now in self.failed:
+					self.failed.append(self.now)
 
 	def type_cb(self, widget, new_text, new_text_length, position, data = None):
 		if not self.pause:
@@ -114,7 +183,7 @@ class FirstRecite(gtk.VBox):
 				gobject.TYPE_STRING,
 				gobject.TYPE_STRING)
 
-		record = ReciteRecord(self.book)
+		record = ReciteRecord(self.book, count = 5)
 
 		for word in record.words:
 			iter = model.append()
