@@ -7,19 +7,20 @@ import gobject
 
 from dictfile import DictFile
 from reciterecord import ReciteRecord
-from readword import readword, typeword, delword
+from playsound import read, play
 
 class FirstRecite(gtk.VBox):
 	def __init__(self, book):
 		gtk.VBox.__init__(self)
 		self.book = book
+		self.pause = False
 		self.show()
 
 		# Stage 1, Confirm WordList
 		self.preview = self.create_preview()
 		self.pack_start(self.preview)
 
-		# Stage 2, te
+		# Stage 2, test function
 		self.wordtest = self.create_test()
 		self.pack_start(self.wordtest)
 		
@@ -57,7 +58,8 @@ class FirstRecite(gtk.VBox):
 	def create_test(self):
 		vbox = gtk.VBox(False, 0)
 
-		self.cn = gtk.Label(self.rr.dict[self.rr.words[0]])
+		self.now = self.rr.words[0]
+		self.cn = gtk.Label(self.rr.dict[self.now])
 		self.cn.set_alignment(0, 0)
 		self.cn.show()
 		vbox.pack_start(self.cn, False, False, 0)
@@ -75,18 +77,33 @@ class FirstRecite(gtk.VBox):
 
 		return vbox
 
+	def check_cb(self, widget, data = None):
+		if self.pause == True:
+			self.result.hide()
+			self.result.set_text("")
+			self.entry.set_text("")
+			self.pause = False
+		else:
+			self.pause = True
+			if self.now == self.entry.get_text():
+				self.result.show()
+				self.result.set_text("正确.按任意键继续.")
+				play("answerok")
+			else:
+				self.result.show()
+				self.result.set_text("错误.正确的应该是%s.按任意键继续" % self.now)
+				play("answerno")
+
 	def type_cb(self, widget, new_text, new_text_length, position, data = None):
-		typeword()
+		if not self.pause:
+			play("type")
 
 	def backspace_cb(self, widget, data = None):
-		delword()
-
-	def check_cb(self, widget, data = None):
-		self.result.show()
-		self.result.set_text("Hello")
+		play("back")
 
 	def button_clicked_cb(self, widget, data = None):
 		self.preview.hide()
+		self.entry.grab_focus()
 		self.wordtest.show()
 
 	def create_listview(self):
@@ -125,7 +142,7 @@ class FirstRecite(gtk.VBox):
 		model = widget.get_selected()[0]
 		iter = widget.get_selected()[1]
 		if iter:
-			readword(model.get_value(iter, 0))
+			read(model.get_value(iter, 0))
 
 if __name__ == "__main__":
 	win = gtk.Window()
@@ -134,10 +151,10 @@ if __name__ == "__main__":
         win.set_default_size(300, 300)
         win.set_border_width(8)
 
-#        vbox = FirstRecite()
+#       vbox = FirstRecite()
         vbox = FirstRecite("/usr/share/reciteword/books/qqssbdc/cykych/ck-kq.bok")
 	vbox.show()
         win.add(vbox)
 
-        win.show()
+        win.show_all()
 	gtk.main()
