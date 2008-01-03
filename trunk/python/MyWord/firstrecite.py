@@ -15,12 +15,22 @@ class FirstRecite(gtk.VBox):
 		gtk.VBox.__init__(self)
 		self.show()
 
+		#当前选好的供背诵的书本
 		self.book = book
+		#rr属性即ReciteRecord
+		self.rr = None
+		#model属性是当前单词的列表，动态更新
+		self.model = None
+		#pause属性来判断单词测试时，是输入状态还是确认状态
 		self.pause = False
-		self.passed = []
-		self.failed = []
+		#correct属性用来决定当前是否是改正模式
 		self.correct = False
+		#second属性用来决定当前是否是第二次强化
 		self.second = False
+		#passed列表中存储测试中通过的单词
+		self.passed = []
+		#failed列表中存储测试中做错的单词，供第二次改正时使用
+		self.failed = []
 
 		# Stage 1, Confirm WordList
 		self.preview = self.create_preview()
@@ -40,13 +50,26 @@ class FirstRecite(gtk.VBox):
 		sw.set_shadow_type(gtk.SHADOW_ETCHED_IN)
 		sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
 
-		listview, self.rr = self.create_listview()
+		listview = self.create_listview()
 		sw.add(listview)
 
 		hpaned.pack1(sw)
 
 		vbox = gtk.VBox(False, 5)
 		vbox.show()
+
+		hbox = gtk.HBox(False, 0)
+		hbox.show()
+		vbox.pack_start(hbox, False, False, 0)
+
+		label = gtk.Label("你要背诵几个单词?")
+		label.show()
+		hbox.pack_start(label, False, False, 0)
+
+		spinbutton = gtk.SpinButton(gtk.Adjustment(25, 10, 100, 1, 1, 1))
+		spinbutton.connect("value-changed", self.value_changed_cb)
+		spinbutton.show()
+		hbox.pack_end(spinbutton, False, False, 0)
 
 		button = gtk.Button("确定")
 		button.show()
@@ -61,11 +84,17 @@ class FirstRecite(gtk.VBox):
 
 		return hpaned
 
+	def value_changed_cb(self, widget, data = None):
+		self.model.clear()
+		self.create_model(widget.get_value())
+
 	def create_test(self):
 		vbox = gtk.VBox(False, 0)
 
-		self.now = self.rr.words[0]
-		self.cn = gtk.Label(self.rr.dict[self.now])
+		self.cn = gtk.Label()
+		if self.rr:
+			self.cn.set_text(self.rr.dict[self.now])
+			self.now = self.rr.words[0]
 		self.cn.set_alignment(0, 0)
 		self.cn.show()
 		vbox.pack_start(self.cn, False, False, 0)
@@ -77,9 +106,16 @@ class FirstRecite(gtk.VBox):
 		self.entry.show()
 		vbox.pack_start(self.entry, False, False, 0)
 
+		hbox = gtk.HBox(False, 0)
+		vbox.pack_start(hbox, False, False, 0)
+
 		self.result = gtk.Label()
 		self.result.set_alignment(0, 0)
-		vbox.pack_start(self.result, False, False, 0)
+		hbox.pack_start(self.result, False, False, 0)
+
+		self.progress = gtk.Label()
+		self.result.set_alignment(1,0)
+		hbox.pack_end(self.progress, False, False, 0)
 
 		return vbox
 
@@ -87,7 +123,7 @@ class FirstRecite(gtk.VBox):
 		if self.pause == True:
 			if self.correct:
 				sum = len(self.failed)
-				print "正在改正，还有%d题" % sum
+				self.progress.set_text("正在改正，还有%d题" % sum)
 				if len(self.failed) > 0:
 					self.now = self.failed[len(self.failed) - 1]
 					self.cn.set_text(self.rr.dict[self.now])
@@ -113,7 +149,7 @@ class FirstRecite(gtk.VBox):
 						show_info("做了好几遍才做好啊！再复习一遍")
 			else:
 				sum = len(self.passed) + len(self.failed)
-				print "已经答了%d" % sum
+				self.progress.set_text("第%d个(共%d)" % (sum, self.rr.num))
 				if sum < len(self.rr.words):
 					self.now = self.rr.words[sum]
 	#				self.cn.set_text(self.now)
@@ -141,6 +177,7 @@ class FirstRecite(gtk.VBox):
 							self.pause = False
 					else:
 						self.correct = True
+						show_info("你错了好几个啊！现在改正一下！")
 						self.now = self.failed[len(self.failed) - 1]
 						self.cn.set_text(self.rr.dict[self.now])
 						self.result.hide()
@@ -179,19 +216,14 @@ class FirstRecite(gtk.VBox):
 		listview = gtk.TreeView()
 		listview.show()
 
-		model = gtk.ListStore(
+		self.model = gtk.ListStore(
 				gobject.TYPE_STRING,
 				gobject.TYPE_STRING)
 
-		record = ReciteRecord(self.book, count = 5)
+		listview.set_model(self.model)
 
-		for word in record.words:
-			iter = model.append()
-			model.set(iter,
-				0, word,
-				1, record.dict[word].strip())
-
-		listview.set_model(model)
+		if self.book:
+			self.create_model()
 
 		renderer = gtk.CellRendererText()
 		column = gtk.TreeViewColumn("单词", renderer, text = 0)
@@ -205,7 +237,16 @@ class FirstRecite(gtk.VBox):
 		selection.set_mode(gtk.SELECTION_SINGLE)
 		selection.connect("changed", self.selection_changed)
 
-		return listview, record
+		return listview
+
+	def create_model(self, count = 25):
+		self.rr = ReciteRecord(self.book, count)
+
+		for word in self.rr.words:
+			iter = self.model.append()
+			self.model.set(iter,
+				0, word,
+				1, self.rr.dict[word].strip())
 
 	def selection_changed(self, widget, data = None):
 		model = widget.get_selected()[0]
