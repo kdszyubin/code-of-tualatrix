@@ -6,6 +6,7 @@ import os
 from choosebook import ChooseBook
 from firstrecite import FirstRecite
 from widgets import show_info
+from result import Result
 
 class MyWord(gtk.Window):
 	def __init__(self):
@@ -22,9 +23,9 @@ class MyWord(gtk.Window):
 		self.book.set_tab_pos(gtk.POS_LEFT)
 		vbox.pack_start(self.book)
 
-		button = gtk.Button("Welcome")
+		welcome = self.welcome()
 		label = gtk.Label("欢迎")
-		self.book.append_page(button, label)
+		self.book.append_page(welcome, label)
 
 		#page 选书
 		label = gtk.Label("选书")
@@ -39,13 +40,22 @@ class MyWord(gtk.Window):
 		label = gtk.Label("复习")
 		self.book.append_page(button, label)
 
-		button = gtk.Button("Welcome")
+		self.result = Result()
 		label = gtk.Label("成绩")
-		self.book.append_page(button, label)
+		self.book.append_page(self.result, label)
 
 		self.show_all()
 
 		self.book.set_current_page(0)
+
+	def welcome(self):
+		vbox = gtk.VBox(False, 10)
+
+		label = gtk.Label()
+		label.set_markup("Hello！欢迎使用Myword背单词软件！")
+		vbox.pack_start(label)
+
+		return vbox
 
 	def create_choosebook(self):
 		vbox = gtk.VBox(False, 10)
