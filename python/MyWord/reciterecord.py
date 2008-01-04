@@ -8,13 +8,22 @@ from dictfile import DictFile
 
 class ReciteRecord:
 	def __init__(self, book, count = 25):
+		#dict，书名
 		self.dict = DictFile(book)
-		self.INTERVAL = (0, 1, 1, 2, 3, 7)
+		#6次复习间隔
+		self.INTERVAL = (0, 1, 1, 2, 3, 7, 14)
+		#背诵单词列表
 		self.words = []
+		#exclude用于如果是同一本书，则选不包括的单词
 		self.exclude = []
+		#count即单词数，用于产生words的数目
 		self.num = count
+		#7-time表示还需要几次复习
 		self.time = 1
+		#next下次背诵时间
 		self.next = self.nextime(True)
+		#group书的第几组
+		self.group = 1
 
 		f = file(os.path.join(os.path.expanduser("~"), ".myword/record"), "rb")
 		
@@ -30,6 +39,7 @@ class ReciteRecord:
 			else:
 				if rr.dict.INFO["TITLE"] == self.dict.INFO["TITLE"]:
 					self.exclude.extend(rr.words)
+					self.group += 1
 		f.close()
 
 		for k in self.dict.keys():
@@ -56,7 +66,7 @@ class ReciteRecord:
 
 if __name__ == "__main__":
 	rr = ReciteRecord("/usr/share/reciteword/books/qqssbdc/cykych/ck-kq.bok")
-	print "The dict is %s." % rr.dict.INFO["TITLE"]
-	print "words to recite %s." % rr.words
-	print "You have revised for %d time(s)." % rr.time
-	print "Next time to revise is %s" % rr.next
+	print "要背诵的书是:%s." % rr.dict.INFO["TITLE"]
+	print "需要背育的单词是:%s." % rr.words
+	print "还需要复习%d次才算掌握." % (7 - rr.time)
+	print "下次复习的时间是:%s" % rr.next

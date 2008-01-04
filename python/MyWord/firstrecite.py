@@ -4,6 +4,7 @@
 import os
 import gtk
 import gobject
+import cPickle as pickle
 
 from dictfile import DictFile
 from reciterecord import ReciteRecord
@@ -39,6 +40,11 @@ class FirstRecite(gtk.VBox):
 		# Stage 2, test function
 		self.wordtest = self.create_test()
 		self.pack_start(self.wordtest)
+
+	def save_record(self):
+		f = file(os.path.join(os.path.expanduser("~", ".myword/record"), "ab"))
+		pickle.dump(self.rr, f, True)
+		f.close()
 		
 	def create_preview(self):
 		hpaned = gtk.HPaned()
@@ -49,11 +55,10 @@ class FirstRecite(gtk.VBox):
 		sw.set_size_request(200, -1)
 		sw.set_shadow_type(gtk.SHADOW_ETCHED_IN)
 		sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+		hpaned.pack1(sw)
 
 		listview = self.create_listview()
 		sw.add(listview)
-
-		hpaned.pack1(sw)
 
 		vbox = gtk.VBox(False, 5)
 		vbox.show()
