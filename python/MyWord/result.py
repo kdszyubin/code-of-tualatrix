@@ -95,7 +95,6 @@ class Result(gtk.VBox):
 					COLUMN_TIMES, 7 - rr.time,
 					COLUMN_NEXT, rr.next)
 		self.result.set_markup("你一共背了<b>%d</b>个单词，强化复习了<b>%d</b>个单词" % (self.ing, self.finished))
-
 		f.close()
 
 if __name__ == "__main__":
