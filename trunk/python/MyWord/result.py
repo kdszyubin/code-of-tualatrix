@@ -22,6 +22,12 @@ class Result(gtk.VBox):
 		gtk.VBox.__init__(self, False, 10)
 		self.rr = None
 
+		self.ing = 0
+		self.finished = 0
+
+		self.result = gtk.Label()
+		self.pack_start(self.result)
+
 		listview = self.create_listview()
 
 		self.pack_start(listview)
@@ -78,12 +84,17 @@ class Result(gtk.VBox):
 				print "载入完毕"
 			else:
 				iter = self.model.append()
+				if rr.time < 7:
+					self.ing += len(rr.words)
+				else:
+					self.finished += len(rr.words)
 				self.model.set(iter,
 					COLUMN_TITLE, rr.dict.INFO["TITLE"],
 					COLUMN_GROUP, rr.group,
 					COLUMN_NUM, len(rr.words),
 					COLUMN_TIMES, 7 - rr.time,
 					COLUMN_NEXT, rr.next)
+		self.result.set_markup("你一共背了<b>%d</b>个单词，强化复习了<b>%d</b>个单词" % (self.ing, self.finished))
 
 		f.close()
 
