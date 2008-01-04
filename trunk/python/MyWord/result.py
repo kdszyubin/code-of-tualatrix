@@ -4,13 +4,23 @@
 import gtk
 import gobject
 import os
+import cPickle as pickle
 
 from dictfile import DictFile
+
+(
+	COLUMN_TITLE,
+	COLUMN_GROUP,
+	COLUMN_NUM,
+	COLUMN_TIMES,
+	COLUMN_NEXT,
+) = range(5)
 
 class Result(gtk.VBox):
 
 	def __init__(self):
 		gtk.VBox.__init__(self, False, 10)
+		self.rr = None
 
 		listview = self.create_listview()
 
@@ -23,29 +33,59 @@ class Result(gtk.VBox):
 
 		self.model = gtk.ListStore(
 				gobject.TYPE_STRING,
+				gobject.TYPE_STRING,
+				gobject.TYPE_STRING,
+				gobject.TYPE_STRING,
 				gobject.TYPE_STRING)
 
 		listview.set_model(self.model)
 
-		if self.book:
-			self.create_model()
+		self.create_model()
 
 		renderer = gtk.CellRendererText()
-		column = gtk.TreeViewColumn("书名", renderer, text = 0)
+		column = gtk.TreeViewColumn("书名", renderer, text = COLUMN_TITLE)
 		listview.append_column(column)
 
 		renderer = gtk.CellRendererText()
-		column = gtk.TreeViewColumn("单词数", renderer, text = 1)
+		column = gtk.TreeViewColumn("组别", renderer, text = COLUMN_GROUP)
 		listview.append_column(column)
 
 		renderer = gtk.CellRendererText()
-		column = gtk.TreeViewColumn("还需要复习次数", renderer, text = 1)
+		column = gtk.TreeViewColumn("单词数", renderer, text = COLUMN_NUM)
+		listview.append_column(column)
 
-		selection = listview.get_selection()
-		selection.set_mode(gtk.SELECTION_SINGLE)
-		selection.connect("changed", self.selection_changed)
+		renderer = gtk.CellRendererText()
+		column = gtk.TreeViewColumn("剩余复习次数", renderer, text = COLUMN_TIMES)
+		listview.append_column(column)
+
+		renderer = gtk.CellRendererText()
+		column = gtk.TreeViewColumn("下次复习时间", renderer, text = COLUMN_NEXT)
+		listview.append_column(column)
 
 		return listview	
+
+	def create_model(self):
+		f = file(os.path.join(os.path.expanduser("~"), ".myword/record"), "rb")
+		Loading = True
+
+		while Loading:
+			try:
+				rr = pickle.load(f)
+			except pickle.UnpicklingError:
+				print "截入错误，应该是空记录"
+			except EOFError:
+				Loading = False
+				print "载入完毕"
+			else:
+				iter = self.model.append()
+				self.model.set(iter,
+					COLUMN_TITLE, rr.dict.INFO["TITLE"],
+					COLUMN_GROUP, rr.group,
+					COLUMN_NUM, len(rr.words),
+					COLUMN_TIMES, 7 - rr.time,
+					COLUMN_NEXT, rr.next)
+
+		f.close()
 
 if __name__ == "__main__":
 	win = gtk.Window()
