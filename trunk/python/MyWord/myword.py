@@ -45,6 +45,8 @@ class MyWord(gtk.Window):
 
 		self.show_all()
 
+		self.book.set_current_page(0)
+
 	def create_choosebook(self):
 		vbox = gtk.VBox(False, 10)
 
@@ -70,7 +72,7 @@ class MyWord(gtk.Window):
 		if data.select_book:
 			print data.select_book
 			self.firstrecite.book = data.select_book
-			self.firstrecite.start_recite()
+			self.firstrecite.create_model()
 		else:
 			show_info("你没有选择任何词典")
 
