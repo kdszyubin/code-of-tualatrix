@@ -42,7 +42,8 @@ class FirstRecite(gtk.VBox):
 		self.pack_start(self.wordtest)
 
 	def save_record(self):
-		f = file(os.path.join(os.path.expanduser("~", ".myword/record"), "ab"))
+		f = file(os.path.join(os.path.expanduser("~"), ".myword/record"), "ab")
+		print f
 		pickle.dump(self.rr, f, True)
 		f.close()
 		
@@ -71,7 +72,7 @@ class FirstRecite(gtk.VBox):
 		label.show()
 		hbox.pack_start(label, False, False, 0)
 
-		spinbutton = gtk.SpinButton(gtk.Adjustment(25, 10, 100, 1, 1, 1))
+		spinbutton = gtk.SpinButton(gtk.Adjustment(25, 5, 100, 1, 1, 1))
 		spinbutton.connect("value-changed", self.value_changed_cb)
 		spinbutton.show()
 		hbox.pack_end(spinbutton, False, False, 0)
@@ -98,8 +99,8 @@ class FirstRecite(gtk.VBox):
 
 		self.cn = gtk.Label()
 		if self.rr:
-			self.cn.set_text(self.rr.dict[self.now])
 			self.now = self.rr.words[0]
+			self.cn.set_text(self.rr.dict[self.now])
 		self.cn.set_alignment(0, 0)
 		self.cn.show()
 		vbox.pack_start(self.cn, False, False, 0)
@@ -139,6 +140,7 @@ class FirstRecite(gtk.VBox):
 				else:
 					if self.second:
 						show_info("初记完成了！下次再提醒你复习！")
+						self.save_record()
 					else:
 						self.second = True
 						self.correct = False
@@ -167,6 +169,7 @@ class FirstRecite(gtk.VBox):
 					if len(self.failed) == 0:
 						if self.second:
 							show_info("好了！等我提醒你复习吧！")
+							self.save_record()
 						else:
 							show_info("答完了！再复习一遍")
 							self.second = True
