@@ -249,6 +249,8 @@ class FirstRecite(gtk.VBox):
 
 	def create_model(self, count = 25):
 		self.rr = ReciteRecord(self.book, count)
+		self.now = self.rr.words[0]
+		self.cn.set_text(self.rr.dict[self.now])
 
 		for word in self.rr.words:
 			iter = self.model.append()
