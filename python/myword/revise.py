@@ -53,17 +53,15 @@ class Revise(gtk.VBox):
 	def update_record(self):
 		self.rr.next = self.rr.nextime()
 		f = file(os.path.join(os.path.expanduser("~"), ".myword/record"), "wb")
-		if self.keep:
-			for rr in self.keep:
-				pickle.dump(self.rr, f, True)
-
-		if self.queue:
-			for rr in self.queue:
-				pickle.dump(self.rr, f, True)
+		self.queue.extend(self.keep)
+		for rr in self.queue:
+			pickle.dump(rr, f, True)
 			
 		f.close()
 		self.preview.show()
 		self.wordtest.hide()
+
+		self.create_model()
 		
 	def create_reviselist(self):
 		hpaned = gtk.HPaned()
@@ -114,13 +112,16 @@ class Revise(gtk.VBox):
 		vbox.pack_start(self.entry, False, False, 0)
 
 		hbox = gtk.HBox(False, 0)
+		hbox.show()
 		vbox.pack_start(hbox, False, False, 0)
 
 		self.result = gtk.Label()
+		self.result.show()
 		self.result.set_alignment(0, 0)
 		hbox.pack_start(self.result, False, False, 0)
 
 		self.progress = gtk.Label()
+		self.progress.show()
 		self.result.set_alignment(1,0)
 		hbox.pack_end(self.progress, False, False, 0)
 
@@ -235,6 +236,7 @@ class Revise(gtk.VBox):
 		return listview
 
 	def create_model(self):
+		self.model.clear()
 		f = file(os.path.join(os.path.expanduser("~"), ".myword/record"), "rb")
 		Loading = True
 

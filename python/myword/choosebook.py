@@ -85,7 +85,7 @@ class DirList(gtk.TreeView):
 		iter = model.append(None)
 		model.set(iter, COLUMN_DIR, "单词库")
 		child_iter = model.append(iter)
-		mybookdir = os.path.join(os.path.expanduser("~"),".reciteword/books")
+		mybookdir = os.path.join(os.path.expanduser("~"),".myword/books")
 		model.set(child_iter,
 			COLUMN_DIR, "我的生词库",
 			COLUMN_PATH, mybookdir)

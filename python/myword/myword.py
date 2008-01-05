@@ -14,6 +14,8 @@ class MyWord(gtk.Window):
 	def __init__(self):
 		gtk.Window.__init__(self)
 
+		self.config_test()
+
 		self.set_title("Myword")
 		self.set_size_request(600, 400)
 		self.connect("destroy", lambda *w: gtk.main_quit())
@@ -55,6 +57,16 @@ class MyWord(gtk.Window):
 		self.show()
 
 		self.book.set_current_page(0)
+
+	def config_test(self):
+		home_dir = os.path.join(os.path.expanduser("~"), ".myword/books")
+		record_file = os.path.join(os.path.expanduser("~"), ".myword/record")
+		if not os.path.exists(home_dir):
+			os.makedirs(home_dir)
+
+		if not os.path.exists(record_file):
+			f = file(record_file, "wb")
+			f.close()
 
 	def welcome(self):
 		vbox = gtk.VBox(False, 10)
@@ -100,29 +112,6 @@ class MyWord(gtk.Window):
 		else:
 			show_info("你没有选择任何词典")
 
-	def activate_cb(self, widget, data = None):
-		books = BookList("/usr/share/reciteword/books") 
-		added = False
-		for book in books:
-			for word in file(book):
-				if word.find("[W]" + widget.get_text() + "[T]") >= 0:
-					tualatrix = open(os.path.join(os.path.expanduser("~"),".reciteword/books/txwords-5.bok"), "a")
-					tualatrix.write(word)
-					tualatrix.close()
-					buffer = gtk.TextBuffer()
-					buffer.set_text("正在搜寻第%d本...找到'%s: %s'并已加入生词本" % ((books.index(book) + 1), widget.get_text(), word.split('[W]')[1].split('[T]')[1].split('[M]')[1].strip()))
-					self.textview.set_buffer(buffer)
-					added = True
-					break
-			if added:
-				break
-			else:
-				buffer = gtk.TextBuffer()
-				buffer.set_text("正在搜寻第%d本...找不到！" % (books.index(book) + 1))
-				self.textview.set_buffer(buffer)
-
-	def backspace_cb(self, widget, data = None):
-		print widget.set_text("")
 def main():
 	MyWord()
 	gtk.main()
