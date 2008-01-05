@@ -17,7 +17,6 @@ from dictfile import DictFile
 ) = range(5)
 
 class Result(gtk.VBox):
-
 	def __init__(self):
 		gtk.VBox.__init__(self, False, 10)
 		self.rr = None
@@ -26,16 +25,16 @@ class Result(gtk.VBox):
 		self.finished = 0
 
 		self.result = gtk.Label()
+		self.result.show()
 		self.pack_start(self.result)
 
 		listview = self.create_listview()
+		listview.show()
 
 		self.pack_start(listview)
 
 	def create_listview(self):
 		listview = gtk.TreeView()
-
-		listview.show()
 
 		self.model = gtk.ListStore(
 				gobject.TYPE_STRING,
