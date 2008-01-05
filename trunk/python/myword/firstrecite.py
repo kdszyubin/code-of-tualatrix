@@ -233,6 +233,12 @@ class FirstRecite(gtk.VBox):
 
 	def button_clicked_cb(self, widget, data = None):
 		if data:
+			self.pause = False
+			self.correct = False
+			self.second = False
+			self.passed = []
+			self.failed = []
+
 			self.preview.show()
 			self.status.set_markup('<span size="xx-large">单词初记-浏览</span>')
 			self.wordtest.hide()
