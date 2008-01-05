@@ -241,6 +241,7 @@ class Revise(gtk.VBox):
 		while Loading:
 			try:
 				rr = pickle.load(f)
+				print rr
 			except pickle.UnpicklingError:
 				print "截入错误，应该是空记录"
 			except EOFError:
