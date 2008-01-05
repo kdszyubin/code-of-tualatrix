@@ -3,6 +3,8 @@
 
 import gtk
 import os
+
+from revise import Revise
 from choosebook import ChooseBook
 from firstrecite import FirstRecite
 from widgets import show_info
@@ -12,39 +14,45 @@ class MyWord(gtk.Window):
 	def __init__(self):
 		gtk.Window.__init__(self)
 
-		self.set_title("TXRecite")
+		self.set_title("Myword")
 		self.set_size_request(600, 400)
 		self.connect("destroy", lambda *w: gtk.main_quit())
 
 		vbox = gtk.VBox(False, 0)
+		vbox.show()
 		self.add(vbox)
 
 		self.book = gtk.Notebook()
+		self.book.show()
 		self.book.set_tab_pos(gtk.POS_LEFT)
 		vbox.pack_start(self.book)
 
 		welcome = self.welcome()
+		welcome.show()
 		label = gtk.Label("欢迎")
 		self.book.append_page(welcome, label)
 
-		#page 选书
+		#选书
 		label = gtk.Label("选书")
 		self.book.append_page(self.create_choosebook(), label)
 
 		#初记
 		self.firstrecite = self.create_firstrecite()
+		self.firstrecite.show()
 		label = gtk.Label("初记")
 		self.book.append_page(self.firstrecite, label)
 
-		button = gtk.Button("Welcome")
+		#复习
 		label = gtk.Label("复习")
-		self.book.append_page(button, label)
+		self.book.append_page(Revise(), label)
 
+		#成绩
 		self.result = Result()
+		self.result.show()
 		label = gtk.Label("成绩")
 		self.book.append_page(self.result, label)
 
-		self.show_all()
+		self.show()
 
 		self.book.set_current_page(0)
 
@@ -52,6 +60,7 @@ class MyWord(gtk.Window):
 		vbox = gtk.VBox(False, 10)
 
 		label = gtk.Label()
+		label.show()
 		label.set_markup("Hello！欢迎使用Myword背单词软件！")
 		vbox.pack_start(label)
 
@@ -59,17 +68,22 @@ class MyWord(gtk.Window):
 
 	def create_choosebook(self):
 		vbox = gtk.VBox(False, 10)
+		vbox.show()
 
 		book = ChooseBook()
+		book.show()
 		vbox.pack_start(book)
 
 		hbox = gtk.HBox(False, 10)
+		hbox.show()
 		vbox.pack_end(hbox, False, False, 0)
 
 		button = gtk.Button(stock = gtk.STOCK_GO_BACK)
+		button.show()
 		hbox.pack_end(button, False, False ,0)
 
 		button = gtk.Button(stock = gtk.STOCK_OK)
+		button.show()
 		button.connect("clicked", self.select_book_cb, book)
 		hbox.pack_end(button, False, False ,0)
 

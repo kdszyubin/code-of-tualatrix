@@ -138,19 +138,24 @@ class ChooseBook(gtk.VBox):
 		self.select_book = None
 
 		hpaned = gtk.HPaned()
+		hpaned.show()
 		self.pack_start(hpaned)
 
 		listview = BookList(self)
+		listview.show()
 
 		sw = gtk.ScrolledWindow()
+		sw.show()
 		sw.set_shadow_type(gtk.SHADOW_ETCHED_IN)
 		sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
 		hpaned.pack1(sw)
 
-		treeview = DirList("/usr/share/reciteword/books", listview)
+		treeview = DirList("books", listview)
+		treeview.show()
 		sw.add(treeview)
 
 		sw = gtk.ScrolledWindow()
+		sw.show()
 		sw.set_shadow_type(gtk.SHADOW_ETCHED_IN)
 		sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
 		hpaned.pack2(sw)
@@ -165,7 +170,8 @@ if __name__ == "__main__":
         win.set_border_width(8)
 
         vbox = ChooseBook()
+	vbox.show()
         win.add(vbox)
 
-        win.show_all()
+        win.show()
 	gtk.main()

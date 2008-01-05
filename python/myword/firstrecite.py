@@ -14,7 +14,6 @@ from widgets import show_info
 class FirstRecite(gtk.VBox):
 	def __init__(self, book):
 		gtk.VBox.__init__(self)
-		self.show()
 
 		#当前选好的供背诵的书本
 		self.book = book
@@ -33,17 +32,21 @@ class FirstRecite(gtk.VBox):
 		#failed列表中存储测试中做错的单词，供第二次改正时使用
 		self.failed = []
 
+		self.status = gtk.Label()
+		self.status.show()
+		self.status.set_markup('<span size="xx-large">单词初记-浏览</span>')
+		self.pack_start(self.status, False, False, 10)
+
 		# Stage 1, Confirm WordList
 		self.preview = self.create_preview()
-		self.pack_start(self.preview)
+		self.pack_start(self.preview, True, True, 10)
 
 		# Stage 2, test function
 		self.wordtest = self.create_test()
-		self.pack_start(self.wordtest)
+		self.pack_start(self.wordtest, False, False, 10)
 
 	def save_record(self):
 		f = file(os.path.join(os.path.expanduser("~"), ".myword/record"), "ab")
-		print f
 		pickle.dump(self.rr, f, True)
 		f.close()
 		
@@ -53,7 +56,7 @@ class FirstRecite(gtk.VBox):
 
 		sw = gtk.ScrolledWindow()
 		sw.show()
-		sw.set_size_request(200, -1)
+		sw.set_size_request(300, -1)
 		sw.set_shadow_type(gtk.SHADOW_ETCHED_IN)
 		sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
 		hpaned.pack1(sw)
@@ -113,6 +116,7 @@ class FirstRecite(gtk.VBox):
 		vbox.pack_start(self.entry, False, False, 0)
 
 		hbox = gtk.HBox(False, 0)
+		hbox.show()
 		vbox.pack_start(hbox, False, False, 0)
 
 		self.result = gtk.Label()
@@ -120,8 +124,18 @@ class FirstRecite(gtk.VBox):
 		hbox.pack_start(self.result, False, False, 0)
 
 		self.progress = gtk.Label()
+		self.progress.show()
 		self.result.set_alignment(1,0)
 		hbox.pack_end(self.progress, False, False, 0)
+
+		hbox = gtk.HBox(False, 0)
+		hbox.show()
+		vbox.pack_start(hbox)
+
+		button = gtk.Button("不背了！")
+		button.show()
+		button.connect("clicked", self.button_clicked_cb, True)
+		hbox.pack_end(button, False, False, 0)
 
 		return vbox
 
@@ -140,6 +154,7 @@ class FirstRecite(gtk.VBox):
 				else:
 					if self.second:
 						show_info("初记完成了！下次再提醒你复习！")
+						self.button_clicked_cb(None, True)
 						self.save_record()
 					else:
 						self.second = True
@@ -169,6 +184,7 @@ class FirstRecite(gtk.VBox):
 					if len(self.failed) == 0:
 						if self.second:
 							show_info("好了！等我提醒你复习吧！")
+							self.button_clicked_cb(None, True)
 							self.save_record()
 						else:
 							show_info("答完了！再复习一遍")
@@ -216,9 +232,15 @@ class FirstRecite(gtk.VBox):
 		play("back")
 
 	def button_clicked_cb(self, widget, data = None):
-		self.preview.hide()
-		self.entry.grab_focus()
-		self.wordtest.show()
+		if data:
+			self.preview.show()
+			self.status.set_markup('<span size="xx-large">单词初记-浏览</span>')
+			self.wordtest.hide()
+		else:
+			self.preview.hide()
+			self.status.set_markup('<span size="xx-large">单词初记-测试</span>')
+			self.entry.grab_focus()
+			self.wordtest.show()
 
 	def create_listview(self):
 		listview = gtk.TreeView()
