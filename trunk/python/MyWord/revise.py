@@ -13,11 +13,12 @@ from playsound import read, play
 from widgets import show_info
 
 (
+	COLUMN_ID,
 	COLUMN_TITLE,
 	COLUMN_GROUP,
 	COLUMN_NUM,
 	COLUMN_TIMES,
-) = range(4)
+) = range(5)
 
 class Revise(gtk.VBox):
 	def __init__(self):
@@ -46,13 +47,23 @@ class Revise(gtk.VBox):
 		self.pack_start(self.preview)
 
 		# Stage 2, test function
-	#	self.wordtest = self.create_test()
-	#	self.pack_start(self.wordtest)
+		self.wordtest = self.create_test()
+		self.pack_start(self.wordtest)
 
 	def update_record(self):
-		f = file(os.path.join(os.path.expanduser("~"), ".myword/record"), "ab")
-		pickle.dump(self.rr, f, True)
+		self.rr.next = self.rr.nextime()
+		f = file(os.path.join(os.path.expanduser("~"), ".myword/record"), "wb")
+		if self.keep:
+			for rr in self.keep:
+				pickle.dump(self.rr, f, True)
+
+		if self.queue:
+			for rr in self.queue:
+				pickle.dump(self.rr, f, True)
+			
 		f.close()
+		self.preview.show()
+		self.wordtest.hide()
 		
 	def create_reviselist(self):
 		hpaned = gtk.HPaned()
@@ -78,10 +89,6 @@ class Revise(gtk.VBox):
 		button = gtk.Button("确定")
 		button.show()
 		button.connect("clicked", self.button_clicked_cb)
-		vbox.pack_end(button, False, False, 0)
-
-		button = gtk.Button("返回")
-		button.show()
 		vbox.pack_end(button, False, False, 0)
 
 		hpaned.pack2(vbox)
@@ -201,6 +208,11 @@ class Revise(gtk.VBox):
 		self.create_model()
 
 		renderer = gtk.CellRendererText()
+		column = gtk.TreeViewColumn("ID", renderer, text = COLUMN_ID)
+		listview.append_column(column)
+
+
+		renderer = gtk.CellRendererText()
 		column = gtk.TreeViewColumn("书名", renderer, text = COLUMN_TITLE)
 		listview.append_column(column)
 
@@ -215,6 +227,10 @@ class Revise(gtk.VBox):
 		renderer = gtk.CellRendererText()
 		column = gtk.TreeViewColumn("第几次复习", renderer, text = COLUMN_TIMES)
 		listview.append_column(column)
+
+		selection = listview.get_selection()
+		selection.set_mode(gtk.SELECTION_SINGLE)
+		selection.connect("changed", self.selection_changed)
 
 		return listview
 
@@ -232,12 +248,16 @@ class Revise(gtk.VBox):
 				print "载入完毕"
 			else:
 				iter = self.model.append()
-				if datetime.date.today() <= rr.next:
+				if datetime.date.today() >= rr.next:
+					self.queue.append(rr)
 					self.model.set(iter,
+						COLUMN_ID, len(self.queue) - 1,
 						COLUMN_TITLE, rr.dict.INFO["TITLE"],
 						COLUMN_GROUP, rr.group,
 						COLUMN_NUM, len(rr.words),
 						COLUMN_TIMES, rr.time)
+				else:
+					self.keep.append(rr)
 
 		f.close()
 
@@ -245,7 +265,9 @@ class Revise(gtk.VBox):
 		model = widget.get_selected()[0]
 		iter = widget.get_selected()[1]
 		if iter:
-			read(model.get_value(iter, 0))
+			self.rr = self.queue[int(model.get_value(iter, COLUMN_ID))]
+			self.now = self.rr.words[0]
+			self.cn.set_text(self.rr.dict[self.now])
 
 if __name__ == "__main__":
 	win = gtk.Window()
