@@ -16,7 +16,7 @@ class MyWord(gtk.Window):
 
 		self.config_test()
 
-		self.set_title("Myword")
+		self.set_title("Myword 0.2")
 		self.set_size_request(600, 400)
 		self.connect("destroy", lambda *w: gtk.main_quit())
 
