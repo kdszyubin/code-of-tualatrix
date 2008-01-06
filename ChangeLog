@@ -1,25 +1,28 @@
-2009-01-05
-"MyWord" 0.1
+2008-01-06
+"Myword" 0.2
+
+2008-01-05
+"Myword" 0.1
 
 2008-01-04
-"MyWord" added the result function.
+"Myword" added the result function.
 
 2008-01-02
-"MyWord" almost finished the FirstRecite function
+"Myword" almost finished the FirstRecite function
 
 2008-01-01
-"MyWord" added the readword function
+"Myword" added the readword function
 
 2007-12-31
-"MyWord" added the ReciteRecord class
+"Myword" added the ReciteRecord class
 
 2007-12-30
-"MyWord" finished the ChooseBook function
+"Myword" finished the ChooseBook function
 2007-12-29
-"MyWord" added the BookList class
+"Myword" added the BookList class
 
 2007-12-27
-"MyWord" added the DictFile class
+"Myword" added the DictFile class
 
 2007-12-23
 Added the "Installer"
