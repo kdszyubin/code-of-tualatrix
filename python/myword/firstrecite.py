@@ -101,7 +101,7 @@ class FirstRecite(gtk.VBox):
 		listview.append_column(column)
 
 		selection = listview.get_selection()
-		selection.set_mode(gtk.SELECTION_SINGLE)
+		selection.set_mode(gtk.SELECTION_BROWSE)
 		selection.connect("changed", self.selection_changed)
 
 		return listview
