@@ -20,10 +20,19 @@ class WordTest(gtk.VBox):
 	def __init__(self, rr, test_type, return_to, status, update_model):
 		gtk.VBox.__init__(self)
 
+		hbox = gtk.HBox(False, 0)
+		hbox.show()
+		self.pack_start(hbox, False, False, 0)
+
 		self.cn = gtk.Label()
 		self.cn.show()
 		self.cn.set_alignment(0, 0)
-		self.pack_start(self.cn, False, False, 0)
+		hbox.pack_start(self.cn, False, False, 0)
+
+		button = gtk.Button("读一下!")
+		button.connect("clicked", self.speak_button_clicked)
+		button.show()
+		hbox.pack_end(button, False, False, 0)
 
 		self.entry = gtk.Entry()
 		self.entry.show()
@@ -59,6 +68,9 @@ class WordTest(gtk.VBox):
 		self.update_model = update_model
 
 		self.create_test(rr)
+
+	def speak_button_clicked(self, widget, data = None):
+		read(self.now)
 
 	def create_test(self, rr = None):
 		self.rr = rr 
@@ -134,7 +146,7 @@ class WordTest(gtk.VBox):
 			self.pause = True
 			if self.now == self.entry.get_text():
 				self.result.show()
-				self.result.set_text("正确!按任意键继续.")
+				self.result.set_text("正确!按回车继续.")
 				play("answerok")
 				if self.now in self.failed:
 					self.point = self.failed.index(self.now) - 1
@@ -142,7 +154,7 @@ class WordTest(gtk.VBox):
 				self.passed.append(self.now)
 			else:
 				self.result.show()
-				self.result.set_markup("错误!正确的应该是<b>%s</b>.按任意键继续" % self.now)
+				self.result.set_markup("错误!正确的应该是<b>%s</b>.按回车继续" % self.now)
 				play("answerno")
 				if not self.now in self.failed:
 					self.failed.append(self.now)

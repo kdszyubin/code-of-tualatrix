@@ -34,21 +34,17 @@ class MyWord(gtk.Window):
 		label = gtk.Label("欢迎")
 		self.book.append_page(welcome, label)
 
-		#选书
 		label = gtk.Label("选书")
 		self.book.append_page(self.create_choosebook(), label)
 
-		#初记
 		self.firstrecite = self.create_firstrecite()
 		self.firstrecite.show()
 		label = gtk.Label("初记")
 		self.book.append_page(self.firstrecite, label)
 
-		#复习
 		label = gtk.Label("复习")
 		self.book.append_page(Revise(), label)
 
-		#成绩
 		self.result = Result()
 		self.result.show()
 		label = gtk.Label("成绩")
@@ -57,6 +53,11 @@ class MyWord(gtk.Window):
 		self.show()
 
 		self.book.set_current_page(0)
+		self.book.connect("switch-page", self.switch_page_cb)
+
+	def switch_page_cb(self, widget, page, page_num, data = None):
+		if page_num == 4:
+			self.result.create_model()
 
 	def config_test(self):
 		home_dir = os.path.join(os.path.expanduser("~"), ".myword/books")
@@ -73,7 +74,7 @@ class MyWord(gtk.Window):
 
 		label = gtk.Label()
 		label.show()
-		label.set_markup("Hello！欢迎使用Myword背单词软件！")
+		label.set_markup('<span size="xx-large">欢迎使用Myword背单词软件！</span>')
 		vbox.pack_start(label)
 
 		return vbox
@@ -90,10 +91,6 @@ class MyWord(gtk.Window):
 		hbox.show()
 		vbox.pack_end(hbox, False, False, 0)
 
-		button = gtk.Button(stock = gtk.STOCK_GO_BACK)
-		button.show()
-		hbox.pack_end(button, False, False ,0)
-
 		button = gtk.Button(stock = gtk.STOCK_OK)
 		button.show()
 		button.connect("clicked", self.select_book_cb, book)
@@ -106,9 +103,9 @@ class MyWord(gtk.Window):
 
 	def select_book_cb(self, widget, data = None):
 		if data.select_book:
-			print data.select_book
 			self.firstrecite.book = data.select_book
 			self.firstrecite.create_model()
+			self.book.set_current_page(2)
 		else:
 			show_info("你没有选择任何词典")
 

@@ -24,9 +24,15 @@ class Result(gtk.VBox):
 		self.ing = 0
 		self.finished = 0
 
+		label = gtk.Label()
+		label.show()
+		label.set_markup('<span size="xx-large">你的成绩</span>')
+		self.pack_start(label, False, False, 10)
+
 		self.result = gtk.Label()
+		self.result.set_alignment(0, 0)
 		self.result.show()
-		self.pack_start(self.result)
+		self.pack_start(self.result, False, False, 10)
 
 		listview = self.create_listview()
 		listview.show()
@@ -70,6 +76,9 @@ class Result(gtk.VBox):
 		return listview	
 
 	def create_model(self):
+		self.model.clear()
+		self.ing = 0
+		self.finished = 0
 		f = file(os.path.join(os.path.expanduser("~"), ".myword/record"), "rb")
 		Loading = True
 
