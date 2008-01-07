@@ -42,7 +42,7 @@ class FirstRecite(gtk.VBox):
 
 		sw = gtk.ScrolledWindow()
 		sw.show()
-		sw.set_size_request(300, -1)
+		sw.set_size_request(280, -1)
 		sw.set_shadow_type(gtk.SHADOW_ETCHED_IN)
 		sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
 		hpaned.pack1(sw)

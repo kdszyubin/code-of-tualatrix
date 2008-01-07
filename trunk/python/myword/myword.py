@@ -16,8 +16,10 @@ class MyWord(gtk.Window):
 
 		self.config_test()
 
-		self.set_title("Myword 0.2")
-		self.set_size_request(600, 400)
+		self.set_title("Myword 0.2.5")
+		self.set_icon_from_file("/usr/share/pixmaps/myword.png")
+		self.set_size_request(500, 300)
+		self.set_position(gtk.WIN_POS_CENTER)
 		self.connect("destroy", lambda *w: gtk.main_quit())
 
 		vbox = gtk.VBox(False, 0)
