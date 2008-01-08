@@ -60,6 +60,13 @@ class ReciteRecord:
 				count -= 1
 				if count == 0:
 					break
+
+		self.cleanup()
+
+	def cleanup(self):
+		for word in self.dict.keys():
+			if not word in self.words:
+				del self.dict[word]
 			
 	def nextime(self, first = None):
 		today = datetime.date.today()

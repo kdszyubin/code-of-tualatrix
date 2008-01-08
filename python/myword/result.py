@@ -34,6 +34,11 @@ from dictfile import DictFile
 	COLUMN_NEXT,
 ) = range(5)
 
+(
+	COLUMN_START,
+	COLUMN_FINISH,
+) = range(3,5)
+
 class Result(gtk.VBox):
 	def __init__(self):
 		gtk.VBox.__init__(self, False, 10)
@@ -47,17 +52,16 @@ class Result(gtk.VBox):
 		label.set_markup('<span size="xx-large">你的成绩</span>')
 		self.pack_start(label, False, False, 10)
 
-		self.result = gtk.Label()
-		self.result.set_alignment(0, 0)
-		self.result.show()
-		self.pack_start(self.result, False, False, 10)
+		self.result_ing = gtk.Label()
+		self.result_ing.set_alignment(0, 0)
+		self.result_ing.show()
+		self.pack_start(self.result_ing, False, False, 10)
 
 		listview = self.create_listview()
 		listview.show()
-
 		self.pack_start(listview)
 
-	def create_listview(self):
+	def create_listview(self, finish = None):
 		listview = gtk.TreeView()
 
 		self.model = gtk.ListStore(
@@ -120,7 +124,7 @@ class Result(gtk.VBox):
 					COLUMN_NUM, len(rr.words),
 					COLUMN_TIMES, 7 - rr.time,
 					COLUMN_NEXT, rr.next)
-		self.result.set_markup("你一共背了<b>%d</b>个单词，强化复习了<b>%d</b>个单词" % (self.ing, self.finished))
+		self.result_ing.set_markup("你正在强化记忆<b>%d</b>个单词" % self.ing)
 		f.close()
 
 if __name__ == "__main__":

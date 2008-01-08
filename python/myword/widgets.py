@@ -8,7 +8,7 @@
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
+# (at your button2) any later version.
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,6 +21,7 @@
 
 import gtk
 import os
+import random
 import cPickle as pickle
 
 from playsound import read, play
@@ -31,6 +32,41 @@ def show_info(message, title = "提示", parent = None):
 	dialog.set_markup(message)
 	dialog.run()
 	dialog.destroy()
+
+class WordReview(gtk.VBox):
+	def __init__(self, rr = None):
+		gtk.VBox.__init__(self)
+
+		self.rr = rr
+
+		title = gtk.Label("Insect")
+		title.show()
+		self.pack_start(title, False, False, 0)
+
+		button1 = gtk.RadioButton(None, "小孩")
+		button1.show()
+		button1.connect("toggled", self.toggled_cb)
+		self.pack_start(button1, False, False, 0)
+
+		button2 = gtk.RadioButton(button1, "中孩")
+		button2.show()
+		button2.connect("toggled", self.toggled_cb)
+		self.pack_start(button2, False, False, 0)
+
+		button3 = gtk.RadioButton(button1, "中孩")
+		button3.show()
+		button3.connect("toggled", self.toggled_cb)
+		self.pack_start(button3, False, False, 0)
+
+		button4 = gtk.RadioButton(button1, "中孩")
+		button4.show()
+		button4.connect("toggled", self.toggled_cb)
+		self.pack_start(button4, False, False, 0)
+
+		self.widgets = (button1, button2, button3, button4) 
+
+	def toggled_cb(self, widget, data = None):
+		print self.widgets[random.randint(0, 3)]
 
 class WordTest(gtk.VBox):
 	"""The word test widget for FirstRecite and WordRevise"""
@@ -220,3 +256,20 @@ class WordTest(gtk.VBox):
 
 	def backspace_cb(self, widget, data = None):
 		play("back")
+
+if __name__ == "__main__":
+	from reciterecord import ReciteRecord
+	win = gtk.Window()
+
+	win.connect('destroy', lambda *w: gtk.main_quit())
+	win.set_title("Widget Test")
+        win.set_default_size(300, 300)
+        win.set_border_width(8)
+
+	vbox = WordReview(ReciteRecord("/usr/share/reciteword/books/qqssbdc/cykych/ck-kq.bok"))
+
+        vbox.show()
+        win.add(vbox)
+
+        win.show()
+        gtk.main()
