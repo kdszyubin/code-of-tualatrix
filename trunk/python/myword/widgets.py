@@ -1,6 +1,24 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+# Myword - Python based word recite application
+#
+# Copyright (C) 2008 TualatriX <tualatrix@gmail.com>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
 import gtk
 import os
 import cPickle as pickle
@@ -100,20 +118,25 @@ class WordTest(gtk.VBox):
 						self.now = self.failed[self.point + 1]
 					self.clear_last()
 				else:
-					if self.second:
-						show_info("本次测试结束了！下次再提醒你复习！")
+					if self.test_type == "first":
+						if self.second:
+							show_info("本次测试结束了！下次再提醒你复习！")
+							self.save_record()
+							self.finish_test_cb(None)
+						else:
+							self.second = True
+							self.correct = False
+							self.passed = []
+							self.failed = []
+
+							self.now = self.rr.words[0]
+							self.clear_last()
+							show_info("加油！再复习一遍")
+							self.progress.set_text("第1个(共%d)" % self.rr.num)
+					else:
+						show_info("好了！等我提醒你复习吧！")
 						self.save_record()
 						self.finish_test_cb(None)
-					else:
-						self.second = True
-						self.correct = False
-						self.passed = []
-						self.failed = []
-
-						self.now = self.rr.words[0]
-						self.clear_last()
-						show_info("加油！再复习一遍")
-						self.progress.set_text("第1个(共%d)" % self.rr.num)
 			else:
 				sum = len(self.passed) + len(self.failed)
 				if sum != self.rr.num:
@@ -123,19 +146,24 @@ class WordTest(gtk.VBox):
 					self.clear_last()
 				else:
 					if len(self.failed) == 0:
-						if self.second:
+						if self.test_type == "first":
+							if self.second:
+								show_info("好了！等我提醒你复习吧！")
+								self.save_record()
+								self.finish_test_cb(None)
+							else:
+								show_info("答完了！再复习一遍")
+								self.second = True
+								self.correct= False
+								self.passed = []
+								self.failed = []
+
+								self.now = self.rr.words[0]
+								self.clear_last()
+						else:
 							show_info("好了！等我提醒你复习吧！")
 							self.save_record()
 							self.finish_test_cb(None)
-						else:
-							show_info("答完了！再复习一遍")
-							self.second = True
-							self.correct= False
-							self.passed = []
-							self.failed = []
-
-							self.now = self.rr.words[0]
-							self.clear_last()
 					else:
 						self.correct = True
 						show_info("现在把答错的改正一下！")
