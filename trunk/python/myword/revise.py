@@ -79,34 +79,43 @@ class Revise(gtk.VBox):
 		self.create_model()
 		
 	def create_reviselist(self):
-		hpaned = gtk.HPaned()
-		hpaned.show()
-
-		sw = gtk.ScrolledWindow()
-		sw.show()
-		sw.set_size_request(400, -1)
-		sw.set_shadow_type(gtk.SHADOW_ETCHED_IN)
-		sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-		hpaned.pack1(sw)
-
 		listview = self.create_listview()
-		sw.add(listview)
 
-		vbox = gtk.VBox(False, 5)
-		vbox.show()
+		if self.queue:
+			hpaned = gtk.HPaned()
+			hpaned.show()
 
-		hbox = gtk.HBox(False, 0)
-		hbox.show()
-		vbox.pack_start(hbox, False, False, 0)
+			sw = gtk.ScrolledWindow()
+			sw.show()
+			sw.set_size_request(400, -1)
+			sw.set_shadow_type(gtk.SHADOW_ETCHED_IN)
+			sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+			hpaned.pack1(sw)
 
-		button = gtk.Button("确定")
-		button.show()
-		button.connect("clicked", self.start_revise_cb)
-		vbox.pack_end(button, False, False, 0)
+			sw.add(listview)
 
-		hpaned.pack2(vbox)
+			vbox = gtk.VBox(False, 5)
+			vbox.show()
 
-		return hpaned
+			hbox = gtk.HBox(False, 0)
+			hbox.show()
+			vbox.pack_start(hbox, False, False, 0)
+
+			button = gtk.Button("确定")
+			button.show()
+			button.connect("clicked", self.start_revise_cb)
+			vbox.pack_end(button, False, False, 0)
+
+			hpaned.pack2(vbox)
+
+			return hpaned
+		else:
+			self.status.set_markup('<span size="xx-large">没有复习安排</span>')
+
+			label = gtk.Label("今天好好休息吧！")
+			label.show()
+
+			return label
 
 	def start_revise_cb(self, widget, data = None):
 		self.wordtest.create_test(self.rr)
