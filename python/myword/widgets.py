@@ -26,24 +26,43 @@ import cPickle as pickle
 
 from playsound import read, play
 
-def show_info(message, title = "提示", parent = None):
-	dialog = gtk.MessageDialog(None, gtk.DIALOG_MODAL, gtk.MESSAGE_INFO, gtk.BUTTONS_OK)
+def show_info(message, title = "提示", buttons = gtk.BUTTONS_OK, parent = None):
+	dialog = gtk.MessageDialog(None, gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_INFO, buttons)
 	dialog.set_title(title)
 	dialog.set_markup(message)
 	dialog.run()
 	dialog.destroy()
 
+class MessageDialog(gtk.MessageDialog):
+
+	def __init__(self, 
+			message,
+			title = "提示",
+			parent = None, 
+			flags = 0, 
+			type = gtk.MESSAGE_INFO,
+			buttons = gtk.BUTTONS_YES_NO):
+		gtk.MessageDialog.__init__(self, parent, flags, type, buttons)
+		self.set_markup(message)
+		self.set_title(title)
+
 class WordReview(gtk.VBox):
-	def __init__(self, rr = None):
+	def __init__(self, rr, finish_cb):
 		gtk.VBox.__init__(self)
 
 		self.rr = rr
-		self.now = self.rr.words[0]
+		self.finish_cb = finish_cb
+		self.passed = False
+		self.queue = []
 
-		title = gtk.Label()
-		title.set_markup('<span size="x-large">%s</span>' % self.now)
-		title.show()
-		self.pack_start(title, False, False, 20)
+		eventbox = gtk.EventBox()
+		eventbox.show()
+		eventbox.connect("button_press_event", self.button_press_event)
+
+		self.title = gtk.Label()
+		self.title.show()
+		eventbox.add(self.title)
+		self.pack_start(eventbox, False, False, 20)
 
 		hbox = gtk.HBox(False, 0)
 		hbox.show()
@@ -69,15 +88,27 @@ class WordReview(gtk.VBox):
 		button4.connect("clicked", self.toggled_cb)
 		hbox.pack_start(button4, True, True, 5)
 
+		hbox = gtk.HBox(False, 0)
+		hbox.show()
+		self.pack_start(hbox, False, False, 10)
+
+		self.status = gtk.Label()
+		self.status.show()
+		hbox.pack_end(self.status, False, False, 0)
+
 		self.buttons = [button1, button2, button3, button4]
 
-		answer = random.randint(0, 3)
-		self.buttons[answer].set_label(self.rr.dict[self.now].strip())
+	def start_review(self, rr):
+		self.rr = rr
+		self.now = self.rr.words[0]
+		self.next()
 
-		filling = random.sample(self.remain_list(), 4)
-		for button in self.buttons:
-			if self.buttons.index(button) != answer:
-				button.set_label(self.rr.dict[filling[self.buttons.index(button)]].strip())
+	def button_press_event(self, widget, event, data = None):
+		if self.passed == True:
+			self.next()
+			self.passed = False
+
+		return False
 				
 	def remain_list(self):
 		remain = self.rr.dict.keys()
@@ -88,12 +119,31 @@ class WordReview(gtk.VBox):
 		cn = widget.get_label()
 		lable = self.rr.dict[self.now].strip()
 		if cn == lable:
-			show_info("回答正确！加一分!")
+			self.queue.append(self.now)
+			play("answerok")
+			if len(self.queue) < len(self.rr.words):
+				self.status.set_label("回答正确！单击英文标题继续.")
+				self.passed = True
+			else:
+				show_info("回想完毕.请等待下次复习！")
+				self.finish_cb(None)
 		else:
-			show_info("回答错误！!")
+			play("answerno")
+			self.status.set_label("回答错误！请重选.")
 
 	def next(self):
-		pass
+		self.now = self.rr.words[len(self.queue)]
+		read(self.now)
+		self.title.set_markup('<span size="x-large">%s</span>' % self.now)
+		self.status.set_label("第%d个(共%d个)" % (len(self.queue) + 1, len(self.rr.words)))
+
+		answer = random.randint(0, 3)
+		self.buttons[answer].set_label(self.rr.dict[self.now].strip())
+
+		filling = random.sample(self.remain_list(), 4)
+		for button in self.buttons:
+			if self.buttons.index(button) != answer:
+				button.set_label(self.rr.dict[filling[self.buttons.index(button)]].strip())
 
 class WordTest(gtk.VBox):
 	"""The word test widget for FirstRecite and WordRevise"""
@@ -101,9 +151,13 @@ class WordTest(gtk.VBox):
 	def __init__(self, rr, test_type, return_to, status, update_model):
 		gtk.VBox.__init__(self)
 
+		self.test_vbox = gtk.VBox(False, 0)
+		self.test_vbox.show()
+		self.pack_start(self.test_vbox, False, False, 0)
+
 		hbox = gtk.HBox(False, 0)
 		hbox.show()
-		self.pack_start(hbox, False, False, 0)
+		self.test_vbox.pack_start(hbox, False, False, 0)
 
 		self.cn = gtk.Label()
 		self.cn.show()
@@ -120,11 +174,11 @@ class WordTest(gtk.VBox):
 		self.entry.connect("activate", self.check_error)
 		self.entry.connect("insert-text", self.type_cb)
 		self.entry.connect("backspace", self.backspace_cb)
-		self.pack_start(self.entry, False, False, 0)
+		self.test_vbox.pack_start(self.entry, False, False, 0)
 
 		hbox = gtk.HBox(False, 0)
 		hbox.show()
-		self.pack_start(hbox, False, False, 10)
+		self.test_vbox.pack_start(hbox, False, False, 10)
 
 		self.result = gtk.Label()
 		self.result.set_alignment(0, 0)
@@ -136,11 +190,11 @@ class WordTest(gtk.VBox):
 
 		hbox = gtk.HBox(False, 0)
 		hbox.show()
-		self.pack_start(hbox)
+		self.test_vbox.pack_start(hbox)
 
 		button = gtk.Button("不背了！")
 		button.show()
-		button.connect("clicked", self.finish_test_cb, True)
+		button.connect("clicked", self.exit_test_cb, True)
 		hbox.pack_end(button, False, False, 0)
 
 		self.test_type = test_type
@@ -149,6 +203,9 @@ class WordTest(gtk.VBox):
 		self.update_model = update_model
 
 		self.create_test(rr)
+
+		self.review = WordReview(rr, self.exit_test_cb)
+		self.pack_start(self.review, False, False, 0)
 
 	def speak_button_clicked(self, widget, data = None):
 		read(self.now)
@@ -183,9 +240,7 @@ class WordTest(gtk.VBox):
 				else:
 					if self.test_type == "first":
 						if self.second:
-							show_info("本次测试结束了！下次再提醒你复习！")
-							self.save_record()
-							self.finish_test_cb(None)
+							self.finish_test()
 						else:
 							self.second = True
 							self.correct = False
@@ -197,9 +252,7 @@ class WordTest(gtk.VBox):
 							show_info("加油！再复习一遍")
 							self.progress.set_text("第1个(共%d)" % self.rr.num)
 					else:
-						show_info("好了！等我提醒你复习吧！")
-						self.save_record()
-						self.finish_test_cb(None)
+						self.finish_test()
 			else:
 				sum = len(self.passed) + len(self.failed)
 				if sum != self.rr.num:
@@ -211,9 +264,7 @@ class WordTest(gtk.VBox):
 					if len(self.failed) == 0:
 						if self.test_type == "first":
 							if self.second:
-								show_info("好了！等我提醒你复习吧！")
-								self.save_record()
-								self.finish_test_cb(None)
+								self.finish_test()
 							else:
 								show_info("答完了！再复习一遍")
 								self.second = True
@@ -224,9 +275,7 @@ class WordTest(gtk.VBox):
 								self.now = self.rr.words[0]
 								self.clear_last()
 						else:
-							show_info("好了！等我提醒你复习吧！")
-							self.save_record()
-							self.finish_test_cb(None)
+							self.finish_test()
 					else:
 						self.correct = True
 						show_info("现在把答错的改正一下！")
@@ -264,17 +313,31 @@ class WordTest(gtk.VBox):
 			f = file(os.path.join(os.path.expanduser("~"), ".myword/record"), "ab")
 			pickle.dump(self.rr, f, True)
 			f.close()
-		else:
-			self.update_model()
+
+	def finish_test(self):
+		self.save_record()
+		dialog = MessageDialog("测试完毕！\n还想做次词义回想以加深记忆吗？(可以不做)")
+		response = dialog.run()
+		if response == gtk.RESPONSE_YES:
+			self.status.set_markup('<span size="xx-large">词义回想</span>')
+			self.test_vbox.hide()
+			self.review.show()
+			self.review.start_review(self.rr)
+		else:	
+			self.exit_test_cb(None)
+		dialog.destroy()
 		
-	def finish_test_cb(self, widget, data = None):
+	def exit_test_cb(self, widget, data = None):
 		self.clear_last()
 		self.return_to.show()
 		if self.test_type == "first":
 			self.update_model()
 			self.status.set_markup('<span size="xx-large">单词初记-浏览</span>')
 		else:
+			self.update_model()
 			self.status.set_markup('<span size="xx-large">单词复习-浏览</span>')
+		self.test_vbox.show()
+		self.review.hide()
 		self.hide()
 
 	def type_cb(self, widget, new_text, new_text_length, position, data = None):
@@ -293,8 +356,8 @@ if __name__ == "__main__":
         win.set_default_size(450, 300)
         win.set_border_width(8)
 
-	vbox = WordReview(ReciteRecord("/usr/share/reciteword/books/qqssbdc/cykych/ck-kq.bok"))
-
+	vbox = WordReview(None, None)
+	vbox.start_review(ReciteRecord("/usr/share/reciteword/books/qqssbdc/cykych/ck-kq.bok"))
         vbox.show()
         win.add(vbox)
 

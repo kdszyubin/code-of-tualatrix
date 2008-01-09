@@ -57,9 +57,15 @@ class Result(gtk.VBox):
 		self.result_ing.show()
 		self.pack_start(self.result_ing, False, False, 10)
 
+		sw = gtk.ScrolledWindow()
+		sw.show()
+		sw.set_shadow_type(gtk.SHADOW_ETCHED_IN)
+		sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+		self.pack_start(sw)
+
 		listview = self.create_listview()
 		listview.show()
-		self.pack_start(listview)
+		sw.add(listview)
 
 	def create_listview(self, finish = None):
 		listview = gtk.TreeView()
