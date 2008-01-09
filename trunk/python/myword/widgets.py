@@ -8,7 +8,7 @@
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 2 of the License, or
-# (at your button2) any later version.
+# (at your option) any later version.
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -38,35 +38,62 @@ class WordReview(gtk.VBox):
 		gtk.VBox.__init__(self)
 
 		self.rr = rr
+		self.now = self.rr.words[0]
 
-		title = gtk.Label("Insect")
+		title = gtk.Label()
+		title.set_markup('<span size="x-large">%s</span>' % self.now)
 		title.show()
-		self.pack_start(title, False, False, 0)
+		self.pack_start(title, False, False, 20)
 
-		button1 = gtk.RadioButton(None, "小孩")
+		hbox = gtk.HBox(False, 0)
+		hbox.show()
+		self.pack_start(hbox, False, False, 0)
+
+		button1 = gtk.Button("Hello")
 		button1.show()
-		button1.connect("toggled", self.toggled_cb)
-		self.pack_start(button1, False, False, 0)
+		button1.connect("clicked", self.toggled_cb)
+		hbox.pack_start(button1, True, True, 5)
 
-		button2 = gtk.RadioButton(button1, "中孩")
+		button2 = gtk.Button("Hello")
 		button2.show()
-		button2.connect("toggled", self.toggled_cb)
-		self.pack_start(button2, False, False, 0)
+		button2.connect("clicked", self.toggled_cb)
+		hbox.pack_start(button2, True, True, 5)
 
-		button3 = gtk.RadioButton(button1, "中孩")
+		button3 = gtk.Button("Hello")
 		button3.show()
-		button3.connect("toggled", self.toggled_cb)
-		self.pack_start(button3, False, False, 0)
+		button3.connect("clicked", self.toggled_cb)
+		hbox.pack_start(button3, True, True, 5)
 
-		button4 = gtk.RadioButton(button1, "中孩")
+		button4 = gtk.Button("Hello")
 		button4.show()
-		button4.connect("toggled", self.toggled_cb)
-		self.pack_start(button4, False, False, 0)
+		button4.connect("clicked", self.toggled_cb)
+		hbox.pack_start(button4, True, True, 5)
 
-		self.widgets = (button1, button2, button3, button4) 
+		self.buttons = [button1, button2, button3, button4]
+
+		answer = random.randint(0, 3)
+		self.buttons[answer].set_label(self.rr.dict[self.now].strip())
+
+		filling = random.sample(self.remain_list(), 4)
+		for button in self.buttons:
+			if self.buttons.index(button) != answer:
+				button.set_label(self.rr.dict[filling[self.buttons.index(button)]].strip())
+				
+	def remain_list(self):
+		remain = self.rr.dict.keys()
+		remain.remove(self.now)
+		return remain
 
 	def toggled_cb(self, widget, data = None):
-		print self.widgets[random.randint(0, 3)]
+		cn = widget.get_label()
+		lable = self.rr.dict[self.now].strip()
+		if cn == lable:
+			show_info("回答正确！加一分!")
+		else:
+			show_info("回答错误！!")
+
+	def next(self):
+		pass
 
 class WordTest(gtk.VBox):
 	"""The word test widget for FirstRecite and WordRevise"""
@@ -83,7 +110,7 @@ class WordTest(gtk.VBox):
 		self.cn.set_alignment(0, 0)
 		hbox.pack_start(self.cn, False, False, 0)
 
-		button = gtk.Button("读一下!")
+		button = gtk.Button("发音(_P)", use_underline = True)
 		button.connect("clicked", self.speak_button_clicked)
 		button.show()
 		hbox.pack_end(button, False, False, 0)
@@ -263,7 +290,7 @@ if __name__ == "__main__":
 
 	win.connect('destroy', lambda *w: gtk.main_quit())
 	win.set_title("Widget Test")
-        win.set_default_size(300, 300)
+        win.set_default_size(450, 300)
         win.set_border_width(8)
 
 	vbox = WordReview(ReciteRecord("/usr/share/reciteword/books/qqssbdc/cykych/ck-kq.bok"))
