@@ -39,7 +39,7 @@ class BookList(UserList):
                         else:
                                 self.extend(hasbooks)
 
-if __name__ == "__main__":
+def commandline():
 	if len(sys.argv) < 2:
 		print "command error!"
 		sys.exit(1)
@@ -53,3 +53,6 @@ if __name__ == "__main__":
 				print "正在搜寻第%d本...找到'%s: %s'并已加入生词本" % ((books.index(book) + 1), sys.argv[1], word.split('[W]')[1].split('[T]')[1].split('[M]')[1].strip())
 				sys.exit(0)
 		print "找完了第%d本，找不到！" % (books.index(book) + 1)
+
+if __name__ == "__main__":
+	commandline()
