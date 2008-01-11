@@ -29,7 +29,7 @@ class FileInfo(UserDict):
 
 class DictFile(FileInfo):
 	"""A book with many words"""
-	separate = ["[C]", "[R]", "[P]", "[A]"]
+	separate = ["[C]", "[R]", "[P]"]
 	description = ["TITLE", "NUM", "AUTHOR", "OTHER"]
 
 	#继承自FileInfo，light参数用于决定是否只取得词典的描述
@@ -42,7 +42,7 @@ class DictFile(FileInfo):
 		file = open(filename)
 		dictinfo = file.readline()
 		dictinfo = dictinfo.split("[N]")[1]
-		self.INFO = {}
+		self.INFO = {"FILE": filename}
 
 		for sep in self.separate:
 			self.INFO[self.description[self.separate.index(sep)]] = dictinfo.split(sep)[0]
@@ -60,6 +60,20 @@ class DictFile(FileInfo):
 					else:
 						self[word.split("[M]")[0]] = word.split("[M]")[1]
 		file.close()
+
+	def save(self):
+		head = "[H]recitewordbookfile[N]%s[C]%s[R]%s[P]%s" % (self.INFO["TITLE"],
+									self.INFO["NUM"],
+									self.INFO["AUTHOR"],
+									self.INFO["OTHER"])
+		content = "".join(["[W]%s[M]%s" % (k,v) for k,v in self.data.items()])
+
+		f = file(self.INFO["FILE"], "wb")
+		f.write(head + content)
+		f.close()
+
+	def __str__(self):
+		return self.INFO["FILE"]
 
 	def to_string(self):
 		return "".join(["%s\t%s" % (k, v) for k, v in self.data.items()])
