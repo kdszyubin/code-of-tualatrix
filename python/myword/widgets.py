@@ -100,6 +100,8 @@ class WordReview(gtk.VBox):
 
 	def start_review(self, rr):
 		self.rr = rr
+		self.passed = False
+		self.queue = []
 		self.now = self.rr.words[0]
 		self.next()
 
