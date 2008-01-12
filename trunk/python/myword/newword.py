@@ -139,20 +139,20 @@ class NewWord(gtk.VBox):
 		treeview = BookList(self.wordlist)
 		treeview.show()
 
-		vbox = gtk.VBox(False, 0)
-		vbox.show()
-		vbox.pack_start(treeview, True, True, 0)
+		vpaned = gtk.VPaned()
+		vpaned.show()
+		vpaned.pack1(treeview)
 
 		button = gtk.Button("新建生词库")
 		button.show()
-		vbox.pack_end(button, False, False, 0)
+		vpaned.pack2(button)
 
 		sw = gtk.ScrolledWindow()
 		sw.show()
 		sw.set_shadow_type(gtk.SHADOW_ETCHED_IN)
 		sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
 		hpaned.pack1(sw)
-		sw.add_with_viewport(vbox)
+		sw.add(vpaned)
 
 		sw = gtk.ScrolledWindow()
 		sw.show()
