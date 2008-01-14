@@ -19,6 +19,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
+import os
 from UserDict import UserDict
 
 class FileInfo(UserDict):
@@ -35,7 +36,9 @@ class DictFile(FileInfo):
 	#继承自FileInfo，light参数用于决定是否只取得词典的描述
 	def __init__(self, filename, light = False):
 		FileInfo.__init__(self, filename)
-		self.__parse(filename, light)
+
+		if os.path.exists(filename):
+			self.__parse(filename, light)
 
 	#解析词典，分两步：第一步，获取词典的信息;第二步，获取词典的正文
 	def __parse(self, filename, light):

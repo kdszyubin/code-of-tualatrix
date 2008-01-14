@@ -26,12 +26,28 @@ import os
 import glob
 from dictfile import DictFile
 from playsound import read
+from UserList import UserList
 
 (
 	COLUMN_TITLE,
 	COLUMN_NUM,
 	COLUMN_PATH,
 ) = range(3)
+
+class ExistBook(UserList):
+        def __init__(self, path):
+                UserList.__init__(self)
+                self.createbookdir(path)
+
+        def createbookdir(self, path):
+                for file in os.listdir(path):
+                        hasbooks = glob.glob(path + "/" + file + "/*.bok")
+                        if not hasbooks:
+                                file = path + "/" + file
+                                if os.path.isdir(file):
+                                        self.createbookdir(file)
+                        else:
+                                self.extend(hasbooks)
 
 class BookList(gtk.TreeView):
 	"""the new word book list"""
@@ -129,9 +145,9 @@ class NewWord(gtk.VBox):
 
 		self.book = None
 
-		hpaned = gtk.HPaned()
-		hpaned.show()
-		self.pack_start(hpaned)
+		main_hbox = gtk.HBox(False, 5)
+		main_hbox.show()
+		self.pack_start(main_hbox)
 
 		self.wordlist = WordList()
 		self.wordlist.show()
@@ -139,28 +155,117 @@ class NewWord(gtk.VBox):
 		treeview = BookList(self.wordlist)
 		treeview.show()
 
-		vpaned = gtk.VPaned()
-		vpaned.show()
-		vpaned.pack1(treeview)
+		vbox = gtk.VBox(False, 10)
+		vbox.show()
+		main_hbox.pack_start(vbox, False, False, 0)
 
-		button = gtk.Button("新建生词库")
+		sw = gtk.ScrolledWindow()
+##		sw.set_size_request(200, -1)
+		sw.show()
+		sw.set_shadow_type(gtk.SHADOW_ETCHED_IN)
+		sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+		vbox.pack_start(sw)
+		sw.add(treeview)
+
+		hbox = gtk.HBox(False, 5)
+		hbox.show()
+		vbox.pack_start(hbox, False, False, 0)
+
+		button = gtk.Button(stock = gtk.STOCK_ADD)
+		button.connect("clicked", self.on_add_book_clicked, treeview)
 		button.show()
-		vpaned.pack2(button)
+		hbox.pack_start(button)
+
+		button = gtk.Button(stock = gtk.STOCK_REMOVE)
+		button.show()
+		hbox.pack_start(button)
+
+		vbox = gtk.VBox(False, 10)
+		vbox.show()
+		main_hbox.pack_start(vbox)
 
 		sw = gtk.ScrolledWindow()
 		sw.show()
 		sw.set_shadow_type(gtk.SHADOW_ETCHED_IN)
 		sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-		hpaned.pack1(sw)
-		sw.add(vpaned)
+		vbox.pack_start(sw)
 
-		sw = gtk.ScrolledWindow()
-		sw.show()
-		sw.set_shadow_type(gtk.SHADOW_ETCHED_IN)
-		sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-		hpaned.pack2(sw)
+		hbox = gtk.HBox(False, 5)
+		hbox.show()
+		vbox.pack_start(hbox, False, False, 0)
+
+		self.entry = gtk.Entry()
+		self.entry.show()
+		hbox.pack_start(self.entry)
+
+		button = gtk.Button(stock = gtk.STOCK_ADD)
+		button.connect("clicked", self.on_add_word_clicked, self.wordlist)
+		button.show()
+		hbox.pack_start(button, False, False, 0)
 
 		sw.add(self.wordlist)
+
+	def on_add_word_clicked(self, widget, data = None):
+		word_add = self.entry.get_text()
+		print word_add
+
+		books = ExistBook("/usr/share/reciteword/books") 
+		Find = True 
+		for book in books:
+			while Find:
+				for word in file(book):
+					if word.find("[W]" + word_add + "[T]") >= 0:
+						Find = False 
+						print "%d" % (books.index(book) + 1)
+						break
+			else:
+				break
+		
+
+	def on_add_book_clicked(self, widget, data = None):
+		dialog = gtk.Dialog("添加生词库", None, 
+				gtk.DIALOG_MODAL, 
+				(gtk.STOCK_OK, gtk.RESPONSE_ACCEPT,
+				gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT))
+
+		title_label = gtk.Label("书名:")
+		title_label.show()
+		dialog.vbox.pack_start(title_label)
+		
+		title_entry = gtk.Entry()
+		title_entry.show()
+		dialog.vbox.pack_start(title_entry)
+
+		file_label = gtk.Label("文件名:")
+		file_label.show()
+		dialog.vbox.pack_start(file_label)
+		
+		file_entry = gtk.Entry()
+		file_entry.show()
+		dialog.vbox.pack_start(file_entry)
+
+		response = dialog.run()
+		if response == gtk.RESPONSE_ACCEPT:
+			book_title = title_entry.get_text()
+			book_path = os.path.join(os.path.expanduser("~"), ".myword/books/", file_entry.get_text())+".bok"
+
+			newbook = DictFile(book_path)
+			newbook.INFO = {}
+			newbook.INFO['FILE'] = book_path
+			newbook.INFO['TITLE'] = book_title
+			newbook.INFO['NUM'] = '0'
+			newbook.INFO['AUTHOR'] = 'TualatriX'
+			newbook.INFO['OTHER'] = 'http://imtx.cn'
+			newbook.save()
+
+			model = data.get_model()
+			iter = model.append()
+			model.set(iter,
+				COLUMN_TITLE, book_title,
+				COLUMN_NUM, 0,
+				COLUMN_PATH, book_path)
+
+		dialog.destroy()
 
 if __name__ == "__main__":
 	win = gtk.Window()
