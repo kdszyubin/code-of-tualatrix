@@ -168,6 +168,8 @@ class Revise(gtk.VBox):
 
 	def create_model(self):
 		self.model.clear()
+		self.keep = []
+		self.queue = []
 		f = file(os.path.join(os.path.expanduser("~"), ".myword/record"), "rb")
 		Loading = True
 
