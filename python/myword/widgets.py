@@ -150,7 +150,7 @@ class WordReview(gtk.VBox):
 class WordTest(gtk.VBox):
 	"""The word test widget for FirstRecite and WordRevise"""
 	
-	def __init__(self, rr, test_type, return_to, status, update_model):
+	def __init__(self, rr, test_type, return_to, status, update_model, revise = None):
 		gtk.VBox.__init__(self)
 
 		self.test_vbox = gtk.VBox(False, 0)
@@ -203,6 +203,7 @@ class WordTest(gtk.VBox):
 		self.return_to = return_to
 		self.status = status
 		self.update_model = update_model
+		self.save_revise = revise
 
 		self.create_test(rr)
 
@@ -315,6 +316,8 @@ class WordTest(gtk.VBox):
 			f = file(os.path.join(os.path.expanduser("~"), ".myword/record"), "ab")
 			pickle.dump(self.rr, f, True)
 			f.close()
+		else:
+			self.save_revise()
 
 	def finish_test(self):
 		self.save_record()

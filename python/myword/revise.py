@@ -62,6 +62,7 @@ class Revise(gtk.VBox):
 					"revise",
 					self.reviselist,
 					self.status,
+					self.create_model,
 					self.update_record)
 		self.pack_start(self.wordtest, False, False, 10)
 
@@ -73,10 +74,9 @@ class Revise(gtk.VBox):
 			pickle.dump(rr, f, True)
 			
 		f.close()
-		self.reviselist.show()
-		self.wordtest.hide()
-
-		self.create_model()
+#		self.reviselist.show()
+#		self.wordtest.hide()
+#		self.create_model()
 		
 	def create_reviselist(self):
 		listview = self.create_listview()
