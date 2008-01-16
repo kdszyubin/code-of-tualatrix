@@ -120,6 +120,7 @@ class DirList(gtk.TreeView):
 		selection = self.get_selection()
 		selection.set_mode(gtk.SELECTION_SINGLE)
 		selection.connect("changed", self.selection_changed, list)
+		selection.select_iter(model.iter_children(model.get_iter_first()))
 
 	def selection_changed(self, widget, data = None):
 		model = widget.get_selected()[0]
