@@ -76,11 +76,11 @@ class BookList(gtk.TreeView):
 		self.__add_columns()
 		self.set_rules_hint(True)
 		self.set_size_request(180, -1)
-		self.expand_all()
 
 		selection = self.get_selection()
 		selection.set_mode(gtk.SELECTION_SINGLE)
 		selection.connect("changed", self.selection_changed, list)
+		selection.select_iter(model.get_iter_first())
 
 	def selection_changed(self, widget, list):
 		model, iter = widget.get_selected()
@@ -193,8 +193,10 @@ class WordList(gtk.TreeView):
 		menu.set_accel_group(group)
 
 		new = gtk.MenuItem("新增")
+		new.add_accelerator("activate", group, ord('N'), gtk.gdk.CONTROL_MASK, gtk.ACCEL_VISIBLE)
 		new.connect("activate", self.add_new_word)
 		remove = gtk.MenuItem("删除")
+		remove.add_accelerator("activate", group, ord('D'), gtk.gdk.CONTROL_MASK, gtk.ACCEL_VISIBLE)
 		remove.connect("activate", self.remove_selected_word)
 		
 		menu.append(new)
@@ -211,9 +213,13 @@ class WordList(gtk.TreeView):
 			COLUMN_CN, "在此输入中文",
 			COLUMN_EDITABLE, True)
 
+		self.get_selection().select_iter(iter)
+
 	def remove_selected_word(self, widget, data = None):
 		model, iter = self.get_selection().get_selected()
 		model.remove(iter)
+
+		self.get_selection().select_iter(iter)
 
 		self.save(model)
 
