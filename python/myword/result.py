@@ -78,6 +78,7 @@ class Result(gtk.VBox):
 				gobject.TYPE_STRING)
 
 		listview.set_model(self.model)
+		listview.set_rules_hint(True)
 
 		self.create_model()
 

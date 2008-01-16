@@ -27,6 +27,7 @@ from choosebook import ChooseBook
 from firstrecite import FirstRecite
 from widgets import show_info
 from result import Result
+from newword import NewWord
 
 class MyWord(gtk.Window):
 	def __init__(self):
@@ -64,6 +65,9 @@ class MyWord(gtk.Window):
 
 		label = gtk.Label("复习")
 		self.book.append_page(Revise(), label)
+
+		label = gtk.Label("生词")
+		self.book.append_page(NewWord(self), label)
 
 		self.result = Result()
 		self.result.show()

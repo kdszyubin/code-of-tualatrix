@@ -136,28 +136,32 @@ class Revise(gtk.VBox):
 				gobject.TYPE_STRING)
 
 		listview.set_model(self.model)
+		listview.set_rules_hint(True)
 
 		self.create_model()
 
-		renderer = gtk.CellRendererText()
-		column = gtk.TreeViewColumn("ID", renderer, text = COLUMN_ID)
-		listview.append_column(column)
-
+#		renderer = gtk.CellRendererText()
+#		column = gtk.TreeViewColumn("ID", renderer, text = COLUMN_ID)
+#		listview.append_column(column)
 
 		renderer = gtk.CellRendererText()
 		column = gtk.TreeViewColumn("书名", renderer, text = COLUMN_TITLE)
+		column.set_sort_column_id(COLUMN_TITLE)
 		listview.append_column(column)
 
 		renderer = gtk.CellRendererText()
 		column = gtk.TreeViewColumn("组别", renderer, text = COLUMN_GROUP)
+		column.set_sort_column_id(COLUMN_GROUP)
 		listview.append_column(column)
 
 		renderer = gtk.CellRendererText()
 		column = gtk.TreeViewColumn("单词数", renderer, text = COLUMN_NUM)
+		column.set_sort_column_id(COLUMN_NUM)
 		listview.append_column(column)
 
 		renderer = gtk.CellRendererText()
 		column = gtk.TreeViewColumn("第几次复习", renderer, text = COLUMN_TIMES)
+		column.set_sort_column_id(COLUMN_TIMES)
 		listview.append_column(column)
 
 		selection = listview.get_selection()
