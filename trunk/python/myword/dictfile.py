@@ -33,15 +33,15 @@ class DictFile(FileInfo):
 	separate = ["[C]", "[R]", "[P]"]
 	description = ["TITLE", "NUM", "AUTHOR", "OTHER"]
 
-	#继承自FileInfo，light参数用于决定是否只取得词典的描述
 	def __init__(self, filename, light = False):
+		"""继承自FileInfo，light参数用于决定是否只取得词典的描述"""
 		FileInfo.__init__(self, filename)
 
 		if os.path.exists(filename):
 			self.__parse(filename, light)
 
-	#解析词典，分两步：第一步，获取词典的信息;第二步，获取词典的正文
 	def __parse(self, filename, light):
+		"""解析词典，分两步：第一步，获取词典的信息;第二步，获取词典的正文"""
 		file = open(filename)
 		dictinfo = file.readline()
 		dictinfo = dictinfo.split("[N]")[1]
@@ -50,7 +50,7 @@ class DictFile(FileInfo):
 		for sep in self.separate:
 			self.INFO[self.description[self.separate.index(sep)]] = dictinfo.split(sep)[0]
 			if self.separate.index(sep) == 2:
-				self.INFO[self.description[3]] = dictinfo.split(sep)[1]
+				self.INFO[self.description[3]] = dictinfo.split(sep)[1].strip()
 			else:
 				dictinfo = dictinfo.split(sep)[1]
 		if not light:
@@ -65,11 +65,12 @@ class DictFile(FileInfo):
 		file.close()
 
 	def save(self):
-		head = "[H]recitewordbookfile[N]%s[C]%s[R]%s[P]%s" % (self.INFO["TITLE"],
+		self.INFO["NUM"] = str(len(self.data))
+		head = "[H]recitewordbookfile[N]%s[C]%s[R]%s[P]%s\n" % (self.INFO["TITLE"],
 									self.INFO["NUM"],
 									self.INFO["AUTHOR"],
 									self.INFO["OTHER"])
-		content = "".join(["[W]%s[M]%s" % (k,v) for k,v in self.data.items()])
+		content = "\n".join(["[W]%s[M]%s" % (k,v) for k,v in self.data.items()])
 
 		f = file(self.INFO["FILE"], "wb")
 		f.write(head + content)

@@ -49,7 +49,6 @@ class BookList(gtk.TreeView):
 
 		self.set_model(model)
 		self.__add_columns()
-
 		self.set_rules_hint(True)
 
 		selection = self.get_selection()
@@ -83,10 +82,12 @@ class BookList(gtk.TreeView):
 
 		renderer = gtk.CellRendererText()
 		column = gtk.TreeViewColumn("书名", renderer, text = COLUMN_TITLE)
+		column.set_sort_column_id(COLUMN_TITLE)
 		self.append_column(column)
 
 		renderer = gtk.CellRendererText()
 		column = gtk.TreeViewColumn("单词数", renderer, text = COLUMN_NUM)
+		column.set_sort_column_id(COLUMN_NUM)
 		self.append_column(column)
 
 		renderer = gtk.CellRendererText()

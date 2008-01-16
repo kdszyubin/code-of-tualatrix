@@ -30,6 +30,11 @@ from playsound import read, play
 from widgets import show_info
 from widgets import WordTest
 
+(
+	COLUMN_EN,
+	COLUMN_CN,
+) = range(2)
+
 class FirstRecite(gtk.VBox):
 	def __init__(self, book):
 		gtk.VBox.__init__(self)
@@ -106,16 +111,19 @@ class FirstRecite(gtk.VBox):
 				gobject.TYPE_STRING)
 
 		listview.set_model(self.model)
+		listview.set_rules_hint(True)
 
 		if self.book:
 			self.create_model()
 
 		renderer = gtk.CellRendererText()
-		column = gtk.TreeViewColumn("单词", renderer, text = 0)
+		column = gtk.TreeViewColumn("单词", renderer, text = COLUMN_EN)
+		column.set_sort_column_id(COLUMN_EN)
 		listview.append_column(column)
 
 		renderer = gtk.CellRendererText()
-		column = gtk.TreeViewColumn("中文解释", renderer, text = 1)
+		column = gtk.TreeViewColumn("中文解释", renderer, text = COLUMN_CN)
+		column.set_sort_column_id(COLUMN_CN)
 		listview.append_column(column)
 
 		selection = listview.get_selection()
