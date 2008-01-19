@@ -158,24 +158,21 @@ class WordList(gtk.TreeView):
 		self.connect("button_press_event", self.button_press_event, menu)
 
 	def on_cell_edited(self, cell, path_string, new_text, model):
-		"""在编辑完单元格后触发，这个回调函数提供了很多有用的值：
-		cell是编辑的单元格，即一个GtkCellRendererText；
-		path_string是这个单元格所处位置的下标，String类型；
-		new_text是编辑后的文本。
-		下面三句代码分别是：取得当前位置的iter，取得当前单元格的分类，设置新的分类"""
+		"""在编辑完单元格后触发，取得编辑前的文本，再比较编辑后的
+		文本，并查找生词库中是否已存在编辑后的文本，假如条件满足则
+		应用新的编辑，否则弹出对话框显示相关信息"""
+		iter = model.get_iter_from_string(path_string)
+		column = cell.get_data("column")
+		old = model.get_value(iter, column)
 
 		exist, exist_book = self.get_exist(new_text)
 
-		if exist:
+		if exist and new_text != old:
 			dialog = MessageDialog('在"%s"中已经有"%s"这个单词了' % (DictFile(exist_book).INFO["TITLE"], new_text), buttons = gtk.BUTTONS_OK)
 			dialog.run()
 			dialog.destroy()
 		else:
-			iter = model.get_iter_from_string(path_string)
-			column = cell.get_data("column")
-
 			model.set_value(iter, column, new_text)
-
 			self.save(model)
 
 	def get_exist(self, new_word):
