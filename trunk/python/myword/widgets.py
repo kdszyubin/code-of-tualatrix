@@ -22,6 +22,7 @@
 import gtk
 import os
 import random
+import copy
 import cPickle as pickle
 
 from playsound import read, play
@@ -216,34 +217,39 @@ class WordTest(gtk.VBox):
 		read(self.now)
 
 	def create_test(self, rr = None):
+		"""根据选中的背诵纪录，创建测试内容"""
 		self.rr = rr 
 		self.pause = False
 		self.correct = False
 		self.second = False
 		self.passed = []
 		self.failed = []
+
+		#如果是复习，则每次创建新的测试都清空队列，以防出错
 		if self.test_type == "revise":
 			self.keep = []
 			self.queue = []
 		if self.rr:
+			self.pool = copy.copy(self.rr.words)
 			self.now = self.next_word()
 			self.cn.set_text(self.rr.get_dict()[self.now])
 			self.progress.set_text("第1个(共%d)" % self.rr.num)
 
 	def next_word(self):
-		return self.rr.words[0]
+		if self.correct:
+			now = random.sample(self.failed, 1)[0]
+		else:
+			now = random.sample(self.pool, 1)[0]
+			self.pool.remove(now)
+		return now
 
 	def check_error(self, widget, data = None):
 		if self.pause == True:
 			if self.correct:
 				#改错模式
 				if len(self.failed) > 0:
-					if self.point + 2 > len(self.failed):
-						self.progress.set_text("正在改正:剩余%d个" % len(self.failed))
-						self.now = self.failed[0]
-					else:
-						self.progress.set_text("正在改正:剩余%d个" % len(self.failed))
-						self.now = self.failed[self.point + 1]
+					self.progress.set_text("正在改正:剩余%d个" % len(self.failed))
+					self.now = self.next_word()
 					self.clear_last()
 				else:
 					if self.test_type == "first":
@@ -255,6 +261,7 @@ class WordTest(gtk.VBox):
 							self.passed = []
 							self.failed = []
 
+							self.pool = copy.copy(self.rr.words)
 							self.now = self.next_word()
 							self.clear_last()
 							show_info("加油！再复习一遍")
@@ -266,9 +273,10 @@ class WordTest(gtk.VBox):
 				if sum != self.rr.num:
 					self.progress.set_text("第%d个(共%d)" % (sum + 1, self.rr.num))
 				if sum < len(self.rr.words):
-					self.now = self.rr.words[sum]
+					self.now = self.next_word()
 					self.clear_last()
 				else:
+					#判断做错的题目是否为0,如果不是就进行改错
 					if len(self.failed) == 0:
 						if self.test_type == "first":
 							if self.second:
@@ -279,6 +287,7 @@ class WordTest(gtk.VBox):
 								self.correct= False
 								self.passed = []
 								self.failed = []
+								self.pool = copy.copy(self.rr.words)
 
 								self.now = self.next_word()
 								self.clear_last()
@@ -287,7 +296,7 @@ class WordTest(gtk.VBox):
 					else:
 						self.correct = True
 						show_info("现在把答错的改正一下！")
-						self.progress.set_text("正在改正:共%d个" % len(self.failed))
+						self.progress.set_text("正在改正:剩余%d个" % len(self.failed))
 						self.now = self.failed[0]
 						self.clear_last()
 		else:
@@ -297,7 +306,6 @@ class WordTest(gtk.VBox):
 				self.result.set_text("正确!按回车继续.")
 				play("answerok")
 				if self.now in self.failed:
-					self.point = self.failed.index(self.now) - 1
 					self.failed.remove(self.now)
 				self.passed.append(self.now)
 			else:
@@ -306,8 +314,6 @@ class WordTest(gtk.VBox):
 				play("answerno")
 				if not self.now in self.failed:
 					self.failed.append(self.now)
-				else:
-					self.point = self.failed.index(self.now)
 
 	def clear_last(self):
 		self.cn.set_text(self.rr.get_dict()[self.now])
