@@ -140,7 +140,7 @@ class FirstRecite(gtk.VBox):
 			iter = self.model.append()
 			self.model.set(iter,
 				0, word,
-				1, self.rr.dict[word].strip())
+				1, self.rr.get_dict()[word])
 
 	def selection_changed(self, widget, data = None):
 		model = widget.get_selected()[0]

@@ -52,16 +52,16 @@ class DictFile(FileInfo):
 			if self.separate.index(sep) == 2:
 				self.INFO[self.description[3]] = dictinfo.split(sep)[1].strip()
 			else:
-				dictinfo = dictinfo.split(sep)[1]
+				dictinfo = dictinfo.split(sep)[1].strip()
 		if not light:
 			dictcontent = file.readlines()
 			for word in dictcontent:
 				if word.find("[M]") != -1:
 					word = word.split("[W]")[1]
 					if word.find("[T]") != -1:
-						self[word.split("[T]")[0]] = word.split("[M]")[1]
+						self[word.split("[T]")[0]] = word.split("[M]")[1].strip()
 					else:
-						self[word.split("[M]")[0]] = word.split("[M]")[1]
+						self[word.split("[M]")[0]] = word.split("[M]")[1].strip()
 		file.close()
 
 	def save(self):
