@@ -28,6 +28,7 @@ from playsound import read, play
 
 def show_info(message, title = "提示", buttons = gtk.BUTTONS_OK, parent = None):
 	dialog = gtk.MessageDialog(None, gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_INFO, buttons)
+	dialog.set_icon_from_file("/usr/share/pixmaps/myword.png")
 	dialog.set_title(title)
 	dialog.set_markup(message)
 	dialog.run()
@@ -45,6 +46,7 @@ class MessageDialog(gtk.MessageDialog):
 		gtk.MessageDialog.__init__(self, parent, flags, type, buttons)
 		self.set_markup(message)
 		self.set_title(title)
+		self.set_icon_from_file("/usr/share/pixmaps/myword.png")
 
 class WordReview(gtk.VBox):
 	def __init__(self, rr, finish_cb):
@@ -113,13 +115,13 @@ class WordReview(gtk.VBox):
 		return False
 				
 	def remain_list(self):
-		remain = self.rr.dict.keys()
+		remain = self.rr.get_dict().keys()
 		remain.remove(self.now)
 		return remain
 
 	def toggled_cb(self, widget, data = None):
 		cn = widget.get_label()
-		lable = self.rr.dict[self.now].strip()
+		lable = self.rr.get_dict()[self.now]
 		if cn == lable:
 			self.queue.append(self.now)
 			play("answerok")
@@ -140,12 +142,12 @@ class WordReview(gtk.VBox):
 		self.status.set_label("第%d个(共%d个)" % (len(self.queue) + 1, len(self.rr.words)))
 
 		answer = random.randint(0, 3)
-		self.buttons[answer].set_label(self.rr.dict[self.now].strip())
+		self.buttons[answer].set_label(self.rr.get_dict()[self.now])
 
 		filling = random.sample(self.remain_list(), 4)
 		for button in self.buttons:
 			if self.buttons.index(button) != answer:
-				button.set_label(self.rr.dict[filling[self.buttons.index(button)]].strip())
+				button.set_label(self.rr.get_dict()[filling[self.buttons.index(button)]])
 
 class WordTest(gtk.VBox):
 	"""The word test widget for FirstRecite and WordRevise"""
@@ -224,9 +226,12 @@ class WordTest(gtk.VBox):
 			self.keep = []
 			self.queue = []
 		if self.rr:
-			self.now = self.rr.words[0]
-			self.cn.set_text(self.rr.dict[self.now])
+			self.now = self.next_word()
+			self.cn.set_text(self.rr.get_dict()[self.now])
 			self.progress.set_text("第1个(共%d)" % self.rr.num)
+
+	def next_word(self):
+		return self.rr.words[0]
 
 	def check_error(self, widget, data = None):
 		if self.pause == True:
@@ -250,7 +255,7 @@ class WordTest(gtk.VBox):
 							self.passed = []
 							self.failed = []
 
-							self.now = self.rr.words[0]
+							self.now = self.next_word()
 							self.clear_last()
 							show_info("加油！再复习一遍")
 							self.progress.set_text("第1个(共%d)" % self.rr.num)
@@ -275,7 +280,7 @@ class WordTest(gtk.VBox):
 								self.passed = []
 								self.failed = []
 
-								self.now = self.rr.words[0]
+								self.now = self.next_word()
 								self.clear_last()
 						else:
 							self.finish_test()
@@ -305,7 +310,7 @@ class WordTest(gtk.VBox):
 					self.point = self.failed.index(self.now)
 
 	def clear_last(self):
-		self.cn.set_text(self.rr.dict[self.now])
+		self.cn.set_text(self.rr.get_dict()[self.now])
 		self.result.hide()
 		self.result.set_text("")
 		self.entry.set_text("")
