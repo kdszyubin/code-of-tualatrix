@@ -163,12 +163,36 @@ class WordList(gtk.TreeView):
 		path_string是这个单元格所处位置的下标，String类型；
 		new_text是编辑后的文本。
 		下面三句代码分别是：取得当前位置的iter，取得当前单元格的分类，设置新的分类"""
-		iter = model.get_iter_from_string(path_string)
-		column = cell.get_data("column")
 
-		model.set_value(iter, column, new_text)
+		exist, exist_book = self.get_exist(new_text)
 
-		self.save(model)
+		if exist:
+			dialog = MessageDialog('在"%s"中已经有"%s"这个单词了' % (DictFile(exist_book).INFO["TITLE"], new_text), buttons = gtk.BUTTONS_OK)
+			dialog.run()
+			dialog.destroy()
+		else:
+			iter = model.get_iter_from_string(path_string)
+			column = cell.get_data("column")
+
+			model.set_value(iter, column, new_text)
+
+			self.save(model)
+
+	def get_exist(self, new_word):
+		"""判断当前加入的单词是否已存在, 返回一个tuple"""
+		exist = False
+		exist_book = None
+
+		for book in os.listdir(os.path.join(os.path.expanduser("~"), ".myword/books")):
+			if exist:
+				break
+			for word in file(os.path.join(os.path.expanduser("~"), ".myword/books", book)):
+				if word.find("[W]" + new_word + "[M]") >= 0:
+					exist_book = os.path.join(os.path.expanduser("~"), ".myword/books", book)
+					exist = True
+					break
+
+		return exist, exist_book
 
 	def save(self, model):
 		"""将更新后的列表内容保存"""
@@ -323,33 +347,41 @@ class NewWord(gtk.VBox):
 		self.show()
 
 	def on_add_word(self, widget, wordlist):
-		word_add = self.entry.get_text()
-		books = ExistBook("/usr/share/reciteword/books") 
-		cn = None 
+		new_word = self.entry.get_text()
+		exist, exist_book = wordlist.get_exist(new_word)
 
-		for book in books:
-			if cn:
-				break
-			for word in file(book):
-				if word.find("[W]" + word_add + "[T]") >= 0:
-					cn = word.split('[W]')[1].split('[T]')[1].split('[M]')[1]
-					break
-
-		model = wordlist.get_model()
-		iter = model.append()
-		if cn:
-			model.set(iter,
-				COLUMN_EN, word_add,
-				COLUMN_CN, cn.strip(),
-				COLUMN_EDITABLE, True)
+		if exist:
+			dialog = MessageDialog('在"%s"中已经有"%s"这个单词了' % (DictFile(exist_book).INFO["TITLE"], new_word), buttons = gtk.BUTTONS_OK)
+			dialog.run()
+			dialog.destroy()
 		else:
-			model.set(iter,
-				COLUMN_EN, word_add,
-				COLUMN_CN, "在此输入中文解释",
-				COLUMN_EDITABLE, True)
+			books = ExistBook("/usr/share/reciteword/books") 
+			cn = None 
 
-		wordlist.get_selection().select_iter(iter)
-		wordlist.save(model)
+			for book in books:
+				if cn:
+					break
+				for word in file(book):
+					if word.find("[W]" + new_word + "[T]") >= 0:
+						cn = word.split('[W]')[1].split('[T]')[1].split('[M]')[1]
+						break
+
+			model = wordlist.get_model()
+			iter = model.append()
+			if cn:
+				model.set(iter,
+					COLUMN_EN, new_word,
+					COLUMN_CN, cn.strip(),
+					COLUMN_EDITABLE, True)
+			else:
+				model.set(iter,
+					COLUMN_EN, new_word,
+					COLUMN_CN, "在此输入中文解释",
+					COLUMN_EDITABLE, True)
+
+			wordlist.get_selection().select_iter(iter)
+			wordlist.save(model)
+			widget.set_text("")
 
 	def on_add_book_clicked(self, widget, booklist):
 		book_path = os.path.join(os.path.expanduser("~"), ".myword/books/", "myword-%s.bok" % datetime.datetime.today().isoformat(" ")[0:19])

@@ -67,9 +67,17 @@ class Revise(gtk.VBox):
 		self.pack_start(self.wordtest, False, False, 10)
 
 	def update_record(self):
-		self.rr.next = self.rr.nextime()
+		"""更新纪录，如果已经是第6次了，则完成这个纪录，从待复习
+		队列中剔除，将queue和keep合并然后更新record纪录"""
+		if self.rr.next == 6:
+			self.rr.finish_recite()
+			self.queue.remove(self.rr)
+		else:
+			self.rr.next = self.rr.set_next()
+
 		f = file(os.path.join(os.path.expanduser("~"), ".myword/record"), "wb")
 		self.queue.extend(self.keep)
+
 		for rr in self.queue:
 			pickle.dump(rr, f, True)
 			
