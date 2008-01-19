@@ -126,7 +126,7 @@ class Result(gtk.VBox):
 				else:
 					self.finished += len(rr.words)
 				self.model.set(iter,
-					COLUMN_TITLE, rr.dict.INFO["TITLE"],
+					COLUMN_TITLE, rr.get_dict().INFO["TITLE"],
 					COLUMN_GROUP, rr.group,
 					COLUMN_NUM, len(rr.words),
 					COLUMN_TIMES, 7 - rr.time,

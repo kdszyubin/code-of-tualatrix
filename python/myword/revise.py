@@ -199,7 +199,7 @@ class Revise(gtk.VBox):
 					self.queue.append(rr)
 					self.model.set(iter,
 						COLUMN_ID, len(self.queue) - 1,
-						COLUMN_TITLE, rr.dict.INFO["TITLE"],
+						COLUMN_TITLE, rr.get_dict().INFO["TITLE"],
 						COLUMN_GROUP, rr.group,
 						COLUMN_NUM, len(rr.words),
 						COLUMN_TIMES, rr.time)
@@ -214,7 +214,7 @@ class Revise(gtk.VBox):
 		if iter:
 			self.rr = self.queue[int(model.get_value(iter, COLUMN_ID))]
 			self.wordtest.now = self.rr.words[0]
-			self.wordtest.cn.set_text(self.rr.dict[self.wordtest.now])
+			self.wordtest.cn.set_text(self.rr.get_dict()[self.wordtest.now])
 			self.wordtest.progress.set_text("第1个(共%d)" % self.rr.num)
 
 if __name__ == "__main__":
