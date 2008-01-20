@@ -29,7 +29,7 @@ from playsound import read, play
 
 def show_info(message, title = "提示", buttons = gtk.BUTTONS_OK, parent = None):
 	dialog = gtk.MessageDialog(None, gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_INFO, buttons)
-	dialog.set_icon_from_file("/usr/share/pixmaps/myword.png")
+	dialog.set_icon_from_file("myword.png")
 	dialog.set_title(title)
 	dialog.set_markup(message)
 	dialog.run()
@@ -47,7 +47,7 @@ class MessageDialog(gtk.MessageDialog):
 		gtk.MessageDialog.__init__(self, parent, flags, type, buttons)
 		self.set_markup(message)
 		self.set_title(title)
-		self.set_icon_from_file("/usr/share/pixmaps/myword.png")
+		self.set_icon_from_file("myword.png")
 
 class WordReview(gtk.EventBox):
 	def __init__(self, rr, finish_cb):
@@ -375,7 +375,7 @@ if __name__ == "__main__":
         win.set_border_width(8)
 
 	vbox = WordReview(None, None)
-	vbox.start_review(ReciteRecord("/usr/share/reciteword/books/qqssbdc/cykych/ck-kq.bok"))
+	vbox.start_review(ReciteRecord("books/qqssbdc/cykych/ck-kq.bok"))
         vbox.show()
         win.add(vbox)
 

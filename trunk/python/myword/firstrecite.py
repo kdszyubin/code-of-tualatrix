@@ -169,7 +169,7 @@ if __name__ == "__main__":
         win.set_default_size(300, 300)
         win.set_border_width(8)
 
-        vbox = FirstRecite("/usr/share/reciteword/books/qqssbdc/cykych/ck-kq.bok")
+        vbox = FirstRecite("books/qqssbdc/cykych/ck-kq.bok")
 	vbox.show()
         win.add(vbox)
 

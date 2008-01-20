@@ -401,7 +401,7 @@ class NewWord(gtk.VBox):
 				dialog.run()
 				dialog.destroy()
 			else:
-				books = ExistBook("/usr/share/myword/books") 
+				books = ExistBook("books") 
 				cn = None 
 
 				for book in books:
