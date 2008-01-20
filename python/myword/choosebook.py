@@ -24,6 +24,8 @@ import gobject
 import os
 
 from dictfile import DictFile
+from reciterecord import ReciteRecord
+from widgets import show_info
 
 (
 	COLUMN_TITLE,
@@ -38,6 +40,7 @@ from dictfile import DictFile
 ) = range(2)
 
 class BookList(gtk.TreeView):
+	"""书本列表"""
 	def __init__(self, parent = None):
 		gtk.TreeView.__init__(self)
 
@@ -50,17 +53,6 @@ class BookList(gtk.TreeView):
 		self.set_model(model)
 		self.__add_columns()
 		self.set_rules_hint(True)
-
-		selection = self.get_selection()
-		selection.set_mode(gtk.SELECTION_SINGLE)
-		selection.connect("changed", self.selection_changed, parent)
-
-	def selection_changed(self, widget, data = None):
-		model = widget.get_selected()[0]
-		iter = widget.get_selected()[1]
-		if iter:
-			path = model.get_value(iter, COLUMN_BOOKPATH)
-			data.select_book = path
 
 	def create_list(self, dir, model):
 		for item in os.listdir(dir):
@@ -151,8 +143,8 @@ class DirList(gtk.TreeView):
 		self.append_column(column)
 
 class ChooseBook(gtk.VBox):
-
-	def __init__(self):
+	"""选择书本的盒子，将DirList和BookList包装起来"""
+	def __init__(self, myword):
 		gtk.VBox.__init__(self, False, 10)
 
 		self.select_book = None
@@ -161,8 +153,8 @@ class ChooseBook(gtk.VBox):
 		hpaned.show()
 		self.pack_start(hpaned)
 
-		listview = BookList(self)
-		listview.show()
+		self.booklist = BookList()
+		self.booklist.show()
 
 		sw = gtk.ScrolledWindow()
 		sw.show()
@@ -170,9 +162,9 @@ class ChooseBook(gtk.VBox):
 		sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
 		hpaned.pack1(sw)
 
-		treeview = DirList("books", listview)
-		treeview.show()
-		sw.add(treeview)
+		dirlist = DirList("books", self.booklist)
+		dirlist.show()
+		sw.add(dirlist)
 
 		sw = gtk.ScrolledWindow()
 		sw.show()
@@ -180,7 +172,33 @@ class ChooseBook(gtk.VBox):
 		sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
 		hpaned.pack2(sw)
 
-		sw.add(listview)
+		sw.add(self.booklist)
+
+		hbox = gtk.HBox(False, 10)
+		hbox.show()
+		self.pack_end(hbox, False, False, 0)
+
+		button = gtk.Button(stock = gtk.STOCK_OK)
+		button.show()
+		button.connect("clicked", self.select_book_cb, myword)
+		hbox.pack_end(button, False, False ,0)
+
+		self.show()
+
+	def select_book_cb(self, widget, myword = None):
+		model, iter = self.booklist.get_selection().get_selected()
+
+		if iter:
+			book = model.get_value(iter, COLUMN_BOOKPATH)
+
+			if ReciteRecord(book).num:
+				myword.firstrecite.book = book
+				myword.firstrecite.create_model()
+				myword.notebook.set_current_page(2)
+			else:
+				show_info("这本书已经没有需要背诵的单词了.请选择其他书.")
+		else:
+			show_info("你没有选择任何词典")
 
 if __name__ == "__main__":
 	win = gtk.Window()
@@ -189,7 +207,7 @@ if __name__ == "__main__":
         win.set_default_size(650, 400)
         win.set_border_width(8)
 
-        vbox = ChooseBook()
+        vbox = ChooseBook(win)
 	vbox.show()
         win.add(vbox)
 

@@ -89,13 +89,9 @@ class FirstRecite(gtk.VBox):
 		spinbutton.show()
 		hbox.pack_end(spinbutton, False, False, 0)
 
-		button = gtk.Button("确定")
+		button = gtk.Button(stock = gtk.STOCK_OK)
 		button.show()
 		button.connect("clicked", self.start_clicked_cb)
-		vbox.pack_end(button, False, False, 0)
-
-		button = gtk.Button("返回")
-		button.show()
 		vbox.pack_end(button, False, False, 0)
 
 		hpaned.pack2(vbox)
@@ -153,11 +149,14 @@ class FirstRecite(gtk.VBox):
 		self.create_model(widget.get_value())
 
 	def start_clicked_cb(self, widget, data = None):
-		self.wordtest.create_test(self.rr)
-		self.preview.hide()
-		self.status.set_markup('<span size="xx-large">单词初记-测试</span>')
-		self.wordtest.entry.grab_focus()
-		self.wordtest.show()
+		if self.rr:
+			self.wordtest.create_test(self.rr)
+			self.preview.hide()
+			self.status.set_markup('<span size="xx-large">单词初记-测试</span>')
+			self.wordtest.entry.grab_focus()
+			self.wordtest.show()
+		else:
+			show_info("还没有选书呢！请选书！")
 
 if __name__ == "__main__":
 	win = gtk.Window()
