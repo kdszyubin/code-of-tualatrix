@@ -117,7 +117,7 @@ class ReciteRecord:
 		f.close()
 
 if __name__ == "__main__":
-	rr = ReciteRecord("/usr/share/reciteword/books/qqssbdc/cykych/ck-kq.bok")
+	rr = ReciteRecord("books/qqssbdc/cykych/ck-kq.bok")
 	print "要背诵的书是:%s." % rr.get_dict().INFO["TITLE"]
 	print "需要背育的单词是:%s." % rr.words
 	print "还需要复习%d次才算掌握." % (7 - rr.time)

@@ -39,7 +39,7 @@ class MyWord(gtk.Window):
 		self.config_test()
 
 		self.set_title("Myword " + VERSION)
-		self.set_icon_from_file("/usr/share/pixmaps/myword.png")
+		self.set_icon_from_file("myword.png")
 		self.set_size_request(560, 320)
 		self.set_position(gtk.WIN_POS_CENTER)
 		self.connect("destroy", lambda *w: gtk.main_quit())
@@ -130,12 +130,12 @@ class MyWord(gtk.Window):
 		gtk.about_dialog_set_url_hook(self.click_website)
 
 		about = gtk.AboutDialog()
-		about.set_icon_from_file("/usr/share/pixmaps/myword.png")
+		about.set_icon_from_file("myword.png")
 		about.set_name("Myword")
 		about.set_version(VERSION)
 		about.set_website("http://imtx.cn")
 		about.set_website_label("I'm TualatriX!")
-		about.set_logo(gtk.gdk.pixbuf_new_from_file("/usr/share/pixmaps/myword.png"))
+		about.set_logo(gtk.gdk.pixbuf_new_from_file("myword.png"))
 		about.set_comments("基于PyGTK的背单词软件！词库来自ReciteWord.")
 		about.set_authors(["TualatriX <tualatrix@gmail.com>"])
 		about.set_copyright("Copyright © 2008 TualatriX")
