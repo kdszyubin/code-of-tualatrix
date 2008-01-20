@@ -69,7 +69,7 @@ class Revise(gtk.VBox):
 	def update_record(self):
 		"""更新纪录，如果已经是第6次了，则完成这个纪录，从待复习
 		队列中剔除，将queue和keep合并然后更新record纪录"""
-		if self.rr.next == 6:
+		if self.rr.time == 6:
 			self.rr.finish_recite()
 			self.queue.remove(self.rr)
 		else:
@@ -82,9 +82,7 @@ class Revise(gtk.VBox):
 			pickle.dump(rr, f, True)
 			
 		f.close()
-#		self.reviselist.show()
-#		self.wordtest.hide()
-#		self.create_model()
+		self.rr = None
 		
 	def create_reviselist(self):
 		listview = self.create_listview()
@@ -109,7 +107,7 @@ class Revise(gtk.VBox):
 			hbox.show()
 			vbox.pack_start(hbox, False, False, 0)
 
-			button = gtk.Button("确定")
+			button = gtk.Button(stock = gtk.STOCK_OK)
 			button.show()
 			button.connect("clicked", self.start_revise_cb)
 			vbox.pack_end(button, False, False, 0)
@@ -126,11 +124,14 @@ class Revise(gtk.VBox):
 			return label
 
 	def start_revise_cb(self, widget, data = None):
-		self.wordtest.create_test(self.rr)
-		self.reviselist.hide()
-		self.status.set_markup('<span size="xx-large">单词复习-测试</span>')
-		self.wordtest.entry.grab_focus()
-		self.wordtest.show()
+		if self.rr:
+			self.wordtest.create_test(self.rr)
+			self.reviselist.hide()
+			self.status.set_markup('<span size="xx-large">单词复习-测试</span>')
+			self.wordtest.entry.grab_focus()
+			self.wordtest.show()
+		else:
+			show_info("请选择你要复习的内容")
 
 	def create_listview(self):
 		listview = gtk.TreeView()
