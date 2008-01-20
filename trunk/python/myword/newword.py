@@ -27,7 +27,7 @@ import glob
 import datetime
 import cPickle as pickle
 
-from widgets import MessageDialog
+from widgets import MessageDialog, show_info
 from dictfile import DictFile
 from playsound import read
 from UserList import UserList
@@ -81,7 +81,8 @@ class BookList(gtk.TreeView):
 		selection = self.get_selection()
 		selection.set_mode(gtk.SELECTION_SINGLE)
 		selection.connect("changed", self.selection_changed, list)
-		selection.select_iter(model.get_iter_first())
+		if model.get_iter_first():
+			selection.select_iter(model.get_iter_first())
 
 	def selection_changed(self, widget, list):
 		model, iter = widget.get_selected()
@@ -128,6 +129,8 @@ class WordList(gtk.TreeView):
 	"""Show a full list of a book"""
 	def __init__(self, parent):
 		gtk.TreeView.__init__(self)
+
+		self.book = None
 
 		model = gtk.ListStore(
 				gobject.TYPE_STRING,
@@ -181,12 +184,13 @@ class WordList(gtk.TreeView):
 				model.set_value(iter, column, new_text)
 				self.save(model)
 
-	def get_reciting(self, word):
+	def get_reciting(self, word = None):
 		"""取得当前编辑的单词是否正在背诵队列里，是则保护其不被修改"""
 		f = file(os.path.join(os.path.expanduser("~"), ".myword/record"), "rb")
 		
 		Reciting = False
 		Loading = True
+
 		while Loading:
 			try:
 				rr = pickle.load(f)
@@ -195,9 +199,14 @@ class WordList(gtk.TreeView):
 			except EOFError:
 				Loading = False
 			else:
-				if word in rr.words:
-					Reciting = True
-					break
+				if word:
+					if word in rr.words:
+						Reciting = True
+						break
+				else:
+					if self.book == rr.dict:
+						Reciting = True
+						break
 		f.close()
 		return Reciting
 
@@ -253,53 +262,57 @@ class WordList(gtk.TreeView):
 		return menu
 
 	def add_new_word(self, widget, data = None):
-		model = self.get_model()
-		iter = model.append()
-		model.set(iter,
-			COLUMN_EN, "在此输入英文",
-			COLUMN_CN, "在此输入中文",
-			COLUMN_EDITABLE, True)
+		if self.book:
+			model = self.get_model()
+			iter = model.append()
+			model.set(iter,
+				COLUMN_EN, "在此输入英文",
+				COLUMN_CN, "在此输入中文",
+				COLUMN_EDITABLE, True)
 
-		self.get_selection().select_iter(iter)
+			self.get_selection().select_iter(iter)
 
 	def remove_selected_word(self, widget, data = None):
 		"""当右键删除单库时触发，先判断是否在背诵，再进行移除，选
 		中下一下，再更新生词库列表"""
-		model, iter = self.get_selection().get_selected()
-		word = model.get_value(iter, COLUMN_EN)
+		if self.get_selection().get_selected()[1]:
+			model, iter = self.get_selection().get_selected()
+			word = model.get_value(iter, COLUMN_EN)
 
-		if self.get_reciting(word):
-			dialog = MessageDialog('当前编辑的单词正在背诵中，不可更改' ,buttons = gtk.BUTTONS_OK)
-			dialog.run()
-			dialog.destroy()
-		else:
-			model.remove(iter)
+			if self.get_reciting(word):
+				dialog = MessageDialog('当前编辑的单词正在背诵中，不可更改' ,buttons = gtk.BUTTONS_OK)
+				dialog.run()
+				dialog.destroy()
+			else:
+				model.remove(iter)
 
-			self.get_selection().select_iter(iter)
+				self.get_selection().select_iter(iter)
 
-			self.save(model)
+				self.save(model)
 
-			booklist = self.get_data("booklist")
-			model = booklist.get_model()
-			booklist.update_list(model)
+				booklist = self.get_data("booklist")
+				model = booklist.get_model()
+				booklist.update_list(model)
 
 	def button_press_event(self, widget, event, data = None):
 		if event.type == gtk.gdk.BUTTON_PRESS and event.button == 3:
 			data.popup(None, None, None, event.button, event.time)
 		return False
 
-	def update_list(self, book):
-		self.book = book
+	def update_list(self, book = None):
 		model = self.get_model()
 		model.clear()
-		self.dict = DictFile(book)
 
-		for word in self.dict.keys():
-			iter = model.append()
-			model.set(iter,
-				0, word,
-				1, self.dict[word].strip(),
-				2, True)
+		if book:
+			self.book = book
+			self.dict = DictFile(book)
+
+			for word in self.dict.keys():
+				iter = model.append()
+				model.set(iter,
+					0, word,
+					1, self.dict[word].strip(),
+					2, True)
 
 	def selection_changed(self, widget, data = None):
 		model = widget.get_selected()[0]
@@ -382,38 +395,39 @@ class NewWord(gtk.VBox):
 		new_word = self.entry.get_text()
 		exist, exist_book = wordlist.get_exist(new_word)
 
-		if exist:
-			dialog = MessageDialog('在"%s"中已经有"%s"这个单词了' % (DictFile(exist_book).INFO["TITLE"], new_word), buttons = gtk.BUTTONS_OK)
-			dialog.run()
-			dialog.destroy()
-		else:
-			books = ExistBook("/usr/share/reciteword/books") 
-			cn = None 
-
-			for book in books:
-				if cn:
-					break
-				for word in file(book):
-					if word.find("[W]" + new_word + "[T]") >= 0:
-						cn = word.split('[W]')[1].split('[T]')[1].split('[M]')[1]
-						break
-
-			model = wordlist.get_model()
-			iter = model.append()
-			if cn:
-				model.set(iter,
-					COLUMN_EN, new_word,
-					COLUMN_CN, cn.strip(),
-					COLUMN_EDITABLE, True)
+		if new_word:
+			if exist:
+				dialog = MessageDialog('在"%s"中已经有"%s"这个单词了' % (DictFile(exist_book).INFO["TITLE"], new_word), buttons = gtk.BUTTONS_OK)
+				dialog.run()
+				dialog.destroy()
 			else:
-				model.set(iter,
-					COLUMN_EN, new_word,
-					COLUMN_CN, "在此输入中文解释",
-					COLUMN_EDITABLE, True)
+				books = ExistBook("/usr/share/myword/books") 
+				cn = None 
 
-			wordlist.get_selection().select_iter(iter)
-			wordlist.save(model)
-			widget.set_text("")
+				for book in books:
+					if cn:
+						break
+					for word in file(book):
+						if word.find("[W]" + new_word + "[T]") >= 0:
+							cn = word.split('[W]')[1].split('[T]')[1].split('[M]')[1]
+							break
+
+				model = wordlist.get_model()
+				iter = model.append()
+				if cn:
+					model.set(iter,
+						COLUMN_EN, new_word,
+						COLUMN_CN, cn.strip(),
+						COLUMN_EDITABLE, True)
+				else:
+					model.set(iter,
+						COLUMN_EN, new_word,
+						COLUMN_CN, "在此输入中文解释",
+						COLUMN_EDITABLE, True)
+
+				wordlist.get_selection().select_iter(iter)
+				wordlist.save(model)
+				widget.set_text("")
 
 	def on_add_book_clicked(self, widget, booklist):
 		book_path = os.path.join(os.path.expanduser("~"), ".myword/books/", "myword-%s.bok" % datetime.datetime.today().isoformat(" ")[0:19])
@@ -436,13 +450,21 @@ class NewWord(gtk.VBox):
 			COLUMN_EDITABLE_OF_BOOK, True)
 
 	def on_remove_book_clicked(self, widget, booklist):
-		dialog = MessageDialog("真的要删除吗？这是不可恢复的！")
-		response = dialog.run()
-		if response == gtk.RESPONSE_YES:
-			model, iter = booklist.get_selection().get_selected()
-			os.remove(model.get_value(iter, COLUMN_PATH))
-			model.remove(iter)
-		dialog.destroy()
+		if booklist.get_selection().get_selected()[1]:
+			if self.wordlist.get_reciting():
+				show_info("不能删除这本生词库，因为当前正在背诵队列里")
+			else:
+				dialog = MessageDialog("真的要删除吗？这是不可恢复的！")
+				response = dialog.run()
+				if response == gtk.RESPONSE_YES:
+					model, iter = booklist.get_selection().get_selected()
+					os.remove(model.get_value(iter, COLUMN_PATH))
+					model.remove(iter)
+					if model.get_iter_first():
+						booklist.get_selection().select_iter(model.get_iter_first())
+					else:
+						self.wordlist.update_list()
+				dialog.destroy()
 
 if __name__ == "__main__":
 	win = gtk.Window()

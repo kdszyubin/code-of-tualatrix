@@ -123,7 +123,6 @@ class Result(gtk.VBox):
 	def create_progress_model(self):
 		self.progress_model.clear()
 		self.ing = 0
-		self.finished = 0
 		f = file(os.path.join(os.path.expanduser("~"), ".myword/record"), "rb")
 		Loading = True
 
@@ -136,10 +135,7 @@ class Result(gtk.VBox):
 				Loading = False
 			else:
 				iter = self.progress_model.append()
-				if rr.time < 7:
-					self.ing += len(rr.words)
-				else:
-					self.finished += len(rr.words)
+				self.ing += len(rr.words)
 				self.progress_model.set(iter,
 					COLUMN_TITLE, rr.get_dict().INFO["TITLE"],
 					COLUMN_GROUP, rr.group,
@@ -183,9 +179,8 @@ class Result(gtk.VBox):
 
 	def create_finished_model(self):
 		self.finished_model.clear()
-		self.ing = 0
 		self.finished = 0
-		f = file(os.path.join(os.path.expanduser("~"), ".myword/result"), "rb")
+		f = file(os.path.join(os.path.expanduser("~"), ".myword/finished"), "rb")
 		Loading = True
 
 		while Loading:
@@ -197,10 +192,7 @@ class Result(gtk.VBox):
 				Loading = False
 			else:
 				iter = self.finished_model.append()
-				if rr.time < 7:
-					self.ing += len(rr.words)
-				else:
-					self.finished += len(rr.words)
+				self.finished += len(rr.words)
 				self.finished_model.set(iter,
 					COLUMN_TITLE, rr.get_dict().INFO["TITLE"],
 					COLUMN_GROUP, rr.group,

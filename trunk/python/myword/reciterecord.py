@@ -29,7 +29,7 @@ class ReciteRecord:
 	和排除列表(exclude)，排除列表是为避免同一本书取到相同的单词，因为单
 	词都是随机选的，time代表下次复习为第几次
 	会保存"""
-	interval = (0, 1, 1, 2, 3, 7, 14)
+	interval = (0, 1, 1, 2, 4, 7, 14)
 
 	def __init__(self, filename, count = 25):
 		self.dict = filename
@@ -45,6 +45,22 @@ class ReciteRecord:
 	def create_wordlist(self, count = None):
 		"""创建单词列表，返回单词数"""
 		f = file(os.path.join(os.path.expanduser("~"), ".myword/record"), "rb")
+		
+		Loading = True
+		while Loading:
+			try:
+				rr = pickle.load(f)
+			except pickle.UnpicklingError:
+				pass
+			except EOFError:
+				Loading = False
+			else:
+				if rr.get_dict().INFO["TITLE"] == self.get_dict().INFO["TITLE"]:
+					self.exclude.extend(rr.words)
+					self.group += 1
+		f.close()
+
+		f = file(os.path.join(os.path.expanduser("~"), ".myword/finished"), "rb")
 		
 		Loading = True
 		while Loading:

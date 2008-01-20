@@ -79,13 +79,13 @@ class MyWord(gtk.Window):
 		self.notebook.connect("switch-page", self.switch_page_cb)
 
 	def switch_page_cb(self, widget, page, page_num, data = None):
-		if page_num == 4:
+		if page_num == 5:
 			self.result.create_model()
 
 	def config_test(self):
 		home_dir = os.path.join(os.path.expanduser("~"), ".myword/books")
 		record_file = os.path.join(os.path.expanduser("~"), ".myword/record")
-		result_file = os.path.join(os.path.expanduser("~"), ".myword/result")
+		finished_file = os.path.join(os.path.expanduser("~"), ".myword/finished")
 
 		if not os.path.exists(home_dir):
 			os.makedirs(home_dir)
@@ -94,8 +94,8 @@ class MyWord(gtk.Window):
 			f = file(record_file, "wb")
 			f.close()
 
-		if not os.path.exists(result_file):
-			f = file(result_file, "wb")
+		if not os.path.exists(finished_file):
+			f = file(finished_file, "wb")
 			f.close()
 
 	def welcome(self):
