@@ -89,10 +89,14 @@ class FirstRecite(gtk.VBox):
 		spinbutton.show()
 		hbox.pack_end(spinbutton, False, False, 0)
 
+		hbox = gtk.HBox(False, 10)
+		hbox.show()
+		vbox.pack_end(hbox, False, False, 0)
+
 		button = gtk.Button(stock = gtk.STOCK_OK)
 		button.show()
 		button.connect("clicked", self.start_clicked_cb)
-		vbox.pack_end(button, False, False, 0)
+		hbox.pack_end(button, False, False, 0)
 
 		hpaned.pack2(vbox)
 

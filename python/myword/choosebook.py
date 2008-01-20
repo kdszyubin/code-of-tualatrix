@@ -150,24 +150,19 @@ class ChooseBook(gtk.VBox):
 		self.select_book = None
 
 		hpaned = gtk.HPaned()
-		hpaned.show()
 		self.pack_start(hpaned)
 
 		self.booklist = BookList()
-		self.booklist.show()
 
 		sw = gtk.ScrolledWindow()
-		sw.show()
 		sw.set_shadow_type(gtk.SHADOW_ETCHED_IN)
 		sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
 		hpaned.pack1(sw)
 
 		dirlist = DirList("books", self.booklist)
-		dirlist.show()
 		sw.add(dirlist)
 
 		sw = gtk.ScrolledWindow()
-		sw.show()
 		sw.set_shadow_type(gtk.SHADOW_ETCHED_IN)
 		sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
 		hpaned.pack2(sw)
@@ -175,15 +170,14 @@ class ChooseBook(gtk.VBox):
 		sw.add(self.booklist)
 
 		hbox = gtk.HBox(False, 10)
-		hbox.show()
-		self.pack_end(hbox, False, False, 0)
+		hbox.set_border_width(5)
+		self.pack_end(hbox, False, False, 5)
 
 		button = gtk.Button(stock = gtk.STOCK_OK)
-		button.show()
 		button.connect("clicked", self.select_book_cb, myword)
 		hbox.pack_end(button, False, False ,0)
 
-		self.show()
+		self.show_all()
 
 	def select_book_cb(self, widget, myword = None):
 		model, iter = self.booklist.get_selection().get_selected()

@@ -45,38 +45,40 @@ class Result(gtk.VBox):
 		self.finished = 0
 
 		label = gtk.Label()
-		label.show()
 		label.set_markup('<span size="xx-large">你的成绩</span>')
 		self.pack_start(label, False, False, 10)
 
+		hpaned = gtk.HPaned()
+		hpaned.show()
+		self.pack_start(hpaned)
+
+		vbox = gtk.VBox(False, 10)
+		hpaned.pack1(vbox)
 		self.result_ing = gtk.Label()
 		self.result_ing.set_alignment(0, 0)
-		self.result_ing.show()
-		self.pack_start(self.result_ing, False, False, 10)
+		vbox.pack_start(self.result_ing, False, False, 10)
 
 		sw = gtk.ScrolledWindow()
-		sw.show()
+		sw.set_size_request(310, -1)
 		sw.set_shadow_type(gtk.SHADOW_ETCHED_IN)
 		sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-		self.pack_start(sw)
+		vbox.pack_start(sw)
 
 		progress = self.create_progress_list()
-		progress.show()
 		sw.add(progress)
 
+		vbox = gtk.VBox(False, 10)
+		hpaned.pack2(vbox)
 		self.result_finished = gtk.Label()
 		self.result_finished.set_alignment(0, 0)
-		self.result_finished.show()
-		self.pack_start(self.result_finished, False, False, 10)
+		vbox.pack_start(self.result_finished, False, False, 10)
 
 		sw = gtk.ScrolledWindow()
-		sw.show()
 		sw.set_shadow_type(gtk.SHADOW_ETCHED_IN)
 		sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-		self.pack_start(sw)
+		vbox.pack_start(sw)
 
 		finished = self.create_finished_list()
-		finished.show()
 		sw.add(finished)
 
 	def create_model(self):
@@ -173,6 +175,7 @@ class Result(gtk.VBox):
 
 		renderer = gtk.CellRendererText()
 		column = gtk.TreeViewColumn("完成时间", renderer, text = COLUMN_FINISH)
+		column.set_fixed_width(50)
 		treeview.append_column(column)
 
 		return treeview	

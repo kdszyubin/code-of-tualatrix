@@ -22,6 +22,7 @@
 import gtk
 import os
 
+from gnome import url_show
 from revise import Revise
 from choosebook import ChooseBook
 from firstrecite import FirstRecite
@@ -29,15 +30,17 @@ from widgets import show_info
 from result import Result
 from newword import NewWord
 
+VERSION = "0.9"
+
 class MyWord(gtk.Window):
 	def __init__(self):
 		gtk.Window.__init__(self)
 
 		self.config_test()
 
-		self.set_title("Myword 0.9")
+		self.set_title("Myword " + VERSION)
 		self.set_icon_from_file("/usr/share/pixmaps/myword.png")
-		self.set_size_request(500, 300)
+		self.set_size_request(560, 320)
 		self.set_position(gtk.WIN_POS_CENTER)
 		self.connect("destroy", lambda *w: gtk.main_quit())
 
@@ -51,7 +54,7 @@ class MyWord(gtk.Window):
 		vbox.pack_start(self.notebook)
 
 		welcome = self.welcome()
-		welcome.show()
+		welcome.show_all()
 		label = gtk.Label("欢迎")
 		self.notebook.append_page(welcome, label)
 
@@ -70,9 +73,16 @@ class MyWord(gtk.Window):
 		self.notebook.append_page(NewWord(self), label)
 
 		self.result = Result()
-		self.result.show()
+		self.result.show_all()
 		label = gtk.Label("成绩")
 		self.notebook.append_page(self.result, label)
+
+		about = self.welcome(message = """
+\tMyword是一款基于PyGTK的自由软件，它使用ReciteWord的生词库，并支持它的语音。\n\n\tMyword具备完整的单词测试、词义回想和复习功能，并应用了记忆遗忘曲线，按时提醒你复习。你可以随时查看当前的背诵状态，因为Myword提供了详细的信息可供追踪。\n\t除此之外，Myword还拥有强大的生词库功能，无论背不背单词，都可以用Myword来创建并管理自己的生字库。查看其他信息请点击我""", 
+				size = "large", about = True)
+		about.show_all()
+		label = gtk.Label("关于")
+		self.notebook.append_page(about, label)
 
 		self.show()
 
@@ -98,15 +108,43 @@ class MyWord(gtk.Window):
 			f = file(finished_file, "wb")
 			f.close()
 
-	def welcome(self):
+	def welcome(self, message = "欢迎使用Myword背单词软件！", size = "xx-large", about = None):
 		vbox = gtk.VBox(False, 10)
 
+		eventbox = gtk.EventBox()
+		if about:
+			eventbox.connect("button_press_event", self.show_about)
+		vbox.pack_start(eventbox)
+
 		label = gtk.Label()
-		label.show()
-		label.set_markup('<span size="xx-large">欢迎使用Myword背单词软件！</span>')
-		vbox.pack_start(label)
+		label.set_line_wrap(True)
+		label.set_markup('<span size="%s">%s</span>' % (size, message))
+		eventbox.add(label)
 
 		return vbox
+
+	def click_website(self, dialog, link, data = None):
+		url_show(link)
+
+	def show_about(self, widget, event, data =  None):
+		gtk.about_dialog_set_url_hook(self.click_website)
+
+		about = gtk.AboutDialog()
+		about.set_icon_from_file("/usr/share/pixmaps/myword.png")
+		about.set_name("Myword")
+		about.set_version(VERSION)
+		about.set_website("http://imtx.cn")
+		about.set_website_label("I'm TualatriX!")
+		about.set_logo(gtk.gdk.pixbuf_new_from_file("/usr/share/pixmaps/myword.png"))
+		about.set_comments("基于PyGTK的背单词软件！词库来自ReciteWord.")
+		about.set_authors(["TualatriX <tualatrix@gmail.com>"])
+		about.set_copyright("Copyright © 2008 TualatriX")
+		about.set_wrap_license(True)
+		about.set_license("Myword is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.\n\
+Myword is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.\n\
+You should have received a copy of the GNU General Public License along with Ubuntu Tweak; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA")
+		about.run()
+		about.destroy()
 
 	def create_firstrecite(self, book = None):
 		return FirstRecite(book)
