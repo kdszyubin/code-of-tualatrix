@@ -102,15 +102,16 @@ class WordReview(gtk.VBox):
 		self.buttons = [button1, button2, button3, button4]
 
 	def start_review(self, rr):
+		"""初始化词意回想，采用随机采样方式，将单词丢进池子"""
 		self.rr = rr
 		self.passed = False
 		self.queue = []
-		self.now = self.rr.words[0]
-		self.next()
+		self.pool = copy.copy(self.rr.words)
+		self.next_word()
 
 	def button_press_event(self, widget, event, data = None):
 		if self.passed == True:
-			self.next()
+			self.next_word()
 			self.passed = False
 
 		return False
@@ -136,8 +137,9 @@ class WordReview(gtk.VBox):
 			play("answerno")
 			self.status.set_label("回答错误！请重选.")
 
-	def next(self):
-		self.now = self.rr.words[len(self.queue)]
+	def next_word(self):
+		self.now = random.sample(self.pool, 1)[0]
+		self.pool.remove(self.now)
 		read(self.now)
 		self.title.set_markup('<span size="x-large">%s</span>' % self.now)
 		self.status.set_label("第%d个(共%d个)" % (len(self.queue) + 1, len(self.rr.words)))

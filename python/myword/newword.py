@@ -25,6 +25,7 @@ import sys
 import os
 import glob
 import datetime
+import cPickle as pickle
 
 from widgets import MessageDialog
 from dictfile import DictFile
@@ -165,15 +166,40 @@ class WordList(gtk.TreeView):
 		column = cell.get_data("column")
 		old = model.get_value(iter, column)
 
-		exist, exist_book = self.get_exist(new_text)
-
-		if exist and new_text != old:
-			dialog = MessageDialog('在"%s"中已经有"%s"这个单词了' % (DictFile(exist_book).INFO["TITLE"], new_text), buttons = gtk.BUTTONS_OK)
+		if self.get_reciting(old):
+			dialog = MessageDialog('当前编辑的单词正在背诵中，不可更改' ,buttons = gtk.BUTTONS_OK)
 			dialog.run()
 			dialog.destroy()
 		else:
-			model.set_value(iter, column, new_text)
-			self.save(model)
+			exist, exist_book = self.get_exist(new_text)
+
+			if exist and new_text != old:
+				dialog = MessageDialog('在"%s"中已经有"%s"这个单词了' % (DictFile(exist_book).INFO["TITLE"], new_text), buttons = gtk.BUTTONS_OK)
+				dialog.run()
+				dialog.destroy()
+			else:
+				model.set_value(iter, column, new_text)
+				self.save(model)
+
+	def get_reciting(self, word):
+		"""取得当前编辑的单词是否正在背诵队列里，是则保护其不被修改"""
+		f = file(os.path.join(os.path.expanduser("~"), ".myword/record"), "rb")
+		
+		Reciting = False
+		Loading = True
+		while Loading:
+			try:
+				rr = pickle.load(f)
+			except pickle.UnpicklingError:
+				pass
+			except EOFError:
+				Loading = False
+			else:
+				if word in rr.words:
+					Reciting = True
+					break
+		f.close()
+		return Reciting
 
 	def get_exist(self, new_word):
 		"""判断当前加入的单词是否已存在, 返回一个tuple"""
@@ -237,16 +263,25 @@ class WordList(gtk.TreeView):
 		self.get_selection().select_iter(iter)
 
 	def remove_selected_word(self, widget, data = None):
+		"""当右键删除单库时触发，先判断是否在背诵，再进行移除，选
+		中下一下，再更新生词库列表"""
 		model, iter = self.get_selection().get_selected()
-		model.remove(iter)
+		word = model.get_value(iter, COLUMN_EN)
 
-		self.get_selection().select_iter(iter)
+		if self.get_reciting(word):
+			dialog = MessageDialog('当前编辑的单词正在背诵中，不可更改' ,buttons = gtk.BUTTONS_OK)
+			dialog.run()
+			dialog.destroy()
+		else:
+			model.remove(iter)
 
-		self.save(model)
+			self.get_selection().select_iter(iter)
 
-		booklist = self.get_data("booklist")
-		model = booklist.get_model()
-		booklist.update_list(model)
+			self.save(model)
+
+			booklist = self.get_data("booklist")
+			model = booklist.get_model()
+			booklist.update_list(model)
 
 	def button_press_event(self, widget, event, data = None):
 		if event.type == gtk.gdk.BUTTON_PRESS and event.button == 3:
