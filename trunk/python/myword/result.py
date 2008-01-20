@@ -34,16 +34,13 @@ from dictfile import DictFile
 	COLUMN_NEXT,
 ) = range(5)
 
-(
-	COLUMN_START,
-	COLUMN_FINISH,
-) = range(3,5)
+COLUMN_FINISH = COLUMN_TIMES
 
 class Result(gtk.VBox):
 	def __init__(self):
 		gtk.VBox.__init__(self, False, 10)
-		self.rr = None
 
+		self.rr = None
 		self.ing = 0
 		self.finished = 0
 
@@ -63,49 +60,68 @@ class Result(gtk.VBox):
 		sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
 		self.pack_start(sw)
 
-		listview = self.create_listview()
-		listview.show()
-		sw.add(listview)
+		progress = self.create_progress_list()
+		progress.show()
+		sw.add(progress)
 
-	def create_listview(self, finish = None):
-		listview = gtk.TreeView()
+		self.result_finished = gtk.Label()
+		self.result_finished.set_alignment(0, 0)
+		self.result_finished.show()
+		self.pack_start(self.result_finished, False, False, 10)
 
-		self.model = gtk.ListStore(
+		sw = gtk.ScrolledWindow()
+		sw.show()
+		sw.set_shadow_type(gtk.SHADOW_ETCHED_IN)
+		sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+		self.pack_start(sw)
+
+		finished = self.create_finished_list()
+		finished.show()
+		sw.add(finished)
+
+	def create_model(self):
+		self.create_progress_model()
+		self.create_finished_model()
+
+	def create_progress_list(self, finish = None):
+		treeview = gtk.TreeView()
+
+		self.progress_model = gtk.ListStore(
 				gobject.TYPE_STRING,
 				gobject.TYPE_STRING,
 				gobject.TYPE_STRING,
 				gobject.TYPE_STRING,
 				gobject.TYPE_STRING)
 
-		listview.set_model(self.model)
-		listview.set_rules_hint(True)
+		treeview.set_model(self.progress_model)
+		treeview.set_rules_hint(True)
 
-		self.create_model()
+		self.create_progress_model()
 
 		renderer = gtk.CellRendererText()
 		column = gtk.TreeViewColumn("书名", renderer, text = COLUMN_TITLE)
-		listview.append_column(column)
+		treeview.append_column(column)
 
 		renderer = gtk.CellRendererText()
 		column = gtk.TreeViewColumn("组别", renderer, text = COLUMN_GROUP)
-		listview.append_column(column)
+		treeview.append_column(column)
 
 		renderer = gtk.CellRendererText()
 		column = gtk.TreeViewColumn("单词数", renderer, text = COLUMN_NUM)
-		listview.append_column(column)
+		treeview.append_column(column)
 
 		renderer = gtk.CellRendererText()
 		column = gtk.TreeViewColumn("剩余复习次数", renderer, text = COLUMN_TIMES)
-		listview.append_column(column)
+		treeview.append_column(column)
 
 		renderer = gtk.CellRendererText()
 		column = gtk.TreeViewColumn("下次复习时间", renderer, text = COLUMN_NEXT)
-		listview.append_column(column)
+		treeview.append_column(column)
 
-		return listview	
+		return treeview	
 
-	def create_model(self):
-		self.model.clear()
+	def create_progress_model(self):
+		self.progress_model.clear()
 		self.ing = 0
 		self.finished = 0
 		f = file(os.path.join(os.path.expanduser("~"), ".myword/record"), "rb")
@@ -115,23 +131,82 @@ class Result(gtk.VBox):
 			try:
 				rr = pickle.load(f)
 			except pickle.UnpicklingError:
-				print "截入错误，应该是空记录"
+				pass
 			except EOFError:
 				Loading = False
-				print "载入完毕"
 			else:
-				iter = self.model.append()
+				iter = self.progress_model.append()
 				if rr.time < 7:
 					self.ing += len(rr.words)
 				else:
 					self.finished += len(rr.words)
-				self.model.set(iter,
+				self.progress_model.set(iter,
 					COLUMN_TITLE, rr.get_dict().INFO["TITLE"],
 					COLUMN_GROUP, rr.group,
 					COLUMN_NUM, len(rr.words),
 					COLUMN_TIMES, 7 - rr.time,
 					COLUMN_NEXT, rr.next)
 		self.result_ing.set_markup("你正在强化记忆<b>%d</b>个单词" % self.ing)
+		f.close()
+
+	def create_finished_list(self, finish = None):
+		treeview = gtk.TreeView()
+
+		self.finished_model = gtk.ListStore(
+				gobject.TYPE_STRING,
+				gobject.TYPE_STRING,
+				gobject.TYPE_STRING,
+				gobject.TYPE_STRING)
+
+		treeview.set_model(self.finished_model)
+		treeview.set_rules_hint(True)
+
+		self.create_finished_model()
+
+		renderer = gtk.CellRendererText()
+		column = gtk.TreeViewColumn("书名", renderer, text = COLUMN_TITLE)
+		treeview.append_column(column)
+
+		renderer = gtk.CellRendererText()
+		column = gtk.TreeViewColumn("组别", renderer, text = COLUMN_GROUP)
+		treeview.append_column(column)
+
+		renderer = gtk.CellRendererText()
+		column = gtk.TreeViewColumn("单词数", renderer, text = COLUMN_NUM)
+		treeview.append_column(column)
+
+		renderer = gtk.CellRendererText()
+		column = gtk.TreeViewColumn("完成时间", renderer, text = COLUMN_FINISH)
+		treeview.append_column(column)
+
+		return treeview	
+
+	def create_finished_model(self):
+		self.finished_model.clear()
+		self.ing = 0
+		self.finished = 0
+		f = file(os.path.join(os.path.expanduser("~"), ".myword/result"), "rb")
+		Loading = True
+
+		while Loading:
+			try:
+				rr = pickle.load(f)
+			except pickle.UnpicklingError:
+				pass
+			except EOFError:
+				Loading = False
+			else:
+				iter = self.finished_model.append()
+				if rr.time < 7:
+					self.ing += len(rr.words)
+				else:
+					self.finished += len(rr.words)
+				self.finished_model.set(iter,
+					COLUMN_TITLE, rr.get_dict().INFO["TITLE"],
+					COLUMN_GROUP, rr.group,
+					COLUMN_NUM, len(rr.words),
+					COLUMN_FINISH, rr.next)
+		self.result_finished.set_markup("你已经掌握了<b>%d</b>个单词" % self.finished)
 		f.close()
 
 if __name__ == "__main__":

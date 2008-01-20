@@ -40,6 +40,10 @@ class ReciteRecord:
 		self.next = self.set_next(True)
 		self.group = 1
 
+		self.create_wordlist(count)
+
+	def create_wordlist(self, count = None):
+		"""创建单词列表，返回单词数"""
 		f = file(os.path.join(os.path.expanduser("~"), ".myword/record"), "rb")
 		
 		Loading = True
@@ -47,10 +51,9 @@ class ReciteRecord:
 			try:
 				rr = pickle.load(f)
 			except pickle.UnpicklingError:
-				print "截入错误，应该是空记录"
+				pass
 			except EOFError:
 				Loading = False
-				print "载入完毕"
 			else:
 				if rr.get_dict().INFO["TITLE"] == self.get_dict().INFO["TITLE"]:
 					self.exclude.extend(rr.words)
@@ -67,6 +70,8 @@ class ReciteRecord:
 					break
 
 		self.num = len(self.words)
+
+		return self.num
 
 	def get_dict(self):
 		"""根据纪录信息打开词典并返回"""

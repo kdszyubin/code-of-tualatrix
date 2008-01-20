@@ -49,27 +49,26 @@ class MessageDialog(gtk.MessageDialog):
 		self.set_title(title)
 		self.set_icon_from_file("/usr/share/pixmaps/myword.png")
 
-class WordReview(gtk.VBox):
+class WordReview(gtk.EventBox):
 	def __init__(self, rr, finish_cb):
-		gtk.VBox.__init__(self)
+		gtk.EventBox.__init__(self)
 
 		self.rr = rr
 		self.finish_cb = finish_cb
 		self.passed = False
 		self.queue = []
 
-		eventbox = gtk.EventBox()
-		eventbox.show()
-		eventbox.connect("button_press_event", self.button_press_event)
+		vbox = gtk.VBox(False, 0)
+		vbox.show()
+		self.add(vbox)
 
 		self.title = gtk.Label()
 		self.title.show()
-		eventbox.add(self.title)
-		self.pack_start(eventbox, False, False, 20)
+		vbox.pack_start(self.title, False, False, 20)
 
 		hbox = gtk.HBox(False, 0)
 		hbox.show()
-		self.pack_start(hbox, False, False, 0)
+		vbox.pack_start(hbox, False, False, 0)
 
 		button1 = gtk.Button("Hello")
 		button1.show()
@@ -93,13 +92,14 @@ class WordReview(gtk.VBox):
 
 		hbox = gtk.HBox(False, 0)
 		hbox.show()
-		self.pack_start(hbox, False, False, 10)
+		vbox.pack_start(hbox, False, False, 10)
 
 		self.status = gtk.Label()
 		self.status.show()
 		hbox.pack_end(self.status, False, False, 0)
 
 		self.buttons = [button1, button2, button3, button4]
+		self.connect("button_press_event", self.button_press_event)
 
 	def start_review(self, rr):
 		"""初始化词意回想，采用随机采样方式，将单词丢进池子"""
@@ -128,7 +128,7 @@ class WordReview(gtk.VBox):
 			self.queue.append(self.now)
 			play("answerok")
 			if len(self.queue) < len(self.rr.words):
-				self.status.set_label("回答正确！单击英文标题继续.")
+				self.status.set_label("回答正确！点击空白处继续.")
 				self.passed = True
 			else:
 				show_info("回想完毕.请等待下次复习！")
