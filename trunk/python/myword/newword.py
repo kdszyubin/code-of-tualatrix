@@ -419,9 +419,9 @@ class NewWord(gtk.VBox):
 
 		self.book = None
 
-		main_hbox = gtk.HBox(False, 5)
-		main_hbox.show()
-		self.pack_start(main_hbox)
+		hpaned = gtk.HPaned()
+		hpaned.show()
+		self.pack_start(hpaned)
 
 		#先创建例句的实例，即使它最后用到
 		sentence = SentenceBox()
@@ -437,10 +437,9 @@ class NewWord(gtk.VBox):
 
 		vbox = gtk.VBox(False, 10)
 		vbox.show()
-		main_hbox.pack_start(vbox, False, False, 0)
+		hpaned.pack1(vbox)
 
 		sw = gtk.ScrolledWindow()
-##		sw.set_size_request(200, -1)
 		sw.show()
 		sw.set_shadow_type(gtk.SHADOW_ETCHED_IN)
 		sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
@@ -463,7 +462,7 @@ class NewWord(gtk.VBox):
 
 		vbox = gtk.VBox(False, 10)
 		vbox.show()
-		main_hbox.pack_start(vbox)
+		hpaned.pack2(vbox)
 
 		sw = gtk.ScrolledWindow()
 		sw.show()
@@ -489,6 +488,9 @@ class NewWord(gtk.VBox):
 
 		sw.add(self.wordlist)
 		self.show()
+
+	def on_toggle_paned(self, widget, vbox):
+		print "toggled"
 
 	def on_add_word(self, widget, wordlist):
 		new_word = self.entry.get_text()
