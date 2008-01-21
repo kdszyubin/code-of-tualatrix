@@ -28,14 +28,14 @@ class FileInfo(UserDict):
         UserDict.__init__(self)
 	self.FILE = filename
 
-class DictFile(FileInfo):
+class DictFile(UserDict):
 	"""A book with many words"""
 	separate = ["[C]", "[R]", "[P]"]
 	description = ["TITLE", "NUM", "AUTHOR", "OTHER"]
 
 	def __init__(self, filename, light = False):
-		"""继承自FileInfo，light参数用于决定是否只取得词典的描述"""
-		FileInfo.__init__(self, filename)
+		"""light参数用于决定是否只取得词典的描述"""
+		UserDict.__init__(self)
 
 		if os.path.exists(filename):
 			self.__parse(filename, light)

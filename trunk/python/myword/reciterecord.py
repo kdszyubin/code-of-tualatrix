@@ -118,6 +118,7 @@ class ReciteRecord:
 
 if __name__ == "__main__":
 	rr = ReciteRecord("books/qqssbdc/cykych/ck-kq.bok")
+	print rr.dict
 	print "要背诵的书是:%s." % rr.get_dict().INFO["TITLE"]
 	print "需要背育的单词是:%s." % rr.words
 	print "还需要复习%d次才算掌握." % (7 - rr.time)
