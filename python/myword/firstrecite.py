@@ -154,11 +154,14 @@ class FirstRecite(gtk.VBox):
 
 	def start_clicked_cb(self, widget, data = None):
 		if self.rr:
-			self.wordtest.create_test(self.rr)
-			self.preview.hide()
-			self.status.set_markup('<span size="xx-large">单词初记-测试</span>')
-			self.wordtest.entry.grab_focus()
-			self.wordtest.show()
+			if self.rr.num >= 5:
+				self.wordtest.create_test(self.rr)
+				self.preview.hide()
+				self.status.set_markup('<span size="xx-large">单词初记-测试</span>')
+				self.wordtest.entry.grab_focus()
+				self.wordtest.show()
+			elif self.rr.num < 5:
+				show_info("单词少于5个时不能进行背诵")
 		else:
 			show_info("还没有选书呢！请选书！")
 

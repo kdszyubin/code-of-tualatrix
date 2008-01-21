@@ -96,6 +96,7 @@ class MyWord(gtk.Window):
 		home_dir = os.path.join(os.path.expanduser("~"), ".myword/books")
 		record_file = os.path.join(os.path.expanduser("~"), ".myword/record")
 		finished_file = os.path.join(os.path.expanduser("~"), ".myword/finished")
+		sentence_file = os.path.join(os.path.expanduser("~"), ".myword/sentence")
 
 		if not os.path.exists(home_dir):
 			os.makedirs(home_dir)
@@ -106,6 +107,10 @@ class MyWord(gtk.Window):
 
 		if not os.path.exists(finished_file):
 			f = file(finished_file, "wb")
+			f.close()
+
+		if not os.path.exists(sentence_file):
+			f = file(sentence_file, "wb")
 			f.close()
 
 	def welcome(self, message = "欢迎使用Myword背单词软件！", size = "xx-large", about = None):
