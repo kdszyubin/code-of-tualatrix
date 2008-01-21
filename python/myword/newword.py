@@ -31,6 +31,7 @@ from widgets import MessageDialog, show_info
 from dictfile import DictFile
 from playsound import read
 from UserList import UserList
+from UserDict import UserDict
 
 (
 	COLUMN_TITLE,
@@ -44,6 +45,7 @@ from UserList import UserList
 	COLUMN_CN,
 	COLUMN_EDITABLE,
 ) = range(3)
+
 
 class ExistBook(UserList):
         def __init__(self, path):
@@ -126,8 +128,9 @@ class BookList(gtk.TreeView):
 		model.set_value(iter, COLUMN_TITLE, new_text)
 
 class WordList(gtk.TreeView):
-	"""Show a full list of a book"""
-	def __init__(self, parent):
+	"""显示某一生词库的单词列表，其中parent参数是指主窗体，用于注册右键菜单
+	sentence参数是例句，当选中一个单词时触发"""
+	def __init__(self, parent, sentence):
 		gtk.TreeView.__init__(self)
 
 		self.book = None
@@ -155,7 +158,7 @@ class WordList(gtk.TreeView):
 
 		selection = self.get_selection()
 		selection.set_mode(gtk.SELECTION_BROWSE)
-		selection.connect("changed", self.selection_changed)
+		selection.connect("changed", self.selection_changed, sentence)
 
 		menu = self.create_popup_menu(parent)
 		menu.show_all()
@@ -314,11 +317,101 @@ class WordList(gtk.TreeView):
 					1, self.dict[word].strip(),
 					2, True)
 
-	def selection_changed(self, widget, data = None):
+	def selection_changed(self, widget, sentence):
 		model = widget.get_selected()[0]
 		iter = widget.get_selected()[1]
 		if iter:
-			read(model.get_value(iter, 0))
+			word = model.get_value(iter, COLUMN_EN)
+			sentence.set_display(word)
+			read(word)
+
+class SentenceFile(UserDict):
+	"""SentenceFile用于使用保存例句的文件"""
+	def __init__(self):
+		UserDict.__init__(self)
+
+		self.__parse()
+
+	def __parse(self):
+		for sentence in file(os.path.join(os.path.expanduser("~"), ".myword/sentence")):
+			self[sentence.split(":")[0]] = sentence.split(":")[1].strip()
+
+	def __setitem__(self, key, item):
+		UserDict.__setitem__(self, key, item)
+		self.save()
+
+	def __delitem__(self, key):
+		UserDict.__delitem__(self, key)
+		self.save()
+
+	def save(self):
+		content = "\n".join(["%s:%s" % (k,v) for k,v in self.data.items()])
+
+		f = file(os.path.join(os.path.expanduser("~"), ".myword/sentence"), "wb")
+		f.write(content)
+		f.close()
+
+class SentenceBox(gtk.VBox):
+	"""显示例句的窗口"""
+	def __init__(self):
+		gtk.VBox.__init__(self)
+	
+		self.word = ""
+
+		eventbox = gtk.EventBox()
+		eventbox.show()
+		self.pack_start(eventbox, False, False, 5)
+
+		self.label = gtk.Label("请选择一个单词")
+		self.label.set_line_wrap(True)
+		self.label.show()
+		eventbox.add(self.label)
+
+		self.hbox = gtk.HBox(False, 0)
+		self.pack_start(self.hbox)
+
+		self.entry = gtk.Entry()
+		self.entry.show()
+		self.entry.connect("activate", self.edit_finished)
+		self.hbox.pack_start(self.entry)
+
+		button = gtk.Button("Apply")
+		button.show()
+		button.connect("clicked", self.edit_finished)
+		self.hbox.pack_start(button, False, False, 5)
+
+		eventbox.connect("button_press_event", self.add_sentence)
+
+	def add_sentence(self, widget, event, data = None):
+		if event.type == gtk.gdk._2BUTTON_PRESS and self.word:
+			self.label.hide()
+			self.hbox.show()
+			self.entry.grab_focus()
+
+	def edit_finished(self, widget, data = None):
+		sentence = SentenceFile()
+		if self.entry.get_text():
+			sentence[self.word] = self.entry.get_text()
+			self.label.set_text(self.entry.get_text())
+		else:
+			if self.word in sentence:
+				del sentence[self.word]
+				self.set_display(self.word)
+		self.label.show()
+		self.hbox.hide()
+
+	def set_display(self, word):
+		self.label.show()
+		self.hbox.hide()
+
+		sentence = SentenceFile()
+		self.word = word
+		if word in sentence:
+			self.label.set_label(sentence[word])
+			self.entry.set_text(sentence[word])
+		else:
+			self.label.set_markup("<b>%s</b>还没有例句，请双击这里添加" % word)
+			self.entry.set_text("")
 
 class NewWord(gtk.VBox):
 	def __init__(self, parent):
@@ -330,7 +423,11 @@ class NewWord(gtk.VBox):
 		main_hbox.show()
 		self.pack_start(main_hbox)
 
-		self.wordlist = WordList(parent)
+		#先创建例句的实例，即使它最后用到
+		sentence = SentenceBox()
+		sentence.show()
+
+		self.wordlist = WordList(parent, sentence)
 		self.wordlist.show()
 
 		booklist = BookList(self.wordlist)
@@ -373,6 +470,8 @@ class NewWord(gtk.VBox):
 		sw.set_shadow_type(gtk.SHADOW_ETCHED_IN)
 		sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
 		vbox.pack_start(sw)
+
+		vbox.pack_start(sentence, False, False, 5)
 
 		hbox = gtk.HBox(False, 5)
 		hbox.show()
