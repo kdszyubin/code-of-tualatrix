@@ -185,10 +185,12 @@ class ChooseBook(gtk.VBox):
 		if iter:
 			book = model.get_value(iter, COLUMN_BOOKPATH)
 
-			if ReciteRecord(book).num:
+			if ReciteRecord(book).num >= 5:
 				myword.firstrecite.book = book
 				myword.firstrecite.create_model()
 				myword.notebook.set_current_page(2)
+			elif ReciteRecord(book).num < 5:
+				show_info("单词少于5个，不能进行背诵.")
 			else:
 				show_info("这本书已经没有需要背诵的单词了.请选择其他书.")
 		else:
