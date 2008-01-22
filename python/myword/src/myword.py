@@ -22,7 +22,10 @@
 import gtk
 import os
 
-from gnome import url_show
+try:
+	from gnome import url_show
+except ImportError:
+	pass
 from revise import Revise
 from choosebook import ChooseBook
 from firstrecite import FirstRecite
@@ -30,7 +33,7 @@ from widgets import show_info
 from result import Result
 from newword import NewWord
 
-VERSION = "0.9.5"
+VERSION = "0.9.6"
 
 class MyWord(gtk.Window):
 	def __init__(self):

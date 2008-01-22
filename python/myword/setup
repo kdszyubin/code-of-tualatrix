@@ -6,6 +6,10 @@ if [ $UID != 0 ]; then
 	exit
 fi
 
+if [ -d $1 ]; then
+	echo "exit"
+fi
+
 if [ $1 == "install" ]; then
 	echo "开始安装"
 	mkdir /usr/share/myword

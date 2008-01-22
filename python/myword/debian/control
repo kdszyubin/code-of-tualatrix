@@ -7,5 +7,9 @@ Standards-Version: 3.7.2
 
 Package: myword
 Architecture: all
-Depends: python, python-gtk2, python-apt, python-gconf, python-gnome2
+Depends: python, python-gtk2, myword-books
 Description: Myword is an recite word application.
+
+Package: myword-books
+Architecture: all
+Description: Myword's book files.

@@ -26,6 +26,7 @@ import copy
 import cPickle as pickle
 
 from playsound import read, play
+from dictfile import SentenceFile
 
 def show_info(message, title = "提示", buttons = gtk.BUTTONS_OK, parent = None):
 	dialog = gtk.MessageDialog(None, gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_INFO, buttons)
@@ -101,9 +102,14 @@ class WordReview(gtk.EventBox):
 		self.buttons = [button1, button2, button3, button4]
 		self.connect("button_press_event", self.button_press_event)
 
+		self.sentence = gtk.Label()
+		self.sentence.set_alignment(0, 0)
+		vbox.pack_start(self.sentence, False, False, 10)
+
 	def start_review(self, rr):
 		"""初始化词意回想，采用随机采样方式，将单词丢进池子"""
 		self.rr = rr
+		self.sentence_file = SentenceFile()
 		self.passed = False
 		self.queue = []
 		self.pool = copy.copy(self.rr.words)
@@ -127,6 +133,9 @@ class WordReview(gtk.EventBox):
 		if cn == lable:
 			self.queue.append(self.now)
 			play("answerok")
+			if self.now in self.sentence_file:
+				self.sentence.set_label(self.sentence_file[self.now])
+				self.sentence.show()
 			if len(self.queue) < len(self.rr.words):
 				self.status.set_label("回答正确！点击空白处继续.")
 				self.passed = True
@@ -140,6 +149,7 @@ class WordReview(gtk.EventBox):
 	def next_word(self):
 		self.now = random.sample(self.pool, 1)[0]
 		self.pool.remove(self.now)
+		self.sentence.hide()
 		read(self.now)
 		self.title.set_markup('<span size="x-large">%s</span>' % self.now)
 		self.status.set_label("第%d个(共%d个)" % (len(self.queue) + 1, len(self.rr.words)))
@@ -375,7 +385,7 @@ if __name__ == "__main__":
         win.set_border_width(8)
 
 	vbox = WordReview(None, None)
-	vbox.start_review(ReciteRecord("books/qqssbdc/cykych/ck-kq.bok"))
+	vbox.start_review(ReciteRecord("/home/tualatrix/.myword/books/myword-2008-01-21 11:56:36.bok"))
         vbox.show()
         win.add(vbox)
 
