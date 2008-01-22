@@ -1,0 +1,24 @@
+#!/bin/bash
+
+if [ $UID != 0 ]; then
+	echo "必须是根用户或用sudo来执行此安装脚本."
+	echo "请用“sudo ./setup install”来安装."
+	exit
+fi
+
+if [ $1 == "install" ]; then
+	echo "开始安装"
+	mkdir /usr/share/myword
+	cp -rv src/* /usr/share/myword
+	cp -v myword.desktop /usr/share/applications
+	cp -v myword /usr/bin
+	echo "安装成功"
+fi
+
+if [ $1 == "uninstall" ]; then
+	echo "开始删除"
+	rm -rv /usr/share/myword
+	rm -v /usr/share/applications/myword.desktop
+	rm -v /usr/bin/myword
+	echo "删除成功"
+fi
