@@ -81,3 +81,29 @@ class DictFile(UserDict):
 
 	def to_string(self):
 		return "".join(["%s\t%s" % (k, v) for k, v in self.data.items()])
+
+class SentenceFile(UserDict):
+	"""SentenceFile用于使用保存例句的文件"""
+	def __init__(self):
+		UserDict.__init__(self)
+
+		self.__parse()
+
+	def __parse(self):
+		for sentence in file(os.path.join(os.path.expanduser("~"), ".myword/sentence")):
+			self[sentence.split(":")[0]] = sentence.split(":")[1].strip()
+
+	def __setitem__(self, key, item):
+		UserDict.__setitem__(self, key, item)
+		self.save()
+
+	def __delitem__(self, key):
+		UserDict.__delitem__(self, key)
+		self.save()
+
+	def save(self):
+		content = "\n".join(["%s:%s" % (k,v) for k,v in self.data.items()])
+
+		f = file(os.path.join(os.path.expanduser("~"), ".myword/sentence"), "wb")
+		f.write(content)
+		f.close()

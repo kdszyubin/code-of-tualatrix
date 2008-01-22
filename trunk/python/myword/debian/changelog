@@ -1,6 +1,11 @@
+myword (0.9.6-1) gutsy; urgency=low
+
+  * New upstream version
+
+ -- TualatriX <tualatrix@gmail.com>  Tue, 22 Jan 2008 21:41:00 +0800
+
 myword (0.9.5-1) gutsy; urgency=low
 
   * New upstream version
 
- -- TualatriX <tualatrix@gmail.com>  Mon, 22 Jan 2008 10:36:00 +0800
-
+ -- TualatriX <tualatrix@gmail.com>  Tue, 22 Jan 2008 10:36:00 +0800
