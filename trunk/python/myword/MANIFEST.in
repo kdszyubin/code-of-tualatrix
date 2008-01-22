@@ -1,0 +1,5 @@
+recursive-include src *
+include TODO README INSTALL AUTHORS COPYING LICENSE NEWS VERSION ChangeLog
+include myword
+include myword.desktop
+include MANIFEST.in

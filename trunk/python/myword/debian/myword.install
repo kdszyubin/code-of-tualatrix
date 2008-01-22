@@ -1,0 +1,6 @@
+src/*.py	/usr/share/myword
+src/myword.png	/usr/share/myword
+src/books	/usr/share/myword
+src/sound	/usr/share/myword
+myword		/usr/bin
+myword.desktop /usr/share/applications
