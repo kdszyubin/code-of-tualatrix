@@ -78,7 +78,7 @@ class MyWord(gtk.Window):
 		self.notebook.append_page(self.result, label)
 
 		about = self.welcome(message = """
-\tMyword是一款基于PyGTK的自由软件，它使用ReciteWord的生词库，并支持它的语音。\n\n\tMyword具备完整的单词测试、词义回想和复习功能，并应用了记忆遗忘曲线，按时提醒你复习。你可以随时查看当前的背诵状态，因为Myword提供了详细的信息可供追踪。\n\t除此之外，Myword还拥有强大的生词库功能，无论背不背单词，都可以用Myword来创建并管理自己的生字库。查看其他信息请点击我""", 
+\tMyword是一款基于PyGTK的背单词软件，它使用ReciteWord的词库，并支持它的语音库。\n\n\tMyword具备完整的单词测试、词义回想和复习功能，并应用了记忆遗忘曲线，按时提醒你复习。你可以随时查看当前的背诵状态，因为Myword提供了详细的信息可供追踪。\n\t除此之外，Myword还拥有强大的生词库功能，无论背不背单词，都可以用Myword来创建并管理自己的生字库。查看其他信息请点击我""", 
 				size = "large", about = True)
 		about.show_all()
 		label = gtk.Label("关于")
