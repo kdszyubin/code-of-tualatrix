@@ -1,8 +1,6 @@
-Install and Uninstall
+安装和删除
 ==================
 
-  1. Open your terminal, type `python setup.py build` to build the locales.
+  1. 打开终端，输入`sudo ./setup install`来安装；
 
-  2. Type `sudo python setup.py install`  to install myword
-
-  3. Type `sudo python setup.py uninstall` to uninstall myword
+  2. 输入`sudo ./setup uninstall`来删除；
