@@ -1,0 +1,11 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Myword
+Comment=一起来背单词吧！
+Exec=myword
+Icon=/usr/share/pixmaps/myword.png
+Terminal=false
+MultipleArgs=false
+Type=Application
+StartupNotify=true
+Categories=GNOME;GTK;Education;

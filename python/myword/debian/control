@@ -1,0 +1,11 @@
+Source: myword
+Section: utils
+Priority: extra
+Maintainer: TualatriX <tualatrix@gmail.com>
+Build-Depends: cdbs, debhelper (>= 5), python
+Standards-Version: 3.7.2
+
+Package: myword
+Architecture: all
+Depends: python, python-gtk2, python-apt, python-gconf, python-gnome2
+Description: Myword is an recite word application.

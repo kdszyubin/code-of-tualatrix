@@ -528,7 +528,7 @@ class NewWord(gtk.VBox):
 
 				wordlist.get_selection().select_iter(iter)
 				wordlist.save(model)
-				widget.set_text("")
+				self.entry.set_text("")
 
 	def on_add_book_clicked(self, widget, booklist):
 		book_path = os.path.join(os.path.expanduser("~"), ".myword/books/", "myword-%s.bok" % datetime.datetime.today().isoformat(" ")[0:19])
