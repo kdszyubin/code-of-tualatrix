@@ -67,7 +67,7 @@ class uninstall (_install):
             except:
                 self.warn ("Could not remove file %s" % file)
 
-ops = ("install", "build", "sdist", "uninstall", "clean")
+ops = ("install", "sdist", "uninstall", "clean")
 
 if len (sys.argv) < 2 or sys.argv[1] not in ops:
     print "Please specify operation : %s" % " | ".join (ops)
@@ -76,37 +76,24 @@ if len (sys.argv) < 2 or sys.argv[1] not in ops:
 srcdir = os.path.join (os.path.realpath ("."), "src")
 src = map(lambda i: "src/%s" % i, filter(lambda i: i[-2:] == "py", os.listdir (srcdir)))
 
-pixmapsdir = os.path.join (os.path.realpath ("."), "src/pixmaps")
-images = map(lambda i: "src/pixmaps/%s" % i, filter(lambda i: i[-3:] == "png", os.listdir(pixmapsdir)))
+bookdir = os.path.join (os.path.realpath ("."), "src/books")
+books = map(lambda i: "src/boook/%s" % i, filter(lambda i: i[-3:] == "png", os.listdir(bookdir)))
 
 data_files = [
-                ("/usr/share/applications", ["ubuntu-tweak.desktop"]),
-		("/usr/share/ubuntu-tweak", src),
-                ("/usr/share/ubuntu-tweak/pixmaps", images),
-                ("/usr/bin", ["ubuntu-tweak"]),
+                ("/usr/share/applications", ["myword.desktop"]),
+		("/usr/share/myword", src),
+		("/usr/share/myword/sound", ["src/sound"]),
+                ("/usr/share/myword/books", ["src/books"]),
+                ("/usr/bin", ["myword"]),
              ]
 
-podir = os.path.join (os.path.realpath ("."), "po")
-if os.path.isdir (podir):
-    buildcmd = "msgfmt -o build/locale/%s/LC_MESSAGES/ubuntu-tweak.mo po/%s.po"
-    mopath = "build/locale/%s/LC_MESSAGES/ubuntu-tweak.mo"
-    destpath = "share/locale/%s/LC_MESSAGES"
-    for name in os.listdir (podir):
-        if name[-2:] == "po":
-            name = name[:-3]
-            if sys.argv[1] == "build" or (sys.argv[1] == "install" and not os.path.exists (mopath % name)):
-                if not os.path.isdir ("build/locale/%s/LC_MESSAGES" % name):
-                    os.makedirs ("build/locale/%s/LC_MESSAGES" % name)
-                os.system (buildcmd % (name, name))
-            data_files.append ((destpath % name, [mopath % name]))
-
 setup(
-	name		= "ubuntu-tweak",
-	version		= "0.2.5",
-	description	= "Ubuntu Tweak is a tool for Ubuntu that makes it easy to configure your system and desktop settings.",
+	name		= "myword",
+	version		= "0.9.5",
+	description	= "PyGTK based word-recite application",
 	author		= "TualatriX",
 	author_email	= "tualatrix@gmail.com",
-	url		= "http://ubuntu-tweak.com",
+	url		= "http://imtx.cn",
 	license		= "GPL",
 	data_files	= data_files,
         cmdclass         = {"uninstall" : uninstall,
