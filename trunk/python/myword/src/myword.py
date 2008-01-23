@@ -33,7 +33,7 @@ from widgets import show_info
 from result import Result
 from newword import NewWord
 
-VERSION = "0.9.6"
+VERSION = "0.9.7"
 
 class MyWord(gtk.Window):
 	def __init__(self):
@@ -61,8 +61,9 @@ class MyWord(gtk.Window):
 		label = gtk.Label("欢迎")
 		self.notebook.append_page(welcome, label)
 
+		self.choosebook = ChooseBook(self)
 		label = gtk.Label("选书")
-		self.notebook.append_page(ChooseBook(self), label)
+		self.notebook.append_page(self.choosebook, label)
 
 		self.firstrecite = self.create_firstrecite()
 		self.firstrecite.show()
@@ -72,8 +73,9 @@ class MyWord(gtk.Window):
 		label = gtk.Label("复习")
 		self.notebook.append_page(Revise(), label)
 
+		self.newword = NewWord(self)
 		label = gtk.Label("生词")
-		self.notebook.append_page(NewWord(self), label)
+		self.notebook.append_page(self.newword, label)
 
 		self.result = Result()
 		self.result.show_all()
@@ -92,7 +94,15 @@ class MyWord(gtk.Window):
 		self.notebook.connect("switch-page", self.switch_page_cb)
 
 	def switch_page_cb(self, widget, page, page_num, data = None):
-		if page_num == 5:
+		if page_num == 1:
+			model, iter = self.choosebook.dirlist.get_selection().get_selected()
+			dir = model.get_value(iter, 1)
+			model = self.choosebook.booklist.get_model()
+			model.clear()
+			self.choosebook.booklist.create_list(dir, model)
+		elif page_num == 4:
+			self.newword.booklist.update_list()
+		elif page_num == 5:
 			self.result.create_model()
 
 	def config_test(self):
