@@ -22,6 +22,7 @@
 import gtk
 import gobject
 import os
+import shutil
 
 from dictfile import DictFile
 from reciterecord import ReciteRecord
@@ -41,7 +42,7 @@ from widgets import show_info
 
 class BookList(gtk.TreeView):
 	"""书本列表"""
-	def __init__(self, parent = None):
+	def __init__(self):
 		gtk.TreeView.__init__(self)
 
 		model = gtk.ListStore(
@@ -53,6 +54,13 @@ class BookList(gtk.TreeView):
 		self.set_model(model)
 		self.__add_columns()
 		self.set_rules_hint(True)
+
+		menu = self.create_popup_menu()
+		menu.show_all()
+		self.connect("button_press_event", self.button_press_event, menu)
+
+	def update_list(self):
+		pass
 
 	def create_list(self, dir, model):
 		for item in os.listdir(dir):
@@ -68,6 +76,32 @@ class BookList(gtk.TreeView):
 					COLUMN_NUM, dict.INFO["NUM"],
 					COLUMN_AUTHOR, dict.INFO["AUTHOR"],
 					COLUMN_BOOKPATH, fullname)
+
+	def create_popup_menu(self):
+		menu = gtk.Menu()
+
+		copybook = gtk.MenuItem("复制至生词库")
+		copybook.connect("activate", self.add_to_newbook)
+		
+		menu.append(copybook)
+		menu.attach_to_widget(self, None)
+
+		return menu
+
+	def add_to_newbook(self, widget, data = None):
+		model, iter = self.get_selection().get_selected()
+		book = model.get_value(iter, COLUMN_BOOKPATH)
+		dst = os.path.join(os.path.expanduser("~"), ".myword/books/")
+		if os.path.basename(book) not in os.listdir(dst):
+			shutil.copy(book, dst)
+			show_info("复制至生词库成功！")
+		else:
+			show_info("你已经复制过啦！")
+
+	def button_press_event(self, widget, event, data = None):
+		if event.type == gtk.gdk.BUTTON_PRESS and event.button == 3:
+			data.popup(None, None, None, event.button, event.time)
+		return False
 
 	def __add_columns(self):
 		model = self.get_model()
@@ -87,7 +121,7 @@ class BookList(gtk.TreeView):
 		self.append_column(column)
 
 class DirList(gtk.TreeView):
-	def __init__(self, dir, list = None):
+	def __init__(self, dir, booklist = None):
 		gtk.TreeView.__init__(self)
 
 		model = gtk.TreeStore(
@@ -111,17 +145,17 @@ class DirList(gtk.TreeView):
 
 		selection = self.get_selection()
 		selection.set_mode(gtk.SELECTION_SINGLE)
-		selection.connect("changed", self.selection_changed, list)
+		selection.connect("changed", self.selection_changed, booklist)
 		selection.select_iter(model.iter_children(model.get_iter_first()))
 
-	def selection_changed(self, widget, data = None):
+	def selection_changed(self, widget, booklist):
 		model = widget.get_selected()[0]
 		iter = widget.get_selected()[1]
 		dir = model.get_value(iter, COLUMN_PATH)
 		if dir:
-			list = data.get_model()
-			list.clear()
-			data.create_list(dir, list)
+			model = booklist.get_model()
+			model.clear()
+			booklist.create_list(dir, model)
 
 	def __create_model(self, dir, model, iter):
 		for item in os.listdir(dir):
@@ -159,8 +193,8 @@ class ChooseBook(gtk.VBox):
 		sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
 		hpaned.pack1(sw)
 
-		dirlist = DirList("books", self.booklist)
-		sw.add(dirlist)
+		self.dirlist = DirList("books", self.booklist)
+		sw.add(self.dirlist)
 
 		sw = gtk.ScrolledWindow()
 		sw.set_shadow_type(gtk.SHADOW_ETCHED_IN)

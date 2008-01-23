@@ -344,7 +344,7 @@ class WordTest(gtk.VBox):
 
 	def finish_test(self):
 		self.save_record()
-		dialog = MessageDialog("测试完毕！\n还想做次词义回想以加深记忆吗？(可以不做)")
+		dialog = MessageDialog("测试完毕！\n还想做次词义回想以加深记忆吗？(可以不做)", type = gtk.MESSAGE_QUESTION)
 		response = dialog.run()
 		if response == gtk.RESPONSE_YES:
 			self.status.set_markup('<span size="xx-large">词义回想</span>')

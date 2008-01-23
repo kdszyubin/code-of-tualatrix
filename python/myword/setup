@@ -7,7 +7,7 @@ if [ $UID != 0 ]; then
 fi
 
 if [ -d $1 ]; then
-	echo "exit"
+	exit
 fi
 
 if [ $1 == "install" ]; then

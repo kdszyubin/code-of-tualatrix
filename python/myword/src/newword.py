@@ -76,7 +76,7 @@ class BookList(gtk.TreeView):
 			gobject.TYPE_BOOLEAN)
 
 		self.set_model(model)
-		self.update_list(model)
+		self.update_list()
 
 		self.__add_columns()
 		self.set_rules_hint(True)
@@ -95,7 +95,8 @@ class BookList(gtk.TreeView):
 			if book:
 				list.update_list(book)
 
-	def update_list(self, model):
+	def update_list(self):
+		model = self.get_model()
 		model.clear()
 		booksdir = os.path.join(os.path.expanduser("~"), ".myword/books")
 		for item in os.listdir(booksdir):
@@ -406,10 +407,10 @@ class NewWord(gtk.VBox):
 		self.wordlist = WordList(parent, sentence)
 		self.wordlist.show()
 
-		booklist = BookList(self.wordlist)
-		booklist.show()
+		self.booklist = BookList(self.wordlist)
+		self.booklist.show()
 
-		self.wordlist.set_data("booklist", booklist)
+		self.wordlist.set_data("booklist", self.booklist)
 
 		vbox = gtk.VBox(False, 10)
 		vbox.show()
@@ -420,19 +421,19 @@ class NewWord(gtk.VBox):
 		sw.set_shadow_type(gtk.SHADOW_ETCHED_IN)
 		sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
 		vbox.pack_start(sw)
-		sw.add(booklist)
+		sw.add(self.booklist)
 
 		hbox = gtk.HBox(False, 5)
 		hbox.show()
 		vbox.pack_start(hbox, False, False, 0)
 
 		button = gtk.Button(stock = gtk.STOCK_ADD)
-		button.connect("clicked", self.on_add_book_clicked, booklist)
+		button.connect("clicked", self.on_add_book_clicked, self.booklist)
 		button.show()
 		hbox.pack_start(button)
 
 		button = gtk.Button(stock = gtk.STOCK_REMOVE)
-		button.connect("clicked", self.on_remove_book_clicked, booklist)
+		button.connect("clicked", self.on_remove_book_clicked, self.booklist)
 		button.show()
 		hbox.pack_start(button)
 
@@ -531,7 +532,7 @@ class NewWord(gtk.VBox):
 			if self.wordlist.get_reciting():
 				show_info("不能删除这本生词库，因为当前正在背诵队列里")
 			else:
-				dialog = MessageDialog("真的要删除吗？这是不可恢复的！")
+				dialog = MessageDialog("真的要删除吗？这是不可恢复的！", type = gtk.MESSAGE_WARNING)
 				response = dialog.run()
 				if response == gtk.RESPONSE_YES:
 					model, iter = booklist.get_selection().get_selected()
