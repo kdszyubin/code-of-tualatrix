@@ -19,11 +19,12 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-import gtk
-import gobject
-import sys
 import os
+import gtk
+import sys
 import glob
+import sexy
+import gobject
 import datetime
 import cPickle as pickle
 
@@ -93,7 +94,7 @@ class BookList(gtk.TreeView):
 		if iter:
 			book = model.get_value(iter, COLUMN_PATH)
 			if book:
-				list.update_list(book)
+				list.update_list(book, list.get_data("filter").get_active())
 
 	def update_list(self):
 		model = self.get_model()
@@ -171,10 +172,12 @@ class WordList(gtk.TreeView):
 		"""在编辑完单元格后触发，取得编辑前的文本，再比较编辑后的
 		文本，并查找生词库中是否已存在编辑后的文本，假如条件满足则
 		应用新的编辑，否则弹出对话框显示相关信息"""
+		#取得当前单元格的旧值，根据column属性，自动取出en或en
 		iter = model.get_iter_from_string(path_string)
 		column = cell.get_data("column")
 		old = model.get_value(iter, column)
 
+		#通过get_reciting来判断当前old是否已存在背诵队例中，很明显中文解释不会受控制
 		if self.get_reciting(old):
 			dialog = MessageDialog('当前编辑的单词正在背诵中，不可更改' ,buttons = gtk.BUTTONS_OK)
 			dialog.run()
@@ -188,7 +191,18 @@ class WordList(gtk.TreeView):
 				dialog.destroy()
 			else:
 				model.set_value(iter, column, new_text)
-				self.save(model)
+				en = model.get_value(iter, COLUMN_EN)
+				cn = model.get_value(iter, COLUMN_CN)
+				dictfile = DictFile(self.book)
+				#如果old在dictfile，即改的是英文的话
+				if old in dictfile:
+					del dictfile[old]
+					dictfile[new_text] = cn
+				else:
+					dictfile[en] = new_text
+#				self.save(model)
+				booklist = self.get_data("booklist")
+				booklist.update_list()
 
 	def get_reciting(self, word = None):
 		"""取得当前编辑的单词是否正在背诵队列里，是则保护其不被修改"""
@@ -232,20 +246,20 @@ class WordList(gtk.TreeView):
 
 		return exist, exist_book
 
-	def save(self, model):
-		"""将更新后的列表内容保存"""
-		book = DictFile(self.book)
-		book.clear()
-
-		iter = model.get_iter_first()
-		while iter:
-			book[model.get_value(iter, COLUMN_EN)] = model.get_value(iter, COLUMN_CN)
-			iter = model.iter_next(iter)
-		book.save()
-
-		booklist = self.get_data("booklist")
-		model = booklist.get_model()
-		booklist.update_list(model)
+#	def save(self, model):
+#		"""将更新后的列表内容保存"""
+#		book = DictFile(self.book)
+#		book.clear()
+#
+#		iter = model.get_iter_first()
+#		while iter:
+#			book[model.get_value(iter, COLUMN_EN)] = model.get_value(iter, COLUMN_CN)
+#			iter = model.iter_next(iter)
+#		book.save()
+#
+#		booklist = self.get_data("booklist")
+#		model = booklist.get_model()
+#		booklist.update_list()
 
 	def create_popup_menu(self, parent):
 		menu = gtk.Menu()
@@ -290,22 +304,23 @@ class WordList(gtk.TreeView):
 				dialog.run()
 				dialog.destroy()
 			else:
+				dictfile = DictFile(self.book)
+				del dictfile[word]
+
 				model.remove(iter)
 
 				self.get_selection().select_iter(iter)
 
-				self.save(model)
-
 				booklist = self.get_data("booklist")
-				model = booklist.get_model()
-				booklist.update_list(model)
+				booklist.update_list()
 
 	def button_press_event(self, widget, event, data = None):
 		if event.type == gtk.gdk.BUTTON_PRESS and event.button == 3:
 			data.popup(None, None, None, event.button, event.time)
 		return False
 
-	def update_list(self, book = None):
+	def update_list(self, book = None, type = None):
+		"""更新WordList，book参数用于当更改选的书时，type参数用于过滤时"""
 		model = self.get_model()
 		model.clear()
 
@@ -313,7 +328,14 @@ class WordList(gtk.TreeView):
 			self.book = book
 			self.dict = DictFile(book)
 
+			#遍历单词，通过combobox的列表属性，分别过滤相关类型的单词
 			for word in self.dict.keys():
+				if type == 1:
+					if not self.get_reciting(word):
+						continue
+				elif type == 2:
+					if self.get_reciting(word):
+						continue
 				iter = model.append()
 				model.set(iter,
 					0, word,
@@ -407,14 +429,31 @@ class NewWord(gtk.VBox):
 		self.wordlist = WordList(parent, sentence)
 		self.wordlist.show()
 
+		#接着创建combobox过滤列表，因为booklist需要从它获得属性
+		combobox = gtk.combo_box_new_text()
+		combobox.append_text("全部")
+		combobox.append_text("背诵中")
+		combobox.append_text("未背诵")
+		combobox.show()
+		combobox.set_active(0)
+		combobox.connect("changed", self.on_toggle_combobox, self.wordlist)
+		self.wordlist.set_data("filter", combobox)
+
+		#然后创建booklist
 		self.booklist = BookList(self.wordlist)
 		self.booklist.show()
 
 		self.wordlist.set_data("booklist", self.booklist)
 
+		#左侧的书本列表
 		vbox = gtk.VBox(False, 10)
 		vbox.show()
 		hpaned.pack1(vbox)
+
+		label = gtk.Label()
+		label.set_markup("<b>生词本列表</b>")
+		label.show()
+		vbox.pack_start(label, False, False, 7)
 
 		sw = gtk.ScrolledWindow()
 		sw.show()
@@ -441,6 +480,28 @@ class NewWord(gtk.VBox):
 		vbox.show()
 		hpaned.pack2(vbox)
 
+		#右侧的生词列表
+		hbox = gtk.HBox(False, 5)
+		hbox.show()
+		vbox.pack_start(hbox, False, False, 0)
+
+		label = gtk.Label("搜索并添加生词")
+		label.show()
+		hbox.pack_start(label, False, False, 5)
+
+		self.entry = sexy.IconEntry()
+		pixbuf = gtk.icon_theme_get_default().load_icon(gtk.STOCK_FIND, gtk.ICON_SIZE_MENU, 0)
+		image = gtk.Image()
+		image.set_from_pixbuf(pixbuf)
+		self.entry.set_icon(sexy.ICON_ENTRY_SECONDARY, image)
+		self.entry.connect("activate", self.on_add_word, self.wordlist)
+		self.entry.connect("icon-pressed", self.on_icon_pressed)
+		self.entry.show()
+		hbox.pack_start(self.entry)
+
+		#单独包装combobox
+		hbox.pack_end(combobox, False, False, 0)
+
 		sw = gtk.ScrolledWindow()
 		sw.show()
 		sw.set_shadow_type(gtk.SHADOW_ETCHED_IN)
@@ -449,25 +510,14 @@ class NewWord(gtk.VBox):
 
 		vbox.pack_start(sentence, False, False, 5)
 
-		hbox = gtk.HBox(False, 5)
-		hbox.show()
-		vbox.pack_start(hbox, False, False, 0)
-
-		self.entry = gtk.Entry()
-		self.entry.connect("activate", self.on_add_word, self.wordlist)
-		self.entry.show()
-		hbox.pack_start(self.entry)
-
-		button = gtk.Button(stock = gtk.STOCK_FIND)
-		button.connect("clicked", self.on_add_word, self.wordlist)
-		button.show()
-		hbox.pack_start(button, False, False, 0)
-
 		sw.add(self.wordlist)
 		self.show()
 
-	def on_toggle_paned(self, widget, vbox):
-		print "toggled"
+	def on_toggle_combobox(self, widget, wordlist):
+		wordlist.update_list(wordlist.book, widget.get_active())
+
+	def on_icon_pressed(self, widget, button, wordlist = None):
+		self.on_add_word(None, self.wordlist)
 
 	def on_add_word(self, widget, wordlist):
 		new_word = self.entry.get_text()
@@ -502,9 +552,13 @@ class NewWord(gtk.VBox):
 						COLUMN_EN, new_word,
 						COLUMN_CN, "在此输入中文解释",
 						COLUMN_EDITABLE, True)
+					cn = "在此输入中文解释"
+
+				dictfile =  DictFile(wordlist.book)
+				dictfile[new_word] = cn
 
 				wordlist.get_selection().select_iter(iter)
-				wordlist.save(model)
+				self.booklist.update_list()
 				self.entry.set_text("")
 
 	def on_add_book_clicked(self, widget, booklist):

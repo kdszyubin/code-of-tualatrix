@@ -46,6 +46,7 @@ class ReciteRecord:
 		"""创建单词列表，返回单词数"""
 		f = file(os.path.join(os.path.expanduser("~"), ".myword/record"), "rb")
 		
+		#首先建立排除列表，在背诵中的单词被加入排除列表中
 		Loading = True
 		while Loading:
 			try:
