@@ -33,7 +33,7 @@ from widgets import show_info
 from result import Result
 from newword import NewWord
 
-VERSION = "0.9.7"
+VERSION = "0.9.8"
 
 class MyWord(gtk.Window):
 	def __init__(self):

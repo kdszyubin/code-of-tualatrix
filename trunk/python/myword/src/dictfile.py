@@ -64,6 +64,14 @@ class DictFile(UserDict):
 						self[word.split("[M]")[0]] = word.split("[M]")[1].strip()
 		file.close()
 
+	def __setitem__(self, key, item):
+		UserDict.__setitem__(self, key, item)
+		self.save()
+
+	def __delitem__(self, key):
+		UserDict.__delitem__(self, key)
+		self.save()
+
 	def save(self):
 		self.INFO["NUM"] = str(len(self.data))
 		head = "[H]recitewordbookfile[N]%s[C]%s[R]%s[P]%s\n" % (self.INFO["TITLE"],
