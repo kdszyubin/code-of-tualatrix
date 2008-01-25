@@ -114,8 +114,9 @@ class Installer(gtk.Window):
 			gobject.TYPE_STRING)
 		treeview = gtk.TreeView()
 
-		column = gtk.TreeViewColumn(" ", renderer, active=COLUMN_INSTALLED)
-		treeview.append_column(column)
+
+#		column = gtk.TreeViewColumn(" ", renderer, active=COLUMN_INSTALLED)
+#		treeview.append_column(column)
 
 		# column for application
 		column = gtk.TreeViewColumn("Application")

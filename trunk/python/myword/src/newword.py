@@ -31,7 +31,7 @@ import cPickle as pickle
 from widgets import show_info
 from widgets import MessageDialog
 from dictfile import DictFile
-from dictfile import SentenceFile
+from widgets import SentenceBox
 from playsound import read
 from UserList import UserList
 from UserDict import UserDict
@@ -349,68 +349,6 @@ class WordList(gtk.TreeView):
 			word = model.get_value(iter, COLUMN_EN)
 			sentence.set_display(word)
 			read(word)
-
-class SentenceBox(gtk.VBox):
-	"""显示例句的窗口"""
-	def __init__(self):
-		gtk.VBox.__init__(self)
-	
-		self.word = ""
-
-		eventbox = gtk.EventBox()
-		eventbox.show()
-		self.pack_start(eventbox, False, False, 5)
-
-		self.label = gtk.Label("请选择一个单词")
-		self.label.set_line_wrap(True)
-		self.label.show()
-		eventbox.add(self.label)
-
-		self.hbox = gtk.HBox(False, 0)
-		self.pack_start(self.hbox)
-
-		self.entry = gtk.Entry()
-		self.entry.show()
-		self.entry.connect("activate", self.edit_finished)
-		self.hbox.pack_start(self.entry)
-
-		button = gtk.Button("Apply")
-		button.show()
-		button.connect("clicked", self.edit_finished)
-		self.hbox.pack_start(button, False, False, 5)
-
-		eventbox.connect("button_press_event", self.add_sentence)
-
-	def add_sentence(self, widget, event, data = None):
-		if event.type == gtk.gdk._2BUTTON_PRESS and self.word:
-			self.label.hide()
-			self.hbox.show()
-			self.entry.grab_focus()
-
-	def edit_finished(self, widget, data = None):
-		sentence = SentenceFile()
-		if self.entry.get_text():
-			sentence[self.word] = self.entry.get_text()
-			self.label.set_text(self.entry.get_text())
-		else:
-			if self.word in sentence:
-				del sentence[self.word]
-				self.set_display(self.word)
-		self.label.show()
-		self.hbox.hide()
-
-	def set_display(self, word):
-		self.label.show()
-		self.hbox.hide()
-
-		sentence = SentenceFile()
-		self.word = word
-		if word in sentence:
-			self.label.set_label(sentence[word])
-			self.entry.set_text(sentence[word])
-		else:
-			self.label.set_markup("<b>%s</b>还没有例句，请双击这里添加" % word)
-			self.entry.set_text("")
 
 class NewWord(gtk.VBox):
 	def __init__(self, parent):
