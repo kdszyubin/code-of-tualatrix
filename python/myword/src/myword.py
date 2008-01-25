@@ -33,7 +33,7 @@ from widgets import show_info
 from result import Result
 from newword import NewWord
 
-VERSION = "0.9.8"
+VERSION = "0.9.9"
 
 class MyWord(gtk.Window):
 	def __init__(self):
@@ -43,7 +43,7 @@ class MyWord(gtk.Window):
 
 		self.set_title("Myword " + VERSION)
 		self.set_icon_from_file("myword.png")
-		self.set_size_request(560, 320)
+		self.set_size_request(600, 320)
 		self.set_position(gtk.WIN_POS_CENTER)
 		self.connect("destroy", lambda *w: gtk.main_quit())
 

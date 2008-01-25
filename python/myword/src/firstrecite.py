@@ -29,6 +29,7 @@ from reciterecord import ReciteRecord
 from playsound import read, play
 from widgets import show_info
 from widgets import WordTest
+from widgets import SentenceBox
 
 (
 	COLUMN_EN,
@@ -89,6 +90,10 @@ class FirstRecite(gtk.VBox):
 		spinbutton.show()
 		hbox.pack_end(spinbutton, False, False, 0)
 
+		self.sentencebox = SentenceBox()
+		self.sentencebox.show()
+		vbox.pack_start(self.sentencebox, False, False, 0)
+
 		hbox = gtk.HBox(False, 10)
 		hbox.show()
 		vbox.pack_end(hbox, False, False, 0)
@@ -146,7 +151,9 @@ class FirstRecite(gtk.VBox):
 		model = widget.get_selected()[0]
 		iter = widget.get_selected()[1]
 		if iter:
-			read(model.get_value(iter, 0))
+			word = model.get_value(iter, COLUMN_EN)
+			read(word)
+			self.sentencebox.set_display(word)
 
 	def value_changed_cb(self, widget, data = None):
 		self.model.clear()
