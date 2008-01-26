@@ -27,8 +27,7 @@ from dictfile import DictFile
 class ReciteRecord:
 	"""背诵纪录的类，记录着当前背诵的书本的文件名(dict)，单词列表(words)
 	和排除列表(exclude)，排除列表是为避免同一本书取到相同的单词，因为单
-	词都是随机选的，time代表下次复习为第几次
-	会保存"""
+	词都是随机选的，time代表下次复习为第几次"""
 	interval = (0, 1, 1, 2, 4, 7, 14)
 
 	def __init__(self, filename, count = 25):
