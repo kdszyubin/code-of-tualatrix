@@ -271,15 +271,24 @@ class WordList(gtk.TreeView):
 		new = gtk.MenuItem("新增")
 		new.add_accelerator("activate", group, ord('N'), gtk.gdk.CONTROL_MASK, gtk.ACCEL_VISIBLE)
 		new.connect("activate", self.add_new_word)
+		paste = gtk.MenuItem("从剪贴板添加")
+		paste.add_accelerator("activate", group, ord('P'), gtk.gdk.CONTROL_MASK, gtk.ACCEL_VISIBLE)
+		paste.connect("activate", self.on_add_from_clipboard)
 		remove = gtk.MenuItem("删除")
 		remove.add_accelerator("activate", group, ord('D'), gtk.gdk.CONTROL_MASK, gtk.ACCEL_VISIBLE)
 		remove.connect("activate", self.remove_selected_word)
 		
 		menu.append(new)
+		menu.append(paste)
 		menu.append(remove)
 		menu.attach_to_widget(self, None)
 
 		return menu
+
+        def paste_received(self, widget, text, data = None):
+		"""当获得剪贴版后，需要粘贴时触发的事件"""
+                if text:
+                    self.find_word_to_add(text)
 
 	def add_new_word(self, widget, data = None):
 		if self.book:
@@ -291,6 +300,52 @@ class WordList(gtk.TreeView):
 				COLUMN_EDITABLE, True)
 
 			self.get_selection().select_iter(iter)
+
+	def on_add_from_clipboard(self, widget, data = None):
+		clipboard = widget.get_clipboard(gtk.gdk.SELECTION_CLIPBOARD)
+                clipboard.request_text(self.paste_received)
+
+	def find_word_to_add(self, new_word):
+		"""查找单词并加入的方法，主要由“剪贴板”和“IconEntry”使用"""
+		exist, exist_book = self.get_exist(new_word)
+
+		if new_word:
+			if exist:
+				dialog = MessageDialog('在"%s"中已经有"%s"这个单词了' % (DictFile(exist_book).INFO["TITLE"], new_word), buttons = gtk.BUTTONS_OK)
+				dialog.run()
+				dialog.destroy()
+			else:
+				books = ExistBook("books") 
+				cn = None 
+
+				for book in books:
+					if cn:
+						break
+					for word in file(book):
+						if word.find("[W]" + new_word + "[T]") >= 0:
+							cn = word.split('[W]')[1].split('[T]')[1].split('[M]')[1]
+							break
+
+				model = self.get_model()
+				iter = model.append()
+				if cn:
+					model.set(iter,
+						COLUMN_EN, new_word,
+						COLUMN_CN, cn.strip(),
+						COLUMN_EDITABLE, True)
+				else:
+					model.set(iter,
+						COLUMN_EN, new_word,
+						COLUMN_CN, "在此输入中文解释",
+						COLUMN_EDITABLE, True)
+					cn = "在此输入中文解释"
+
+				dictfile =  DictFile(self.book)
+				dictfile[new_word] = cn
+
+				self.get_selection().select_iter(iter)
+				booklist = self.get_data("booklist")
+				booklist.update_list()
 
 	def remove_selected_word(self, widget, data = None):
 		"""当右键删除单库时触发，先判断是否在背诵，再进行移除，选
@@ -458,46 +513,10 @@ class NewWord(gtk.VBox):
 		self.on_add_word(None, self.wordlist)
 
 	def on_add_word(self, widget, wordlist):
+		"""IconEntry触发的事件，查找单词并加入"""
 		new_word = self.entry.get_text()
-		exist, exist_book = wordlist.get_exist(new_word)
-
-		if new_word:
-			if exist:
-				dialog = MessageDialog('在"%s"中已经有"%s"这个单词了' % (DictFile(exist_book).INFO["TITLE"], new_word), buttons = gtk.BUTTONS_OK)
-				dialog.run()
-				dialog.destroy()
-			else:
-				books = ExistBook("books") 
-				cn = None 
-
-				for book in books:
-					if cn:
-						break
-					for word in file(book):
-						if word.find("[W]" + new_word + "[T]") >= 0:
-							cn = word.split('[W]')[1].split('[T]')[1].split('[M]')[1]
-							break
-
-				model = wordlist.get_model()
-				iter = model.append()
-				if cn:
-					model.set(iter,
-						COLUMN_EN, new_word,
-						COLUMN_CN, cn.strip(),
-						COLUMN_EDITABLE, True)
-				else:
-					model.set(iter,
-						COLUMN_EN, new_word,
-						COLUMN_CN, "在此输入中文解释",
-						COLUMN_EDITABLE, True)
-					cn = "在此输入中文解释"
-
-				dictfile =  DictFile(wordlist.book)
-				dictfile[new_word] = cn
-
-				wordlist.get_selection().select_iter(iter)
-				self.booklist.update_list()
-				self.entry.set_text("")
+		wordlist.find_word_to_add(new_word)
+		self.entry.set_text("")
 
 	def on_add_book_clicked(self, widget, booklist):
 		book_path = os.path.join(os.path.expanduser("~"), ".myword/books/", "myword-%s.bok" % datetime.datetime.today().isoformat(" ")[0:19])
