@@ -1,3 +1,9 @@
+myword (1.0.0-1) gutsy; urgency=low
+
+  * New upstream version
+
+ -- TualatriX <tualatrix@gmail.com>  Sat, 27 Jan 2008 10:17:00 +0800
+
 myword (0.9.9-1) gutsy; urgency=low
 
   * New upstream version
