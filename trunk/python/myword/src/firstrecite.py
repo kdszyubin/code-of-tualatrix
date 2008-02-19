@@ -156,7 +156,6 @@ class FirstRecite(gtk.VBox):
 			self.sentencebox.set_display(word)
 
 	def value_changed_cb(self, widget, data = None):
-		self.model.clear()
 		self.create_model(widget.get_value())
 
 	def start_clicked_cb(self, widget, data = None):
