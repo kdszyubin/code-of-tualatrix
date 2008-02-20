@@ -1,56 +1,79 @@
-2008-02-29
+2008-02-21 TualatriX <tualatrix@gmail.com>
+
+	* archive/stu_manager: 加入了第一次编的软件。
+
+2008-02-20 TualatriX <tualatrix@gmail.com>
 
 	* gtk/example/boy: 加入一个GObject的例子。
 
-2008-01-19
-"Myword" 0.8
+2008-01-19 TualatriX <tualatrix@gmail.com>
 
-2008-01-16
-"Myword" 0.7
+	* "Myword" 0.8
 
-2008-01-15
-"Myword" 0.6
+2008-01-16 TualatriX <tualatrix@gmail.com>
 
-2008-01-14
-"Myword" 0.5
+	* "Myword" 0.7
 
-2008-01-09
-"Myword" 0.4
+2008-01-15 TualatriX <tualatrix@gmail.com>
 
-2008-01-08
-"Myword" 0.3.0
+	* "Myword" 0.6
 
-2008-01-07
-"Myword" 0.2.5
+2008-01-14 TualatriX <tualatrix@gmail.com>
 
-2008-01-06
-"Myword" 0.2
+	* "Myword" 0.5
 
-2008-01-05
-"Myword" 0.1
+2008-01-09 TualatriX <tualatrix@gmail.com>
 
-2008-01-04
-"Myword" added the result function.
+	* "Myword" 0.4
 
-2008-01-02
-"Myword" almost finished the FirstRecite function
+2008-01-08 TualatriX <tualatrix@gmail.com>
 
-2008-01-01
-"Myword" added the readword function
+	* "Myword" 0.3.0
 
-2007-12-31
-"Myword" added the ReciteRecord class
+2008-01-07 TualatriX <tualatrix@gmail.com>
 
-2007-12-30
-"Myword" finished the ChooseBook function
-2007-12-29
-"Myword" added the BookList class
+	* "Myword" 0.2.5
 
-2007-12-27
-"Myword" added the DictFile class
+2008-01-06 TualatriX <tualatrix@gmail.com>
 
-2007-12-23
-Added the "Installer"
+	* "Myword" 0.2
 
-2007-12-22
-Added the "addword"
+2008-01-05 TualatriX <tualatrix@gmail.com>
+
+	* "Myword" 0.1
+
+2008-01-04 TualatriX <tualatrix@gmail.com>
+
+	* "Myword" added the result function.
+
+2008-01-02 TualatriX <tualatrix@gmail.com>
+
+	* "Myword" almost finished the FirstRecite function
+
+2008-01-01 TualatriX <tualatrix@gmail.com>
+
+	* "Myword" added the readword function
+
+2007-12-31 TualatriX <tualatrix@gmail.com>
+
+	* "Myword" added the ReciteRecord class
+
+2007-12-30 TualatriX <tualatrix@gmail.com>
+
+	* "Myword" finished the ChooseBook function
+
+2007-12-29 TualatriX <tualatrix@gmail.com>
+
+	* "Myword" added the BookList class
+
+2007-12-27 TualatriX <tualatrix@gmail.com>
+
+	* "Myword" added the DictFile class
+
+2007-12-23 TualatriX <tualatrix@gmail.com>
+
+	* Added the "Installer"
+
+2007-12-22 TualatriX <tualatrix@gmail.com>
+
+	* Added the "addword"
