@@ -1,0 +1,6 @@
+1.安装开发软件包，打开terminal,运行下面的指令安装
+
+sudo apt-get install firefox-dev libgnomevfs2-dev gnome-core-devel libgconf2-dev
+ 
+
+2.安装好后，解压缩那个pagico.tar.gz，用终端进入目录，直接make，即产生了pagico这个可执行文件，把这个发给我。我打包。

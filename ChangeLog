@@ -1,3 +1,7 @@
+2008-02-27 TualatriX <tualatrix@gmail.com>
+
+	* gtk/pagico: 加入了基于gtkembedmoz的Pagico客户端。
+
 2008-02-21 TualatriX <tualatrix@gmail.com>
 
 	* archive/stu_manager: 加入了第一次编的软件。
