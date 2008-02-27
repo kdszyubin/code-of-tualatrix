@@ -16,18 +16,6 @@ ICON_DIR = '/usr/share/app-install/icons/'
 	COLUMN_NAME
 ) = range(3)
 
-(
-	CATEGORY_ICON,
-	CATEGORY_NAME
-) = range(2)
-
-category = \
-(
-	("applications-accessories", "Welcome"),
-	("applications-internet", "Internet"),
-	("applications-multimedia", "Computer"),
-)
-
 data = \
 (
 	(False, "/usr/share/ubuntu-tweak/pixmaps/computer.png", 'pidgin'),
@@ -62,7 +50,7 @@ class Installer(gtk.Window):
 		vbox.pack_start(sw)
 
 		# create tree view
-		treeview = self.create_listview()
+		treeview = self.create_treeview()
 		treeview.set_rules_hint(True)
 		treeview.set_search_column(COLUMN_NAME)
 		sw.add(treeview)
@@ -82,15 +70,15 @@ class Installer(gtk.Window):
 
 		return pkg.isInstalled
 
-	def get_comment(self, name):
+	def getComment(self, name):
 		app = DesktopEntry(DESKTOP_DIR + name + ".desktop")
 		return app.getComment()
 
-	def get_name(self, name):
+	def getName(self, name):
 		app = DesktopEntry(DESKTOP_DIR + name + ".desktop")
 		return app.getName()
 
-	def get_icon(self, name):
+	def getIcon(self, name):
 		app = DesktopEntry(DESKTOP_DIR + name + ".desktop")
 		if app.getIcon().find("/") == 0:
 			return DESKTOP_DIR + app.getIcon()
@@ -108,18 +96,23 @@ class Installer(gtk.Window):
 		# set new value
 		model.set(iter, COLUMN_INSTALLED, fixed)
 
-	def create_listview(self):
+	def create_treeview(self):
 		lstore = gtk.ListStore(
+			gobject.TYPE_BOOLEAN,
 			gtk.gdk.Pixbuf,
 			gobject.TYPE_STRING)
 		treeview = gtk.TreeView()
 
+		# column for fixed toggles
+		renderer = gtk.CellRendererToggle()
+		renderer.connect('toggled', self.fixed_toggled, lstore)
 
-#		column = gtk.TreeViewColumn(" ", renderer, active=COLUMN_INSTALLED)
-#		treeview.append_column(column)
+		column = gtk.TreeViewColumn(' ', renderer, active=COLUMN_INSTALLED)
+
+		treeview.append_column(column)
 
 		# column for application
-		column = gtk.TreeViewColumn("Application")
+		column = gtk.TreeViewColumn('Application')
 
 		renderer = gtk.CellRendererPixbuf()
 		column.pack_start(renderer, True)
@@ -140,42 +133,7 @@ class Installer(gtk.Window):
 
 			lstore.append((self.check_install(item[COLUMN_NAME]),
 					pixbuf,
-					"<big><b>%s</b></big>\n%s" % (self.get_name(item[COLUMN_NAME]), self.get_comment(item[COLUMN_NAME])),
-					))
-		
-		treeview.set_model(lstore)
-
-		return treeview
-
-	def create_categoryview(self):
-		lstore = gtk.ListStore(
-			gobject.TYPE_BOOLEAN,
-			gtk.gdk.Pixbuf,
-			gobject.TYPE_STRING)
-		treeview = gtk.TreeView()
-
-		# column for category
-		column = gtk.TreeViewColumn("Category")
-
-		renderer = gtk.CellRendererPixbuf()
-		column.pack_start(renderer, True)
-		column.set_attributes(renderer, pixbuf = CATEGORY_ICON)
-
-		renderer = gtk.CellRendererText()
-		column.pack_start(renderer, True)
-		column.add_attribute(renderer, "markup", CATEGORY_NAME)
-		treeview.append_column(column)
-		
-		icon = gtk.icon_theme_get_default()
-
-		for item in category:
-			try:
-				pixbuf = icon.load_icon(item[CATEGORY_ICON], 24, 0)
-			except gobject.GError:
-				pixbuf = icon.load_icon(gtk.STOCK_MISSING_IMAGE, 24, 0)
-
-			lstore.append(( pixbuf,
-					item[CATEGORY_NAME],
+					"<big><b>%s</b></big>\n%s" % (self.getName(item[COLUMN_NAME]), self.getComment(item[COLUMN_NAME])),
 					))
 		
 		treeview.set_model(lstore)
