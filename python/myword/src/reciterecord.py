@@ -100,7 +100,7 @@ class ReciteRecord:
 
 		if first:
 			next = today + datetime.timedelta(1)
-		else:	
+		else:
 			next = today + datetime.timedelta(self.interval[self.time + 1])
 			self.time += 1
 
