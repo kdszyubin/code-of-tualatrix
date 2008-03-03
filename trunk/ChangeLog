@@ -1,3 +1,7 @@
+2008-03-03 TualatriX <tualatrix@gmail.com>
+
+	* gtk/socket-plug: 加入了一个GTK+的socket和plug的例子。
+
 2008-02-27 TualatriX <tualatrix@gmail.com>
 
 	* gtk/pagico: 加入了基于gtkembedmoz的Pagico客户端。
