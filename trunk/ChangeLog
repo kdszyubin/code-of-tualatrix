@@ -1,6 +1,8 @@
 2008-03-03 TualatriX <tualatrix@gmail.com>
 
 	* gtk/socket-plug: 加入了一个GTK+的socket和plug的例子。
+	* programs: 所有的程序将移入这里。
+	* documents: 所有的文档将移入这里。
 
 2008-02-27 TualatriX <tualatrix@gmail.com>
 
