@@ -1,3 +1,7 @@
+2008-03-04 TualatriX <tualatrix@gmail.com>
+
+	* documents/gobject-manual: 加入了《GObject参考手册》。
+
 2008-03-03 TualatriX <tualatrix@gmail.com>
 
 	* gtk/socket-plug: 加入了一个GTK+的socket和plug的例子。

@@ -1,0 +1,23 @@
+\chapter{基类：GObject}
+前面两个章节讨论了Glib动态类型系统的细节和它的信号控制系统。GObject库同时也包括了一个最基本的类型即基类，即为GObject。
+
+GObject是一个类化的可实例的基类。它实现了：
+\begin{itemize}
+	\item 使用引用计数的内存管理。
+	\item 实例的构造和析构 。
+	\item 使用set/get函数对进行的一般性属性操作。
+	\item 简易使用的信号机制。
+\end{itemize}
+所有使用GLib类型系统的GNOME库（如GTK+和GStreamer）都由GObject继承，所以了解有关它是如何工作的细节是如此重要。
+
+\section{对象实例}
+\verb|g_object_new|系列函数可以被用作实例化由GObject基本类型继承的一些GType。所有的这些函数确保类和实例的结构被Glib的类型系统正确的初始化，然后调用一个或别的构造类方法用于：
+
+\begin{itemize}
+	\item 通过\verb|g_type_create_instance|来分配和清理内存。
+	\item 初始化对象的实例用构造属性。
+\end{itemize}
+
+尽管你可以期待所有的类和实例成员（指向父类的部分）都会设置为0，但是尽量考虑自己明确地去设置它们。
+由GObject继承的对象们允许重载它的类构造方法：在做下面之前它们需要连接到父类的构造方法：
+
