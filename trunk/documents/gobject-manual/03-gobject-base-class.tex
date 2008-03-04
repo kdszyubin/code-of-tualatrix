@@ -19,5 +19,324 @@ GObject是一个类化的可实例的基类。它实现了：
 \end{itemize}
 
 尽管你可以期待所有的类和实例成员（指向父类的部分）都会设置为0，但是尽量考虑自己明确地去设置它们。
-由GObject继承的对象们允许重载它的类构造方法：在做下面之前它们需要连接到父类的构造方法：
 
+由GObject继承的对象们允许重载它的类构造方法：在做下面之前它们需要连接到父类的构造方法：
+\begin{verbatim}
+  GObject*   (*constructor)     (GType                  type,
+                                 guint                  n_construct_properties,
+                                 GObjectConstructParam *construct_properties);
+\end{verbatim}
+
+下面的代码显示MamanBar重载了父类的构造器：
+
+\begin{verbatim}
+#define MAMAN_TYPE_BAR                  (maman_bar_get_type ())
+#define MAMAN_BAR(obj)                  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MAMAN_TYPE_BAR, MamanBar))
+#define MAMAN_BAR_CLASS(klass)          (G_TYPE_CHECK_CLASS_CAST ((klass), MAMAN_TYPE_BAR, MamanBarClass))
+#define MAMAN_IS_BAR(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), MAMAN_TYPE_BAR))
+#define MAMAN_IS_BAR_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), MAMAN_TYPE_BAR))
+#define MAMAN_BAR_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj), MAMAN_TYPE_BAR, MamanBarClass))
+
+typedef struct _MamanBar MamanBar;
+typedef struct _MamanBarClass MamanBarClass;
+
+struct _MamanBar {
+  GObject parent;
+  /* instance members */
+};
+
+struct _MamanBarClass {
+  GObjectClass parent;
+
+  /* class members */
+};
+
+/* used by MAMAN_TYPE_BAR */
+GType maman_bar_get_type (void);
+
+static GObject *
+maman_bar_constructor (GType                  type,
+                       guint                  n_construct_properties,
+                       GObjectConstructParam *construct_properties)
+{
+  GObject *obj;
+
+  {
+    /* Invoke parent constructor. */
+    MamanBarClass *klass;
+    GObjectClass *parent_class;
+    klass = MAMAN_BAR_CLASS (g_type_class_peek (MAMAN_TYPE_BAR));
+    parent_class = G_OBJECT_CLASS (g_type_class_peek_parent (klass));
+    obj = parent_class->constructor (type,
+                                     n_construct_properties,
+                                     construct_properties);
+  }
+
+  /* do stuff. */
+
+  return obj;
+}
+
+static void
+maman_bar_instance_init (GTypeInstance   *instance,
+                         gpointer         g_class)
+{
+  MamanBar *self = (MamanBar *)instance;
+  /* do stuff */
+}
+
+static void
+maman_bar_class_init (gpointer g_class,
+                      gpointer g_class_data)
+{
+  GObjectClass *gobject_class = G_OBJECT_CLASS (g_class);
+  MamanBarClass *klass = MAMAN_BAR_CLASS (g_class);
+
+  gobject_class->constructor = maman_bar_constructor;
+}
+
+GType maman_bar_get_type (void)
+{
+  static GType type = 0;
+  if (type == 0) {
+    static const GTypeInfo info = {
+      sizeof (MamanBarClass),
+      NULL,   /* base_init */
+      NULL,   /* base_finalize */
+      maman_bar_class_init,   /* class_init */
+      NULL,   /* class_finalize */
+      NULL,   /* class_data */
+      sizeof (MamanBar),
+      0,      /* n_preallocs */
+      maman_bar_instance_init    /* instance_init */
+    };
+    type = g_type_register_static (G_TYPE_OBJECT,
+                                   "MamanBarType",
+                                   &info, 0);
+  }
+  return type;
+}
+\end{verbatim}
+如果用户是用下面的方法创建一个MamanBar的实例的：
+
+\verb|MamanBar *bar = g_object_new (MAMAN_TYPE_BAR, NULL);|
+
+如果这是用户创建的第一个实例，那么\verb|maman_b_class_init|函数将会在\verb|maman_b_base_class_init|调用后才调用。这将确保这个新对象的类结构会正确的初始化。这里，\verb|mana_bar_class_init|被期望重载对象的类方法，并且设置这个类的自己的方法。在上面的例子中，构造方法是唯一被重载的方法：它设置为了\verb|maman_bar_constructor|。
+
+一旦\verb|g_object_new|已经得到了一个初始化后的类结构的引用，它就调用它的构造方法来为这个新对象创建一个实例。因为它刚刚被\verb|maman_bar_class_init|由\verb|maman_bar_constructor|重载，后者将被调用，因为它是实现正确的，它也连接了父类的构造器。问题是，我们怎么才能找到父类的构造器。一个接近（在GTK+源代码中使用）将会来保存原始的构造器在一个从\verb|maman_class_init|来的静态变量中，然后可以通过\verb|maman_bar_constructor来|重用它。这是足够清楚的，也非常简单，但是我说这不是很好的办法，更好的办法是用\verb|g_type_class_peek|和\verb|g_type_class_peek_parent|函数。
+
+最终，在长链中一个\verb|g_object_constructor|被最后一个构造器调用。这个函数通过\verb|g_type_create_instance|分配的对象实例的缓存，这意味着如果它被注册过的话\verb|instance_init|函数将在这点上被调用。在\verb|instance_init|返回以后，对象就完全初始化好了，应该准备好应答用户的请求了。当\verb|g_type_create_instance|返回了，\verb|g_object_constructor|设置构造属性（属性由\verb|g_object_new|给的）并返回用户的构造器，使它来允许完成一些有用的实例初始化。
+
+这个所描述的处理过程看起来有一点难懂（在我看来确实难懂），但是由下面的表格可以清楚的概况起来，当\verb|g_object_new|调用时，相关函数的调用顺序。
+
+箭头表示由\verb|g_object_new|进行的函数调用和它们的调用顺序。
+
+表格太大，不贴了
+
+读者可能会对函数调用的顺序感到不安：当然，技术上来说，类结构方法总是在GType的\verb|instance_init|调用之前被调用（因为\verb|g_type_create_instance|来调用\verb|instance_init|相当于由\verb|g_object_constructor|来调用顶级类的构造器，这是用户所期望的），运行着用户提供的构造器的用户的代码将总是在GType的\verb|instance_init|函数之后运行，因为用户提供的构造器必须在做一些有用的事情前被链接好。
+
+\section{GObject的内存管理}
+GObject的内存管理相关的API有一点复杂，但是背后的主旨是相当简单的：它的目的是提供一个灵活的基于引用计数的、可以集成在使用或需要各种不同的内存管理模型（就像垃圾回收）的应用程序的模型。这些方法被用来操作它的引用数。
+
+\begin{verbatim}
+/*
+  Refcounting
+*/
+gpointer    g_object_ref                      (gpointer        object);
+void        g_object_unref                    (gpointer        object);
+
+/*
+  Weak References
+*/
+typedef void (*GWeakNotify)                (gpointer      data,
+                                         GObject      *where_the_object_was);
+void            g_object_weak_ref                      (GObject              *object,
+                                               GWeakNotify     notify,
+                                               gpointer               data);
+void            g_object_weak_unref                      (GObject              *object,
+                                               GWeakNotify     notify,
+                                               gpointer               data);
+void        g_object_add_weak_pointer         (GObject        *object,
+                                               gpointer       *weak_pointer_location);
+void        g_object_remove_weak_pointer      (GObject        *object,
+                                               gpointer       *weak_pointer_location);
+/*
+  Cycle handling
+*/
+void        g_object_run_dispose              (GObject              *object);
+\end{verbatim}
+\subsection{引用计数}
+函数\verb|g_object_ref/g_object_unref|分别增加或减少引用数。在GLib 2.8中，这些函数是线程安全的。所谓引用计数，没啥悬念的，当\verb|g_object_new|初始化了一个实例后，调用者即成了新创建的引用的把持者。当引用计数到达0以后，最后保持这个对象引用的客户端在调用\verb|g_object_unref|后，处理和终结类方法将被调用。
+
+在终结函数被调用以后，\verb|g_type_free_instance|被呼叫来翻译这个对象的实例。依赖内存分配策略中类型的注册时间（通过\verb|g_type_register|函数集），对象的实例所占据的内存将被释放并将类型返回对象池中。一旦对象被释放，如果它是最后一个这个类型的实例，那么类型的类将被销毁（如前面章节所讲的销毁策略一样）。
+
+关于一个GObject的销毁过程总结如下：
+\subsection{弱引用}
+弱引用用来监视一个对象的终结：\verb|g_object_weak_ref|加入了一个不把持对象引用的监视回调函数，但当对象运行它的处理函数时会被调用。这样的话，每个弱引用都可以在对象终结前被调用超过一次（因为处理函数在对象终结前会运行超过一次）。
+
+\verb|g_object_weak_unref|可以用来从对象上移除一个监视回调函数。
+
+弱引用同样用来实现\verb|g_object_add_weak_pointer|和\verb|g_object_remove_weak_pointer|。这些函数用来废弃对象的指针，当对象被终结以后。
+\subsection{引用计数和周期}
+注意：下面的段落内容由 James Henstridge所启发。如果有任何表扬都应该给他。
+
+GObject的内存管理模式被设计为可以容易地集成在现存的使用垃圾回收的代码中。这就是为什么销毁过程会被分离成两个阶段：第一个阶段，执行处理过程使得猜想释放了所有到其他对象的引用。第二个阶段，执行终结处理函数并猜想完成了对象销毁过程。对象的方法应该有能力在这两个阶段里无错误的情况下运行。
+
+这两步走的销毁过程对于打断引用计数周期是十分有用的。当在外部代码检测循环周期时，外部代码可以调用\verb|g_object_dispose|来运行与这个对象相关联的处理函数来理想地打断现存的周期。
+
+聪明的读者可能已经懂了处理函数的一些规则：处理函数可以被调用好几次。我们来假设一个引用计数周期：对象A引用了B，同B自己也引用了对象A。现在我们知道了这个周期，并决定销毁这两个对象。来完成这个，只要在其中一个对象调用\verb|g_object_dispose|即可。
+
+如果对象A释放了到所有其他对象的引用，这个意味着它释放了它到对象B的引用。如果对象B已经不被其他所占有，这就是最后一次由B的处理函数进行的引用计数，释放在对象A上的引用。
+
+\section{GObject的对象属性}
+GObject的其中一个漂亮特性就是它那为对象属性准备的通用get/set机制。当一个对象被实例化以后，对象的类初始化处理将用\verb|g_object_class_install_property|来注册对象的属性（由gobject.c中实现）。
+
+理解对象属性是如何工作的最好就是看下面的例子：
+\begin{verbatim}
+/************************************************/
+/* Implementation                               */
+/************************************************/
+
+enum {
+  MAMAN_BAR_CONSTRUCT_NAME = 1,
+  MAMAN_BAR_PAPA_NUMBER,
+};
+
+static void
+maman_bar_instance_init (GTypeInstance   *instance,
+                         gpointer         g_class)
+{
+  MamanBar *self = (MamanBar *)instance;
+}
+
+static void
+maman_bar_set_property (GObject      *object,
+                        guint         property_id,
+                        const GValue *value,
+                        GParamSpec   *pspec)
+{
+  MamanBar *self = (MamanBar *) object;
+
+  switch (property_id) {
+  case MAMAN_BAR_CONSTRUCT_NAME: {
+    g_free (self->priv->name);
+    self->priv->name = g_value_dup_string (value);
+    g_print ("maman: %s\n",self->priv->name);
+  }
+    break;
+  case MAMAN_BAR_PAPA_NUMBER: {
+    self->priv->papa_number = g_value_get_uchar (value);
+    g_print ("papa: %u\n",self->priv->papa_number);
+  }
+    break;
+  default:
+    /* We don't have any other property... */
+    G_OBJECT_WARN_INVALID_PROPERTY_ID(object,property_id,pspec);
+    break;
+  }
+}
+
+static void
+maman_bar_get_property (GObject      *object,
+                        guint         property_id,
+                        GValue       *value,
+                        GParamSpec   *pspec)
+{
+  MamanBar *self = (MamanBar *) object;
+
+  switch (property_id) {
+  case MAMAN_BAR_CONSTRUCT_NAME: {
+    g_value_set_string (value, self->priv->name);
+  }
+    break;
+  case MAMAN_BAR_PAPA_NUMBER: {
+    g_value_set_uchar (value, self->priv->papa_number);
+  }
+    break;
+  default:
+    /* We don't have any other property... */
+    G_OBJECT_WARN_INVALID_PROPERTY_ID(object,property_id,pspec);
+    break;
+  }
+}
+
+static void
+maman_bar_class_init (gpointer g_class,
+                      gpointer g_class_data)
+{
+  GObjectClass *gobject_class = G_OBJECT_CLASS (g_class);
+  MamanBarClass *klass = MAMAN_BAR_CLASS (g_class);
+  GParamSpec *pspec;
+
+  gobject_class->set_property = maman_bar_set_property;
+  gobject_class->get_property = maman_bar_get_property;
+
+  pspec = g_param_spec_string ("maman-name",
+                               "Maman construct prop",
+                               "Set maman's name",
+                               "no-name-set" /* default value */,
+                               G_PARAM_CONSTRUCT_ONLY | G_PARAM_READWRITE);
+  g_object_class_install_property (gobject_class,
+                                   MAMAN_BAR_CONSTRUCT_NAME,
+                                   pspec);
+
+  pspec = g_param_spec_uchar ("papa-number",
+                              "Number of current Papa",
+                              "Set/Get papa's number",
+                              0  /* minimum value */,
+                              10 /* maximum value */,
+                              2  /* default value */,
+                              G_PARAM_READWRITE);
+  g_object_class_install_property (gobject_class,
+                                   MAMAN_BAR_PAPA_NUMBER,
+                                   pspec);
+}
+
+/************************************************/
+/* Use                                          */
+/************************************************/
+
+GObject *bar;
+GValue val = {0,};
+bar = g_object_new (MAMAN_TYPE_SUBBAR, NULL);
+g_value_init (&val, G_TYPE_CHAR);
+g_value_set_char (&val, 11);
+g_object_set_property (G_OBJECT (bar), "papa-number", &val);
+\end{verbatim}
+
+上面的例子看起来应该是简单的，但是很多事情发生了：
+
+\verb|g_object_set_property|先确保相应名称的属性已经在bar的\verb|class_init|处理函数中被注册。如果是的话，它依次调用类继承关系中的\verb|object_set_property|，从底至顶，基础类型用来找到注册了这个属性的类。接着它尝试转换用户提供的GValue到属性所关联的GValue。
+
+如果用户提供了一个有符号的字符GValue，就像这里所示，如果对象的属性被注册为一个无符号的整型，\verb|g_value_transform|将会试着转换输入的有符号的字符到一个无符号的整型。当然，转换是否成功取取决于可用的转换函数。实际上，如果需要的时候，总会有相关的转换函数可以用。
+
+在转型以后，GValue将被\verb|g_param_value_validata|来验证，以确保用户保存在GValue中的数据吻合由属性的 GParamSpea所描述的字符特性。在这里，我们在\verb|class_init|里提供的GParamSpec有一个验证函数来确保GValue包含了一个代表最小和最大边界的GParamSpec。在上面的例子中，客户端的GValue并没有尊重规范（它设置为了11，而最大值是10）。因为这样，所了\verb|g_object_set_property|函数将返回一个错误。
+
+如果用户的GValue已经被设置成了一个可用的值，\verb|g_object_set_property|将处理一下呼叫至对象的\verb|set_property|的类方法。在这里，因为我们在Foo的实现代码中并没有重载这个函数，代码路径将会跳到\verb|foo_set_property|在收到\verb|g_object_class_install_property|存储了GParamSpec的\verb|param_id|后。
+
+一时已经用对象的\verb|set_property|类方法来设置好属性以后，代码路径将调用\verb|g_object_nofity_queue_thaw|使返回到\verb|g_object_set_property|。这个函数确保“notify”信号”已经在对象实例完成改变属性后被发出，除非通知台已经被\verb|g_object_free_notify|所冻洁。
+
+\verb|g_object_thaw_nofity|可以被用来重新启用通过“notify”信号的属性修改的通知中心。这是非常重要的，记住当属性被改变时通知中心是否被冻结，“notify”信号将会当在属性改变的一睡意由通知中心所发出：没有属性改变会因“notify”所信号。只有通过通知中心的冻结机制才能使信号发身被延误。
+
+这听起来像是一个无聊的任务每次设置GValues当我想需要一个属性时。实际上我们仅仅很少这样做。\verb|g_object_set_property|和\verb|g_object_get_property|一般是用来语言绑定的。对应用程序来说，有一个更简单的方法，在下面描述。
+同时修改多个属性
+
+我想这很有趣，我们可以通过\verb|g_object_set|和\verb|g_object_set_valist|函数来同时设置多个属性值。客户端代码可以被重写为：
+
+\begin{verbatim}
+MamanBar *foo;
+foo = /* */;
+g_object_set (G_OBJECT (foo),
+              "papa-number", 2,
+              "maman-name", "test",
+              NULL);
+\end{verbatim}
+这个节省了我们管理用\verb|g_object_set_property|来处理GValue的时间。在被修改时这个代码同样会触发每个属性。
+
+当然，\_get的版本同样是存在的：\verb|g_object_get|和\verb|g_object-get_valist|可以用来一次性得到很多属性。
+
+这些高级的方法有一个缺点──它们不提供一个返回值。在使用它们时，你需要注意这些参数类型和范围 。（暂时不会了）
+
+These high level functions have one drawback - they don’t provide a return result. One should pay attention to the argument types and ranges when using them. A know source of errors is to e.g. pass a gfloat instead of a gdouble and thus shifting all subsequent parameters by four bytes. Also forgetting the terminating NULL will lead to unexpected behaviour.
+
+如果你认真看这章的话，现在你应该已经知道了\verb|g_object_new|，\verb|g_object_newv|和\verb|g_object_new_valist|是如何工作的：它们解析用户提供的变量数目和参数并当对象成功的创建以后，用这些参数调用\verb|g_object_set|。当然，“notify”信号同样会在每个属性改变后发射。
