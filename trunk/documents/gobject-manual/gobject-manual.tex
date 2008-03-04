@@ -1,0 +1,53 @@
+\documentclass[a4paper]{book}
+% 设定页边距
+\usepackage[top=1.1in,bottom=1.1in,left=1.25in,right=1in]{geometry}
+% 引入graphicx的图形组件，dvips为图形加入引擎
+\usepackage[dvips]{graphicx}
+% 引入华丽页眉功能
+\usepackage{fancyhdr}
+% 引入并设定中文首行缩进功能
+\usepackage{indentfirst}
+\setlength{\parindent}{2em}
+\setlength{\parskip}{0pt}
+% 加载 CJK 相关宏包，并设置中文字体
+\usepackage{CJKutf8, CJKnumb}
+\newcommand{\song}{\CJKfamily{song}}
+\newcommand{\hei}{\CJKfamily{hei}}
+\newcommand{\kai}{\CJKfamily{kai}}
+% 设定章节标题格式
+\usepackage{titlesec}
+\titleformat{\chapter}{\centering\LARGE\hei}{第\,\CJKnumber{\thechapter}\,章}{1em}{}
+\titleformat{\section}{\large\hei}{\thesection}{1em}{}
+\titleformat{\subsection}{\normalsize\hei}{\thesubsection}{1em}{}
+% 设置页眉页脚
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\renewcommand{\chaptermark}[ 1]{\markboth{\small 第\,\thechapter \,章\quad #1}{}}
+\renewcommand{\sectionmark}[ 1]{\markright{\small\thesection \quad #1}{}}
+\fancyhf{}
+\fancyhead[ER]{ \leftmark}
+\fancyhead[OL]{ \rightmark}
+\fancyhead[EL,OR]{ $\cdot$\,\thepage\,$\cdot$ }
+\renewcommand{\headrulewidth}{ 0.4pt}
+\headheight=16pt
+% 加入图形搜索路径
+\graphicspath{{images/}}
+
+\begin{document}
+\begin{CJK}{UTF8}{song}
+\title{GObject引用手册}
+\author{TualatriX}
+\date{\today}
+
+\maketitle
+\tableofcontents
+\newpage
+
+\include{overview}
+\include{01-background}
+\include{02-dynamic-type-system}
+\include{03-gobject-base-class}
+
+\newpage
+\end{CJK}
+\end{document}
