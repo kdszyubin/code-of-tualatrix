@@ -29,7 +29,6 @@ class GconfCheckButton(gtk.CheckButton, BoolSetting):
 		BoolSetting.__init__(self, key)
 
 		self.set_label(label)
-		print self.value
 		self.set_active(self.get_bool())
 
 		self.client.notify_add(key, self.value_changed)
@@ -40,6 +39,21 @@ class GconfCheckButton(gtk.CheckButton, BoolSetting):
 
 	def button_toggled(self, widget, data = None):
 		self.client.set_bool(self.key, self.get_active())
+
+class CGconfCheckButton(GconfCheckButton):
+	def __init__(self, label, key, mediator):
+		GconfCheckButton.__init__(self, label, key)
+
+		self.mediator = mediator
+
+		self.connect("toggled", self.button_state_change)
+
+	def button_state_change(self, widget, data = None):
+		self.mediator.colleague_changed()
+
+class Mediator:
+	def colleague_changed(self):
+		pass
 
 class ItemBox(gtk.VBox):
 	"""The itembox used to pack a set of widgets with a markup title"""

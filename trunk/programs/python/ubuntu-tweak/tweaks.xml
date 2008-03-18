@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <tweaks>
 	<category title="session">
-		<item title="splash_image" key="/apps/gnome-session/options/splash_image"></item>
+		<item title="auto_save_session" key="/apps/gnome-session/options/auto_save_session"></item>
+		<item title="logout_prompt" key="/apps/gnome-session/options/logout_prompt"></item>
+		<item title="allow_tcp_connections" key="/apps/gnome-session/options/allow_tcp_connections"></item>
 		<item title="show_splash_screen" key="/apps/gnome-session/options/show_splash_screen"></item>
+		<item title="splash_image" key="/apps/gnome-session/options/splash_image"></item>
 	</category>
 
 	<category title="security">

@@ -36,7 +36,11 @@ class GnomeVersion:
 		return "%s.%s.%s (%s %s)" % (self.platform, self.minor, self.micro, self.distributor, self.date)
 
 class DistroInfo:
-	pass
+	if GnomeVersion.distributor == "Ubuntu":
+		from aptsources import distro
+		ubuntu = distro.get_distro()
+		distribution = ubuntu.description
+		codename = ubuntu.codename
 
 class SystemInfo:
 	gnome = GnomeVersion()

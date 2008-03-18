@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import UserDict
-from Widgets import GconfCheckButton
+from Widgets import GconfCheckButton, CGconfCheckButton
 from SystemInfo import SystemInfo
 from xml.sax import make_parser
 from xml.sax.handler import ContentHandler
@@ -36,6 +36,15 @@ class Factory:
 	def create_gconfcheckbutton(self, label, key, tooltip = None):
 		if key in self.keys:
 			button = GconfCheckButton(label, self.keys[key])
+			if tooltip:
+				button.set_tooltip_text(tooltip)
+			return button
+		else:
+			return None
+
+	def create_cgconfcheckbutton(self, label, key, mediator, tooltip = None):
+		if key in self.keys:
+			button = CGconfCheckButton(label, self.keys[key], mediator)
 			if tooltip:
 				button.set_tooltip_text(tooltip)
 			return button
