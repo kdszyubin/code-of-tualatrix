@@ -141,7 +141,7 @@ class Installer(gtk.Window):
 		return treeview
 
 def main():
-	Installer()
+	win = Installer()
 	gtk.main()
 
 if __name__ == '__main__':
