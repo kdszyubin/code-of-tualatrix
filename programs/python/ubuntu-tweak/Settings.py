@@ -30,8 +30,6 @@ class Setting:
 		self.key = key
 		self.value = self.client.get(key)
 
-		print "key is %s, value is %s" % (self.key, self.value.type)
-
 		dir = self.get_dir_from_key(key)
 		self.client.add_dir(dir, gconf.CLIENT_PRELOAD_NONE)
 #		self.client.notify_add(key, self.value_changed, key)
