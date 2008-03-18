@@ -1,6 +1,10 @@
+2008-03-18 TualatriX <tualatrix@gmail.com>
+
+	* programs/python/ubuntu-tweak: 加入Ubuntu Tweak最新分支。
+
 2008-03-04 TualatriX <tualatrix@gmail.com>
 
-	* documents/gobject-manual: 加入了《GObject参考手册》。
+	* documents/gobject-concepts: 加入了《GObject的概念》。
 
 2008-03-03 TualatriX <tualatrix@gmail.com>
 
