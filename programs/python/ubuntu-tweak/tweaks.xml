@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tweaks>
+	<category title="session">
+		<item title="splash_image" key="/apps/gnome-session/options/splash_image"></item>
+		<item title="show_splash_screen" key="/apps/gnome-session/options/show_splash_screen"></item>
+	</category>
+
+	<category title="security">
+		<item title="disable_command_line" key="/desktop/gnome/lockdown/disable_command_line"></item>
+		<item title="disable_lock_screen" key="/desktop/gnome/lockdown/disable_lock_screen"></item>
+		<item title="disable_save_to_disk" key="/desktop/gnome/lockdown/disable_printing"></item>
+		<item title="disable_print_setup" key="/desktop/gnome/lockdown/disable_print_setup"></item>
+		<item title="disable_save_to_disk" key="/desktop/gnome/lockdown/disable_save_to_disk"></item>
+		<item title="disable_user_switching" key="/desktop/gnome/lockdown/disable_user_switching"></item>
+	</category>
+
+	<category title="powermanager">
+		<item title="can_hibernate" key="/apps/gnome-power-manager/can_hibernate" version="18"></item>
+		<item title="can_hibernate" key="/apps/gnome-power-manager/general/can_hibernate" version="20"></item>
+	</category>
+</tweaks>
