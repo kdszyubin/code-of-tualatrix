@@ -1,3 +1,8 @@
+2008-03-19 TualatriX <tualatrix@gmail.com>
+
+	* programs/python/ubuntu-tweak/Utility.py: 加入单元测试功能。
+	* programs/python/ubuntu-tweak/Icon.py: 将Icon换上了新的API。
+	
 2008-03-18 TualatriX <tualatrix@gmail.com>
 
 	* programs/python/ubuntu-tweak: 加入Ubuntu Tweak最新分支。

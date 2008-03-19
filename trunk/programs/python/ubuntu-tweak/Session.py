@@ -121,12 +121,10 @@ class Session(gtk.VBox, Mediator):
 		return hbox
 
 	def session_control_box(self):
-		factory = Factory()
-
-		button = factory.create("gconfcheckbutton", _("Automatically save changes to session"), "auto_save_session")
-		button2 = factory.create("gconfcheckbutton", _("Show Logout prompt"), "logout_prompt")
-		button3 = factory.create("gconfcheckbutton", _("Allow TCP Connections(Remote Connect)"), "allow_tcp_connections")
-		self.show_splash_button = factory.create("cgconfcheckbutton", _("Show Splash screen"), "show_splash_screen", self)
+		button = Factory.create("gconfcheckbutton", _("Automatically save changes to session"), "auto_save_session")
+		button2 = Factory.create("gconfcheckbutton", _("Show Logout prompt"), "logout_prompt")
+		button3 = Factory.create("gconfcheckbutton", _("Allow TCP Connections(Remote Connect)"), "allow_tcp_connections")
+		self.show_splash_button = Factory.create("cgconfcheckbutton", _("Show Splash screen"), "show_splash_screen", self)
 
 		box = ItemBox(_("<b>Session Control</b>"), (button, button2, button3, self.show_splash_button))
 		return box

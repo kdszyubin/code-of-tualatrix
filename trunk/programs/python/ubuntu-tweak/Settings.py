@@ -49,7 +49,23 @@ class BoolSetting(Setting):
 
 	def get_bool(self):
 		self.value = self.client.get(self.key)
-		if self.value.type == gconf.VALUE_BOOL:
-			return self.value.get_bool()
-		elif self.value.type == gcon.VALUE_STRING:
-			return bool(self.value.get_string())
+		if self.value:
+			if self.value.type == gconf.VALUE_BOOL:
+				return self.value.get_bool()
+			elif self.value.type == gcon.VALUE_STRING:
+				return bool(self.value.get_string())
+		else:
+			return False
+
+class StringSetting(Setting):
+	def __init__(self, key):
+		Setting.__init__(self, key)
+
+		self.string = self.get_string()
+
+	def get_string(self):
+		self.value = self.client.get(self.key)
+		if self.value:
+			return self.value.get_string()
+		else:
+			return None
