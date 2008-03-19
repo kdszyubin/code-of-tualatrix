@@ -8,6 +8,19 @@
 		<item title="splash_image" key="/apps/gnome-session/options/splash_image"></item>
 	</category>
 
+	<category title="icon">
+		<item title="show_desktop" key="/apps/nautilus/preferences/show_desktop"></item>
+		<item title="computer_icon_visible" key="/apps/nautilus/desktop/computer_icon_visible"></item>
+		<item title="computer_icon_name" key="/apps/nautilus/desktop/computer_icon_name"></item>
+		<item title="home_icon_visible" key="/apps/nautilus/desktop/home_icon_visible"></item>
+		<item title="home_icon_name" key="/apps/nautilus/desktop/home_icon_name"></item>
+		<item title="trash_icon_visible" key="/apps/nautilus/desktop/trash_icon_visible"></item>
+		<item title="trash_icon_name" key="/apps/nautilus/desktop/trash_icon_name"></item>
+		<item title="network_icon_visible" key="/apps/nautilus/desktop/network_icon_visible"></item>
+		<item title="volumes_visible" key="/apps/nautilus/desktop/volumes_visible"></item>
+		<item title="desktop_is_home_dir" key="/apps/nautilus/preferences/desktop_is_home_dir"></item>
+	</category>
+
 	<category title="security">
 		<item title="disable_command_line" key="/desktop/gnome/lockdown/disable_command_line"></item>
 		<item title="disable_lock_screen" key="/desktop/gnome/lockdown/disable_lock_screen"></item>

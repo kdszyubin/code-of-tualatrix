@@ -21,7 +21,18 @@
 import pygtk
 pygtk.require("2.0")
 import gtk
-from Settings import BoolSetting
+from Settings import BoolSetting, StringSetting
+
+class Colleague:
+	def __init__(self, mediator):
+		self.mediator = mediator
+
+	def state_changed(self, widget, data = None):
+		self.mediator.colleague_changed()
+
+class Mediator:
+	def colleague_changed(self):
+		pass
 
 class GconfCheckButton(gtk.CheckButton, BoolSetting):
 	def __init__(self, label, key):
@@ -40,20 +51,38 @@ class GconfCheckButton(gtk.CheckButton, BoolSetting):
 	def button_toggled(self, widget, data = None):
 		self.client.set_bool(self.key, self.get_active())
 
-class CGconfCheckButton(GconfCheckButton):
+class StrGconfCheckButton(GconfCheckButton, Colleague):
 	def __init__(self, label, key, mediator):
 		GconfCheckButton.__init__(self, label, key)
+		Colleague.__init__(self, mediator)
 
-		self.mediator = mediator
+		self.connect("toggled", self.state_changed)
 
-		self.connect("toggled", self.button_state_change)
-
-	def button_state_change(self, widget, data = None):
-		self.mediator.colleague_changed()
-
-class Mediator:
-	def colleague_changed(self):
+	def button_toggled(self, widget, data = None):
 		pass
+
+class GconfEntry(gtk.Entry, StringSetting):
+	def __init__(self, key):
+		gtk.Entry.__init__(self)
+		StringSetting.__init__(self, key)
+
+		if self.get_string():
+			self.set_text(self.get_string())
+		else:
+			self.set_text("Unset")
+
+		self.connect("activate", self.activated_cb)
+
+	def activated_cb(self, widget, data = None):
+		self.client.set_string(self.key, self.get_text())
+
+
+class CGconfCheckButton(GconfCheckButton, Colleague):
+	def __init__(self, label, key, mediator):
+		GconfCheckButton.__init__(self, label, key)
+		Colleague.__init__(self, mediator)
+
+		self.connect("toggled", self.state_changed)
 
 class ItemBox(gtk.VBox):
 	"""The itembox used to pack a set of widgets with a markup title"""

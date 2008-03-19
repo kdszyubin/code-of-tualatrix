@@ -58,11 +58,9 @@ class LockDown(gtk.VBox):
         def __init__(self):
                 gtk.VBox.__init__(self)
 
-		factory = Factory()
-
 		box = ItemBox(_("<b>System Security options</b>"), ())
 		for key in lockdown_keys:
-			button = factory.create("gconfcheckbutton", lockdown_names[lockdown_keys.index(key)], key, "Hello Wolrd!")
+			button = Factory.create("gconfcheckbutton", lockdown_names[lockdown_keys.index(key)], key, "Hello Wolrd!")
 			if button:
 				box.vbox.pack_start(button, False, False, 0)
 #			button = GConfCheckButton(lockdown_names[lockdown_keys.index(key)], key)
@@ -70,13 +68,5 @@ class LockDown(gtk.VBox):
 		self.pack_start(box, False, False, 0)
 
 if __name__ == "__main__":
-	win = gtk.Window()
-	win.connect('destroy', lambda *w: gtk.main_quit())
-        win.set_title("Document Templates")
-        win.set_default_size(650, 400)
-        win.set_border_width(8)
-
-        win.add(LockDown())
-
-        win.show_all()
-	gtk.main()	
+	from Utility import Test
+        Test(LockDown)
