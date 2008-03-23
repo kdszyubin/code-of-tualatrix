@@ -3,47 +3,69 @@
 
 import gtk
 import gconf
+from Widgets import *
+from Utility import ManyTest, Test
 from xml.sax import make_parser
 from xml.sax.handler import ContentHandler
 
-class Setting:
-	client = gconf.client_get_default()
+class Bool(gtk.VBox):
+	def __init__(self, label):
+		gtk.VBox.__init__(self)
 
-	def __init__(self, key):
-		self.key = key
+		self.Widget = gtk.HBox ()
+		self.pack_start(self.Widget)
 
-		dir = self.get_dir_from_key(key)
-		self.client.add_dir(dir, gconf.CLIENT_PRELOAD_NONE)
-		self.client.notify_add(key, self.value_changed, key)
+		self.CheckButton = gtk.CheckButton ()
+		label = gtk.Label (label)
+		self.align = gtk.Alignment ()
+		self.align.add (label)
+		self.buttonAlign = gtk.Alignment (0, 0.5)
+		self.buttonAlign.set_padding (0, 0, 0, 10)
+		self.buttonAlign.add (self.CheckButton)
+		self.Widget.pack_start (self.align, True, True)
+		self.Widget.pack_start (self.buttonAlign, False, False)
 
-		self.value = self.client.get(key)
+		self.show_all()
 
-		self.value_type = ''
+def ComboboxItem(texts):
+	comboxbox = gtk.combo_box_new_text()
 
-	def value_changed(self, client, id, entry, data = None):
-		print "我靠！有变化了！"
+	for element in texts:
+		comboxbox.append_text(element)
 
-	def get_dir_from_key(self, key):
-		return "/".join(key.split("/")[0: -1])
+	return comboxbox
 
-class XmlLoader(ContentHandler):
-	def __init__(self):
-		pass
+class BoolAndInt(gtk.VBox):
+	def __init__(self, label):
+		gtk.VBox.__init__(self)
 
-	def startElement(self, name, attrs):
-		if name == "item":
-			print "Start:", name, attrs["title"]
-			print "Start:", name, attrs["key"]
-		else:
-			print "Start:", name, attrs
+		self.Widget = gtk.HBox ()
+		self.pack_start(self.Widget)
 
-	def endElement(self, name):
-		print "End:", name
-	
-	def characters(self, text):
-		pass
+		self.CheckButton = gtk.CheckButton (label)
+		self.align = gtk.Alignment (0, 0.5)
+		self.align.add (self.CheckButton)
+
+		self.scale = gtk.HScale()
+		self.buttonAlign = gtk.Alignment (0, 0.5)
+		self.buttonAlign.set_padding (0, 0, 0, 10)
+		self.buttonAlign.add (self.scale)
+		self.Widget.pack_start (self.align, True, True)
+		self.Widget.pack_start (self.buttonAlign, False, False)
+
+		self.show_all()
 
 if __name__ == "__main__":
-	Setting("/apps/panel/global/confirm_panel_remove")
-	Setting("/apps/panel/global/locked_down")
+	win = gtk.Window()
+
+	win.connect('destroy', lambda *w: gtk.main_quit())
+	win.set_position(gtk.WIN_POS_CENTER)
+
+	vbox = gtk.VBox(False, 5)
+	win.add(vbox)
+
+	vbox.pack_start(GconfCombobox("/apps/gwd/mouse_wheel_action", ["None", "Roll up"], ["none", "shade"]).combobox)
+	
+	win.show_all()
+
 	gtk.main()

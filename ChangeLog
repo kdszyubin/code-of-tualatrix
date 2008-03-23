@@ -1,3 +1,8 @@
+2008-03-23 TualatriX <tualatrix@gmail.com>
+
+	* programs/python/ubuntu-tweak/Widgets.py: 加入新的Pack API。
+	* programs/python/ubuntu-tweak/Metacity.py: 基本更新Metacity。
+
 2008-03-19 TualatriX <tualatrix@gmail.com>
 
 	* programs/python/ubuntu-tweak/Utility.py: 加入单元测试功能。

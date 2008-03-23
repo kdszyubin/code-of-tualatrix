@@ -26,7 +26,7 @@ import gconf
 import gettext
 
 from Factory import Factory
-from Widgets import GconfCheckButton, ItemBox
+from Widgets import ListPack
 
 gettext.install("ubuntu-tweak", unicode = True)
 
@@ -58,7 +58,7 @@ class LockDown(gtk.VBox):
         def __init__(self):
                 gtk.VBox.__init__(self)
 
-		box = ItemBox(_("<b>System Security options</b>"), ())
+		box = ListPack(_("<b>System Security options</b>"), ())
 		for key in lockdown_keys:
 			button = Factory.create("gconfcheckbutton", lockdown_names[lockdown_keys.index(key)], key, "Hello Wolrd!")
 			if button:

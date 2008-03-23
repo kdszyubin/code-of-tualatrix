@@ -25,7 +25,7 @@ import os
 import gconf
 import gettext
 
-from Widgets import ItemBox
+from Widgets import ListPack, SinglePack
 from Widgets import Mediator
 from Factory import Factory
 
@@ -38,7 +38,7 @@ class Session(gtk.VBox, Mediator):
 
 		self.pack_start(self.session_control_box(), False, False, 0)
 
-		box = ItemBox(_("<b>Click the large button to change Splash screen</b>"), (self.splash_hbox(),))
+		box = SinglePack(_("<b>Click the large button to change Splash screen</b>"), self.splash_hbox())
 		self.pack_start(box, False, False, 0)
 
 	def change_splash_cb(self, widget, data = None):
@@ -126,7 +126,7 @@ class Session(gtk.VBox, Mediator):
 		button3 = Factory.create("gconfcheckbutton", _("Allow TCP Connections(Remote Connect)"), "allow_tcp_connections")
 		self.show_splash_button = Factory.create("cgconfcheckbutton", _("Show Splash screen"), "show_splash_screen", self)
 
-		box = ItemBox(_("<b>Session Control</b>"), (button, button2, button3, self.show_splash_button))
+		box = ListPack(_("<b>Session Control</b>"), (button, button2, button3, self.show_splash_button))
 		return box
 
 	def colleague_changed(self):
@@ -136,13 +136,5 @@ class Session(gtk.VBox, Mediator):
 			self.button.set_sensitive(False)
 
 if __name__ == "__main__":
-	win = gtk.Window()
-	win.connect('destroy', lambda *w: gtk.main_quit())
-        win.set_title("Document Templates")
-        win.set_default_size(650, 400)
-        win.set_border_width(8)
-
-        win.add(Session())
-
-        win.show_all()
-	gtk.main()	
+	from Utility import Test
+	Test(Session)

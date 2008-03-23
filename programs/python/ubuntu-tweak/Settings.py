@@ -69,3 +69,9 @@ class StringSetting(Setting):
 			return self.value.get_string()
 		else:
 			return None
+
+class ConstStringSetting(StringSetting):
+	def __init__(self, key, values):
+		StringSetting.__init__(self, key)
+
+		self.values = values

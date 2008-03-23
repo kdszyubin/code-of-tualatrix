@@ -21,6 +21,19 @@
 		<item title="desktop_is_home_dir" key="/apps/nautilus/preferences/desktop_is_home_dir"></item>
 	</category>
 
+	<category title="metacity">
+		<item title="use_metacity_theme" key="/apps/gwd/use_metacity_theme"></item>
+		<item title="metacity_theme_active_shade_opacity" key="/apps/gwd/metacity_theme_active_shade_opacity"></item>
+		<item title="metacity_theme_active_opacity" key="/apps/gwd/metacity_theme_active_opacity"></item>
+		<item title="metacity_theme_active_opacity" key="/apps/gwd/metacity_theme_active_opacity"></item>
+		<item title="metacity_theme_shade_opacity" key="/apps/gwd/metacity_theme_shade_opacity"></item>
+		<item title="metacity_theme_opacity" key="/apps/gwd/metacity_theme_opacity"></item>
+		<item title="mouse_wheel_action" key="/apps/gwd/mouse_wheel_action"></item>
+		<item title="action_double_click_titlebar" key="/apps/metacity/general/action_double_click_titlebar"></item>
+		<item title="action_middle_click_titlebar" key="/apps/metacity/general/action_middle_click_titlebar"></item>
+		<item title="action_right_click_titlebar" key="/apps/metacity/general/action_right_click_titlebar"></item>
+	</category>
+
 	<category title="security">
 		<item title="disable_command_line" key="/desktop/gnome/lockdown/disable_command_line"></item>
 		<item title="disable_lock_screen" key="/desktop/gnome/lockdown/disable_lock_screen"></item>
