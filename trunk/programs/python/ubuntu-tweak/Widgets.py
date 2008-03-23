@@ -182,15 +182,16 @@ class TablePack(BaseListPack):
 		table = gtk.Table(len(items), len(items[0]))
 
 		for item in items:
-			for widget in item:
-				left_attch = item.index(widget)
-				top_attach = items.index(item)
+			if not None in item:
+				for widget in item:
+					left_attch = item.index(widget)
+					top_attach = items.index(item)
 
-				if left_attch == 1:
-					table.attach(widget, left_attch, left_attch + 1, top_attach, top_attach + 1, xpadding = 10, ypadding = 5)
-				else:
-					widget.set_alignment(0, 0)
-					table.attach(widget, left_attch, left_attch + 1, top_attach, top_attach + 1, gtk.FILL, ypadding = 10)
+					if left_attch == 1:
+						table.attach(widget, left_attch, left_attch + 1, top_attach, top_attach + 1, xpadding = 10, ypadding = 5)
+					else:
+						widget.set_alignment(0, 0)
+						table.attach(widget, left_attch, left_attch + 1, top_attach, top_attach + 1, gtk.FILL, ypadding = 10)
 
 		self.vbox.pack_start(table)
 
