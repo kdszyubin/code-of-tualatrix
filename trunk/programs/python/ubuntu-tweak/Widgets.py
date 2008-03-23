@@ -21,7 +21,7 @@
 import pygtk
 pygtk.require("2.0")
 import gtk
-from Settings import BoolSetting, StringSetting
+from Settings import *
 
 class Colleague:
 	def __init__(self, mediator):
@@ -71,9 +71,9 @@ class GconfEntry(gtk.Entry, StringSetting):
 		else:
 			self.set_text("Unset")
 
-		self.connect("activate", self.activated_cb)
-
-	def activated_cb(self, widget, data = None):
+		self.connect("activate", self.on_edit_finished_cb)
+	
+	def on_edit_finished_cb(self, widget, data = None):
 		self.client.set_string(self.key, self.get_text())
 
 
@@ -83,6 +83,25 @@ class CGconfCheckButton(GconfCheckButton, Colleague):
 		Colleague.__init__(self, mediator)
 
 		self.connect("toggled", self.state_changed)
+
+class GconfCombobox(ConstStringSetting):
+	def __init__(self, key, texts, values):
+		ConstStringSetting.__init__(self, key, values)
+
+		self.combobox = gtk.combo_box_new_text()
+		self.texts = texts
+
+		for text in texts:
+			self.combobox.append_text(text)
+
+		if self.get_string() in values:
+			self.combobox.set_active(values.index(self.get_string()))
+
+		self.combobox.connect("changed", self.value_changed_cb)
+
+	def value_changed_cb(self, widget, data = None):
+		text = widget.get_active_text()
+		self.client.set_string(self.key, self.values[self.texts.index(text)])
 
 class ItemBox(gtk.VBox):
 	"""The itembox used to pack a set of widgets with a markup title"""
@@ -114,7 +133,66 @@ class ItemBox(gtk.VBox):
 					self.add(widgets[0])
 			else:
 				for widget in widgets:
-					self.vbox.pack_start(widget, False, False, 0)
+					self.vbox.pack_start(widget, False, False, 5)
+
+class BasePack(gtk.VBox):
+	def __init__(self, title):
+		gtk.VBox.__init__(self)
+		self.set_border_width(5)
+
+		label = gtk.Label()
+		label.set_markup(title)
+		label.set_alignment(0, 0)
+		self.pack_start(label, False, False, 0)
+
+class SinglePack(BasePack):
+	def __init__(self, title, widget):
+		BasePack.__init__(self, title)
+
+		self.pack_start(widget, True, True, 20)
+
+class BaseListPack(BasePack):
+	def __init__(self, title):
+		BasePack.__init__(self, title)
+
+		hbox = gtk.HBox(False, 5)
+		hbox.set_border_width(5)
+		self.pack_start(hbox, True, False, 0)
+
+		label = gtk.Label(" ")
+		hbox.pack_start(label, False, False, 0)
+
+		self.vbox = gtk.VBox(False, 0)
+		hbox.pack_start(self.vbox, True, True, 0)
+
+class ListPack(BaseListPack):
+	def __init__(self, title, widgets):
+		BaseListPack.__init__(self, title)
+
+		if widgets:
+			for widget in widgets:
+				if widget: self.vbox.pack_start(widget, False, False, 5)
+		else:
+			self = None
+
+class TablePack(BaseListPack):
+	def __init__(self, title, items):
+		BaseListPack.__init__(self, title)
+
+		table = gtk.Table(len(items), len(items[0]))
+
+		for item in items:
+			for widget in item:
+				left_attch = item.index(widget)
+				top_attach = items.index(item)
+
+				if left_attch == 1:
+					table.attach(widget, left_attch, left_attch + 1, top_attach, top_attach + 1, xpadding = 10, ypadding = 5)
+				else:
+					widget.set_alignment(0, 0)
+					table.attach(widget, left_attch, left_attch + 1, top_attach, top_attach + 1, gtk.FILL, ypadding = 10)
+
+		self.vbox.pack_start(table)
 
 class EntryBox(gtk.HBox):
 	def __init__(self, label, text):
@@ -183,6 +261,5 @@ class ComboboxItem(gtk.HBox):
 		client = gconf.client_get_default()
 		text = widget.get_active_text()
 		client.set_string(data, widget.values[widget.texts.index(text)]) 
-
 class AboutBlank:
 	pass

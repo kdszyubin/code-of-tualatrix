@@ -5,7 +5,6 @@ from SystemInfo import SystemInfo
 from xml.sax import make_parser
 from xml.sax.handler import ContentHandler
 
-
 class XmlHandler(ContentHandler):
         def __init__(self, dict):
 		self.dict = dict
@@ -67,6 +66,13 @@ class Factory:
 			if tooltip:
 				entry.set_tooltip_text(tooltip)
 			return entry
+		else:
+			return None
+
+	def create_gconfcombobox(self, key, texts, values):
+		if key in self.keys:
+			combobox = GconfCombobox(self.keys[key], texts, values)
+			return combobox.combobox
 		else:
 			return None
 

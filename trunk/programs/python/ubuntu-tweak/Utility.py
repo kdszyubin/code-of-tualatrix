@@ -38,3 +38,24 @@ class Test:
 		win.show_all()
 
 		gtk.main()
+
+
+class ManyTest:
+	def __init__(self, widgets):
+		win = gtk.Window()
+
+		win.connect('destroy', lambda *w: gtk.main_quit())
+		win.set_position(gtk.WIN_POS_CENTER)
+
+		win.set_title("Many test")
+		
+		vbox = gtk.VBox(False, 10)
+		win.add(vbox)
+
+		for widget in widgets:
+			vbox.pack_start(widget, False, False, 5)
+
+		win.show_all()
+
+		gtk.main()
+
