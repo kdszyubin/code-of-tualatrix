@@ -16,7 +16,7 @@ class XmlHandler(ContentHandler):
 			except KeyError:
 				self.dict[attrs["title"]] = attrs["key"]
 			else:
-				if SystemInfo.gnome.minor == minor:
+				if SystemInfo.gnome.minor >= minor:
 					self.dict[attrs["title"]] = attrs["key"]
 
 class GconfKeys:
