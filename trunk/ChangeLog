@@ -1,3 +1,7 @@
+2008-03-24 TualatriX <tualatrix@gmail.com>
+
+	* programs/python/ubuntu-tweak/Compiz.py: 基本更新Compiz，全新API。
+
 2008-03-23 TualatriX <tualatrix@gmail.com>
 
 	* programs/python/ubuntu-tweak/Widgets.py: 加入新的Pack API。
