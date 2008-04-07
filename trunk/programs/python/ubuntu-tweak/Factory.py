@@ -30,8 +30,15 @@ class GconfKeys:
 class Factory:
 	keys = GconfKeys.keys
 	@staticmethod
-	def create(widget = None, label = None, key = None, tooltip = None):
-		return getattr(Factory(), "create_%s" % widget)(label, key, tooltip)
+	def create(widget = None, *argv):
+		if len(argv) == 1:
+			return getattr(Factory(), "create_%s" % widget)(argv[0])
+		elif len(argv) == 2:
+			return getattr(Factory(), "create_%s" % widget)(argv[0], argv[1])
+		elif len(argv) == 3:
+			return getattr(Factory(), "create_%s" % widget)(argv[0], argv[1], argv[2])
+		elif len(argv) == 4:
+			return getattr(Factory(), "create_%s" % widget)(argv[0], argv[1], argv[2], argv[3])
 	
 	def create_gconfcheckbutton(self, label, key, tooltip = None):
 		if key in self.keys:
@@ -60,7 +67,7 @@ class Factory:
 		else:
 			return None
 
-	def create_gconfentry(self, key, mediator, tooltip = None):
+	def create_gconfentry(self, key, mediator = None, tooltip = None):
 		if key in self.keys:
 			entry = GconfEntry(self.keys[key])
 			if tooltip:
@@ -76,7 +83,7 @@ class Factory:
 		else:
 			return None
 
-	def create_gconfscale(self, min, max, key, digits = 0):
+	def create_gconfscale(self, min, max, key, digits = None):
 		if key in self.keys:
 			scale = GconfScale(min, max, self.keys[key], digits)
 			return scale
