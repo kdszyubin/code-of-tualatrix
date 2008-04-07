@@ -36,13 +36,13 @@ class Metacity(gtk.VBox):
 	def __init__(self):
 		gtk.VBox.__init__(self)
 
-		box = ItemBox(_("<b>Window Decorate Effect</b>"), (
-			Factory.create("gconfcheckbutton", _("Use metacity theme"), "use_metacity_theme"),
-			Factory.create("gconfcheckbutton", _("Metacity theme active window opacity shade"), "metacity_theme_active_shade_opacity"),
-			HScaleBox(_("Active window opacity level"), 0, 1, "/apps/gwd/metacity_theme_active_opacity", digits = 2),
-			Factory.create("gconfcheckbutton", _("Metacity theme opacity shade"), "metacity_theme_shade_opacity"),
-			HScaleBox(_("Window shade opacity level"), 0, 1, "/apps/gwd/metacity_theme_opacity", digits = 2),
-			))
+		box = TablePack(_("<b>Window Decorate Effect</b>"), [
+			[Factory.create("gconfcheckbutton", _("Use metacity theme"), "use_metacity_theme")],
+			[Factory.create("gconfcheckbutton", _("Metacity theme active window opacity shade"), "metacity_theme_active_shade_opacity")],
+			[gtk.Label(_("Active window opacity level")), Factory.create("gconfscale", 0, 1, "metacity_theme_active_opacity", digits = 2)],
+			[Factory.create("gconfcheckbutton", _("Metacity theme opacity shade"), "metacity_theme_shade_opacity")],
+			[gtk.Label(_("Window shade opacity level")), Factory.create("gconfscale", 0, 1, "metacity_theme_opacity", digits = 2)],
+			])
 		self.pack_start(box, False, False, 0)
 
 		table = TablePack(_("<b>Window Titlebar Action</b>"), [

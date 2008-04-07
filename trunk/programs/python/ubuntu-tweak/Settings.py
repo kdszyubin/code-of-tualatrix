@@ -70,6 +70,26 @@ class StringSetting(Setting):
 		else:
 			return None
 
+class IntSetting(Setting):
+	def __init__(self, key):
+		Setting.__init__(self, key)
+
+		self.int = self.get_int()
+
+	def get_int(self):
+		self.value = self.client.get(self.key)
+		return self.value.get_int()
+
+class FloatSetting(Setting):
+	def __init__(self, key):
+		Setting.__init__(self, key)
+
+		self.int = self.get_float()
+
+	def get_float(self):
+		self.value = self.client.get(self.key)
+		return self.value.get_float()
+
 class ConstStringSetting(StringSetting):
 	def __init__(self, key, values):
 		StringSetting.__init__(self, key)

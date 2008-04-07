@@ -21,6 +21,7 @@
 import pygtk
 pygtk.require("2.0")
 import gtk
+import gconf
 from Settings import *
 
 class Colleague:
@@ -102,6 +103,28 @@ class GconfCombobox(ConstStringSetting):
 	def value_changed_cb(self, widget, data = None):
 		text = widget.get_active_text()
 		self.client.set_string(self.key, self.values[self.texts.index(text)])
+
+class GconfScale(Setting, gtk.HScale):
+	def __init__(self, min, max, key, digits = 0):
+		gtk.HScale.__init__(self)
+		Setting.__init__(self, key)
+		
+		self.set_range(min, max)
+		self.set_digits(digits)
+		self.set_value_pos(gtk.POS_RIGHT)
+		self.connect("value-changed", self.on_value_changed)
+
+		if self.value.type == gconf.VALUE_INT:
+			self.set_value(self.client.get_int(key))
+		elif self.value.type == gconf.VALUE_FLOAT:
+			self.set_value(self.client.get_float(key))
+
+	def on_value_changed(self, widget, data = None):
+		self.value = self.client.get(self.key)
+		if self.value.type == gconf.VALUE_INT:
+			self.client.set_int(self.key, int(widget.get_value()))
+		elif self.value.type == gconf.VALUE_FLOAT:
+			self.client.set_float(self.key, widget.get_value())
 
 class ItemBox(gtk.VBox):
 	"""The itembox used to pack a set of widgets with a markup title"""
@@ -190,8 +213,9 @@ class TablePack(BaseListPack):
 					if left_attch == 1:
 						table.attach(widget, left_attch, left_attch + 1, top_attach, top_attach + 1, xpadding = 10, ypadding = 5)
 					else:
-						if type(widget) == "gtk.Label": widget.set_alignment(0, 0)
-						table.attach(widget, left_attch, left_attch + 1, top_attach, top_attach + 1, gtk.FILL, ypadding = 10)
+#						if type(widget) == "gtk.Label":
+						widget.set_alignment(0, 0)
+						table.attach(widget, left_attch, left_attch + 1, top_attach, top_attach + 1, gtk.FILL, ypadding = 5)
 
 		self.vbox.pack_start(table)
 
