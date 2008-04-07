@@ -36,14 +36,19 @@ class GnomeVersion:
 		return "%s.%s.%s (%s %s)" % (self.platform, self.minor, self.micro, self.distributor, self.date)
 
 class DistroInfo:
-	if GnomeVersion.distributor == "Ubuntu":
-		from aptsources import distro
-		ubuntu = distro.get_distro()
-		distribution = ubuntu.description
-		codename = ubuntu.codename
+	def __init__(self):
+		distro = GnomeVersion.distributor
+		if  distro == "Ubuntu":
+			from aptsources import distro
+			ubuntu = distro.get_distro()
+			distribution = ubuntu.description
+			codename = ubuntu.codename
+		elif distro == "Archlinux":
+			pass
 
 class SystemInfo:
 	gnome = GnomeVersion()
 			
 if __name__ == "__main__":
 	print SystemInfo.gnome
+	print GnomeVersion.distributor

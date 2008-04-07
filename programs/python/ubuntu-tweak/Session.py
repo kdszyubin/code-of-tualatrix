@@ -72,7 +72,11 @@ class Session(gtk.VBox, Mediator):
 	def splash_hbox(self):
 		client = gconf.client_get_default()
 		filename = client.get_string("/apps/gnome-session/options/splash_image")
+		if filename[0] != "/":
+			filename = "/usr/share/pixmaps/" + filename
+
 		self.filedir = os.path.dirname(filename)
+
 		try:
 			f = open(filename)
 		except IOError:
