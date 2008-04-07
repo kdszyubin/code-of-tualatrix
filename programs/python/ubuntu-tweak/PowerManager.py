@@ -48,8 +48,8 @@ class PowerManager(gtk.VBox):
                 self.pack_start(box, False, False, 0)
 
 		box = TablePack(_("<b>CPU Policy</b>"), [
-			[HScaleBox(_("The Performance value when on AC power"), 0, 100, "/apps/gnome-power-manager/cpufreq/performance_ac")],
-			[HScaleBox(_("The Performance value when on battery power"), 0, 100, "/apps/gnome-power-manager/cpufreq/performance_battery")],
+			[gtk.Label(_("The Performance value when on AC power")), Factory.create("gconfscale", 0, 100, "performance_ac")],
+			[gtk.Label(_("The Performance value when on battery power")), Factory.create("gconfscale", 0, 100, "performance_battery")],
 			[gtk.Label(_("The CPU frequency policy when on AC power")), Factory.create("gconfcombobox", "policy_ac", [_("On Demand"), _("Power Save"), _("Performance")], ["ondemand", "powersave", "performance"])],
 			[gtk.Label(_("The CPU frequency policy when on battery power")), Factory.create("gconfcombobox", "policy_battery", [_("On Demand"), _("Power Save"), _("Performance")], ["ondemand", "powersave", "performance"])],
 		])

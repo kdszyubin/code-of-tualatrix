@@ -57,11 +57,13 @@
 		<item title="can_hibernate" key="/apps/gnome-power-manager/general/can_hibernate" version="20"></item>
 		<item title="can_suspend" key="/apps/gnome-power-manager/can_suspend" version="18"></item>
 		<item title="can_suspend" key="/apps/gnome-power-manager/general/can_suspend" version="20"></item>
-		<item title="show_cpufreq_ui" key="/apps/gnome-power-manager/show_cpufreq_ui" version="18"></item>
-		<item title="show_cpufreq_ui" key="/apps/gnome-power-manager/ui/cpufreq_show" version="20"></item>
+		<item title="cpufreq_show" key="/apps/gnome-power-manager/show_cpufreq_ui" version="18"></item>
+		<item title="cpufreq_show" key="/apps/gnome-power-manager/ui/cpufreq_show" version="20"></item>
 		<item title="network_sleep" key="/apps/gnome-power-manager/general/network_sleep" version="20"></item>
-		<item title="display_icon_policy" key="/apps/gnome-power-manager/display_icon_policy" version="18"></item>
-		<item title="display_icon_policy" key="/apps/gnome-power-manager/ui/icon_policy" version="20"></item>
+		<item title="blank_screen" key="/apps/gnome-power-manager/lock_on_blank_screen" version="18"></item>
+		<item title="blank_screen" key="/apps/gnome-power-manager/lock/blank_screen" version="20"></item>
+		<item title="icon_policy" key="/apps/gnome-power-manager/display_icon_policy" version="18"></item>
+		<item title="icon_policy" key="/apps/gnome-power-manager/ui/icon_policy" version="20"></item>
 		<item title="performance_ac" key="/apps/gnome-power-manager/cpufreq_ac_performance" version="18"></item>
 		<item title="performance_ac" key="/apps/gnome-power-manager/cpufreq/performance_ac" version="20"></item>
 		<item title="performance_battery" key="/apps/gnome-power-manager/cpufreq_battery_performance" version="18"></item>

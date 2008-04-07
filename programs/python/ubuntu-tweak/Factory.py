@@ -76,5 +76,12 @@ class Factory:
 		else:
 			return None
 
+	def create_gconfscale(self, min, max, key, digits = 0):
+		if key in self.keys:
+			scale = GconfScale(min, max, self.keys[key], digits)
+			return scale
+		else:
+			return None
+
 if __name__ == "__main__":
 	print Factory().keys
