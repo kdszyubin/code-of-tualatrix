@@ -54,23 +54,22 @@ class OpacityMenu(gtk.CheckButton, CompizSetting):
 		gtk.CheckButton.__init__(self, label)
 
 		self.plugin = self.context.Plugins['core']
+		self.setting_matches = self.plugin.Screens[0]['opacity_matches']
+		self.setting_values = self.plugin.Screens[0]['opacity_values']
 
-		if self.menu_match in self.plugin.Screens[0]['opacity_matches'].Value:
+		if self.menu_match in self.setting_matches.Value:
 			self.set_active(True)
 
 		self.connect("toggled", self.on_button_toggled)
 
 	def on_button_toggled(self, widget, data = None):
 		if self.get_active():
-			self.plugin.Screens[0]['opacity_matches'].Value.append(self.menu_match)
-			self.plugin.Screens[0]['opacity_values'].Value.append(90)
+			self.setting_matches.Value = [self.menu_match]
+			self.setting_values.Value = [90]
 		else:
-			index = self.plugin.Screens[0]['opacity_matches'].Value.index(self.menu_match)
-			print index
-			self.plugin.Screens[0]['opacity_matches'].Value.pop(index)
-			self.plugin.Screens[0]['opacity_values'].Value.pop(index)
-			print self.plugin.Screens[0]['opacity_matches'].Value
-			print self.plugin.Screens[0]['opacity_values'].Value
+			index = self.setting_matches.Value.index(self.menu_match)
+			self.setting_matches.Value = []
+			self.setting_values.Value = []
 		self.context.Write()
 
 class WobblyMenu(gtk.CheckButton, CompizSetting):
@@ -78,17 +77,56 @@ class WobblyMenu(gtk.CheckButton, CompizSetting):
 		gtk.CheckButton.__init__(self, label)
 
 		self.plugin = self.context.Plugins['wobbly']
+		self.setting = self.plugin.Screens[0]['map_window_match']
 		
-		if self.plugin.Screens[0]['map_window_match'].Value == "Splash | DropdownMenu | PopupMenu | Tooltip | Notification | Combo | Dnd | Unknown":
+		if self.setting.Value == self.setting.DefaultValue:
 			self.set_active(True)
 
 		self.connect("toggled", self.on_button_toggled)
 
 	def on_button_toggled(self, widget, data = None):
 		if self.get_active():
-			self.plugin.Screens[0]['map_window_match'].Value = "Splash | DropdownMenu | PopupMenu | Tooltip | Notification | Combo | Dnd | Unknown"
+			self.setting.Reset()
 		else:
-			self.plugin.Screens[0]['map_window_match'].Value = ""
+			self.setting.Value = ""
+		self.context.Write()
+
+class WobblyWindow(gtk.CheckButton, CompizSetting):
+	def __init__(self, label):
+		gtk.CheckButton.__init__(self, label)
+
+		self.plugin = self.context.Plugins['wobbly']
+		self.setting = self.plugin.Screens[0]['move_window_match']
+		
+		if self.setting.Value == self.setting.DefaultValue:
+			self.set_active(True)
+
+		self.connect("toggled", self.on_button_toggled)
+
+	def on_button_toggled(self, widget, data = None):
+		if self.get_active():
+			self.setting.Reset()
+		else:
+			self.setting.Value = ""
+		self.context.Write()
+
+class SnapWindow(gtk.CheckButton, CompizSetting):
+	def __init__(self, label):
+		gtk.CheckButton.__init__(self, label)
+
+		self.plugin = self.context.Plugins['wobbly']
+		self.setting = self.plugin.Screens[0]['move_window_match']
+		
+		if self.setting.Value == self.setting.DefaultValue:
+			self.set_active(True)
+
+		self.connect("toggled", self.on_button_toggled)
+
+	def on_button_toggled(self, widget, data = None):
+		if self.get_active():
+			self.setting.Reset()
+		else:
+			self.setting.Value = ""
 		self.context.Write()
 
 class Compiz(gtk.VBox):
@@ -112,7 +150,7 @@ class Compiz(gtk.VBox):
 
 		button1 = self.create_snap_window_checkbutton(_("Snapping Windows(DON'T USE with Wobbly Windows)"))
 		button2 = self.create_wobbly_effect_checkbutton(_("Maximize Effect"), "/apps/compiz/plugins/wobbly/screen0/options/maximize_effect")
-		button3 = self.create_wobbly_effect_checkbutton(_("Wobbly Windows"),"/apps/compiz/plugins/wobbly/screen0/options/move_window_match")
+		button3 = WobblyWindow(_("Wobbly Windows"));
 
 		box = ItemBox(_("<b>Window Effects</b>"), (button1, button2, button3))
 		self.pack_start(box, False, False, 0)
