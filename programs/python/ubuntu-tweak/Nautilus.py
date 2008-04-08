@@ -77,3 +77,7 @@ class Nautilus(gtk.VBox):
 		widget.set_increments(widget.get_value(), widget.get_value())
 		client = gconf.client_get_default()
 		client.set_int("/apps/nautilus/icon_view/thumbnail_size", int(widget.get_value()))
+
+if __name__ == "__main__":
+	from Utility import Test
+	Test(Nautilus)
