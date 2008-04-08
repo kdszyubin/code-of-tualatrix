@@ -27,20 +27,15 @@ import os
 import gobject
 import gettext
 
-from Computer import Computer, DISTRIB
 from gnome import url_show
+from Computer import Computer
 from Session import Session
 from AutoStart import AutoStart
 from Icon import Icon
 from Compiz import Compiz
-if DISTRIB != "feisty":
-	from UserDir import UserDir
-	from Templates import Templates
-	from Scripts import Scripts
-else:
-	from Widgets import AboutBlank as UserDir
-	from Widgets import AboutBlank as Templates
-	from Widgets import AboutBlank as Scripts
+from UserDir import UserDir
+from Templates import Templates
+from Scripts import Scripts
 from PowerManager import PowerManager
 from Gnome import Gnome
 from Nautilus import Nautilus
@@ -233,8 +228,6 @@ class MainWindow(gtk.Window):
 				gobject.TYPE_STRING)
 
 		for item in itemlist:
-			if DISTRIB == "feisty" and item[0] == PERSONAL_PAGE:
-				continue
 			icon = gtk.gdk.pixbuf_new_from_file(item[ICON_COLUMN])
 			iter = model.append(None)
 			model.set(iter,
@@ -295,8 +288,6 @@ class MainWindow(gtk.Window):
 		notebook.set_show_tabs(False)
 
 		for item in itemlist:
-			if DISTRIB == "feisty" and item[0] == PERSONAL_PAGE:
-				continue
 			page = item[PAGE_COLUMN]
 			notebook.append_page(page, None)
 

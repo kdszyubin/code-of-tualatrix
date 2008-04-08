@@ -25,7 +25,7 @@ import os
 import gconf
 import gettext
 from IniFile import IniFile
-from Widgets import GConfCheckButton, ItemBox, TweakPage, EntryBox, show_info
+from Widgets import ItemBox, TweakPage, EntryBox, show_info
 
 gettext.install("ubuntu-tweak", unicode = True)
 
