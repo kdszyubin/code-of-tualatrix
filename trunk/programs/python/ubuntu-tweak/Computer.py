@@ -25,11 +25,10 @@ import os
 import gobject
 import gettext
 
-from aptsources import distro
-from Widgets import GConfCheckButton, ItemBox, EntryBox
+from Widgets import ItemBox, EntryBox
+from SystemInfo import SystemInfo
 
-UBUNTU = distro.get_distro()
-DISTRIB = UBUNTU.codename
+gettext.install("ubuntu-tweak", unicode = True)
 
 class Computer(gtk.VBox):
 	"""Some options about current user"""
@@ -51,7 +50,8 @@ class Computer(gtk.VBox):
 
 		box = ItemBox(_("<b>System information</b>"),(
 			EntryBox(_("Hostname"),		os.uname()[1]),
-			EntryBox(_("Distribution"), 	UBUNTU.description),
+			EntryBox(_("Distribution"), 	SystemInfo.distro),
+			EntryBox(_("Desktop Environment"), 	SystemInfo.gnome),
 			EntryBox(_("Kernel"), 		os.uname()[0]+" "+os.uname()[2]),
 			EntryBox(_("Platform"), 	os.uname()[-1]),
 			EntryBox(_("CPU"), 		cpumodel[0:-1]),
@@ -67,3 +67,7 @@ class Computer(gtk.VBox):
 				))
 			
 		self.pack_start(box, False, False, 0)
+
+if __name__ == "__main__":
+	from Utility import Test
+	Test(Computer)

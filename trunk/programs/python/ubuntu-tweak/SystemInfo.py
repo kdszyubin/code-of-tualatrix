@@ -31,24 +31,21 @@ class GnomeVersion:
 	micro = xmldoc.getElementsByTagName("micro")[0].firstChild.data
 	distributor = xmldoc.getElementsByTagName("distributor")[0].firstChild.data
 	date = xmldoc.getElementsByTagName("date")[0].firstChild.data
-
-	def __str__(self):
-		return "%s.%s.%s (%s %s)" % (self.platform, self.minor, self.micro, self.distributor, self.date)
+	description = "GNOME %s.%s.%s (%s %s)" % (platform, minor, micro, distributor, date)
 
 class DistroInfo:
-	def __init__(self):
-		distro = GnomeVersion.distributor
-		if  distro == "Ubuntu":
-			from aptsources import distro
-			ubuntu = distro.get_distro()
-			distribution = ubuntu.description
-			codename = ubuntu.codename
-		elif distro == "Archlinux":
-			pass
+	distro = GnomeVersion.distributor
+	if  distro == "Ubuntu":
+		from aptsources import distro
+		ubuntu = distro.get_distro()
+		distro = ubuntu.description
+	else:
+		distro = ubuntu.description
 
 class SystemInfo:
-	gnome = GnomeVersion()
+	gnome = GnomeVersion.description
+	distro = DistroInfo.distro
 			
 if __name__ == "__main__":
 	print SystemInfo.gnome
-	print GnomeVersion.distributor
+	print SystemInfo.distro
