@@ -26,7 +26,6 @@ import gconf
 import os
 import gobject
 import compizconfig as ccs
-from apt import package
 from Widgets import GconfCheckButton, ItemBox
 
 gettext.install("ubuntu-tweak", unicode = True)

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import UserDict
 from Widgets import *
-from SystemInfo import SystemInfo
+from SystemInfo import GnomeVersion
 from xml.sax import make_parser
 from xml.sax.handler import ContentHandler
 
@@ -16,7 +16,7 @@ class XmlHandler(ContentHandler):
 			except KeyError:
 				self.dict[attrs["title"]] = attrs["key"]
 			else:
-				if SystemInfo.gnome.minor >= minor:
+				if GnomeVersion.minor >= minor:
 					self.dict[attrs["title"]] = attrs["key"]
 
 class GconfKeys:
