@@ -118,19 +118,14 @@ class SnapWindow(gtk.CheckButton, CompizSetting):
 	def __init__(self, label):
 		gtk.CheckButton.__init__(self, label)
 
-		self.plugin = self.context.Plugins['wobbly']
-		self.setting = self.plugin.Screens[0]['move_window_match']
+		self.plugin = self.context.Plugins['snap']
 		
-		if self.setting.Value == self.setting.DefaultValue:
-			self.set_active(True)
+		self.set_active(self.plugin.Enabled)
 
 		self.connect("toggled", self.on_button_toggled)
 
 	def on_button_toggled(self, widget, data = None):
-		if self.get_active():
-			self.setting.Reset()
-		else:
-			self.setting.Value = ""
+		self.plugin.Enabled = widget.get_active()
 		self.context.Write()
 
 class Compiz(gtk.VBox):
@@ -152,7 +147,7 @@ class Compiz(gtk.VBox):
 		self.pack_start(hbox, False, False, 0)
 		hbox.pack_start(self.create_edge_setting(), True, False, 0)
 
-		button1 = self.create_snap_window_checkbutton(_("Snapping Windows(DON'T USE with Wobbly Windows)"))
+		button1 = SnapWindow(_("Snapping Windows(DON'T USE with Wobbly Windows)"))
 		button2 = self.create_wobbly_effect_checkbutton(_("Maximize Effect"), "/apps/compiz/plugins/wobbly/screen0/options/maximize_effect")
 		button3 = WobblyWindow(_("Wobbly Windows"));
 
