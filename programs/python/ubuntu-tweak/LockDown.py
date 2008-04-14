@@ -25,10 +25,11 @@ import os
 import gconf
 import gettext
 
+from Constants import *
 from Factory import Factory
 from Widgets import ListPack
 
-gettext.install("ubuntu-tweak", unicode = True)
+gettext.install(App, unicode = True)
 
 class LockDown(gtk.VBox):
         """Lock down some function"""

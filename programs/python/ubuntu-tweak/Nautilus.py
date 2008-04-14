@@ -25,9 +25,10 @@ import os
 import gconf
 import gettext
 
+from Constants import *
 from Widgets import GconfCheckButton, ItemBox
 
-gettext.install("ubuntu-tweak", unicode = True)
+gettext.install(App, unicode = True)
 
 nautilus_keys = \
 [

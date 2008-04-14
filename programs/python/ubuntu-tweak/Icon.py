@@ -24,10 +24,11 @@ import gtk
 import gettext
 import gconf
 
+from Constants import *
 from Widgets import Mediator
 from Factory import Factory
 
-gettext.install("ubuntu-tweak", unicode = True)
+gettext.install(App, unicode = True)
 
 computer_icon = \
 {

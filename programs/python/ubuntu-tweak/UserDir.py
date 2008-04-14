@@ -24,12 +24,13 @@ import gtk
 import os
 import gconf
 import gettext
+from Constants import *
 from IniFile import IniFile
 from Widgets import ItemBox, TweakPage, EntryBox, show_info
 
-gettext.install("ubuntu-tweak", unicode = True)
+gettext.install(App, unicode = True)
 
-class UserdirEntry(IniFile):
+class UserdirFile(IniFile):
 	"""Class to parse userdir file"""
 	filename = os.path.join(os.path.expanduser("~"), ".config/user-dirs.dirs")
 	def __init__(self):
@@ -68,7 +69,7 @@ class UserDir(TweakPage):
 	def create_table(self):
 		table = gtk.Table(8, 3)
 
-		ue = UserdirEntry()
+		ue = UserdirFile()
 		length = len(ue.content.keys())
 
 		for item, value in self.diritems.items():
@@ -76,7 +77,12 @@ class UserDir(TweakPage):
 			label.set_markup("<b>%s</b>" % value)
 
 			entry = gtk.Entry()
-			dirpath = os.getenv("HOME") + "/"  + "/".join([dir for dir in ue.get(item).strip('"').split("/")[1:]])
+
+			prefix = ue.get(item).strip('"').split("/")[0]
+			if prefix:
+				dirpath = os.getenv("HOME") + "/"  + "/".join([dir for dir in ue.get(item).strip('"').split("/")[1:]])
+			else:
+				dirpath = ue.get(item).strip('"')
 
 			entry.set_text(dirpath)
 			entry.set_editable(False)
@@ -99,12 +105,19 @@ class UserDir(TweakPage):
 				buttons = (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL, gtk.STOCK_OPEN, gtk.RESPONSE_ACCEPT))
 		dialog.set_current_folder(os.getenv("HOME"))
 		if dialog.run() == gtk.RESPONSE_ACCEPT:
-			ue = UserdirEntry()
+			ue = UserdirFile()
 			realpath = dialog.get_filename()
-			folder = '"$HOME/' + "/".join([dir for dir in realpath.split('/')[3:]]) + '"'
+			dirname = '/'.join([path for path in realpath.split('/')[:3]])
+			if dirname == os.getenv("HOME"):
+				folder = '"$HOME/' + "/".join([dir for dir in realpath.split('/')[3:]]) + '"'
+			else:
+				folder = '"' + realpath + '"'
 			ue.set(item, folder)
 			ue.write()
-			folder = os.getenv("HOME") + "/" +  "/".join([dir for dir in realpath.split('/')[3:]])
+			if dirname == os.getenv("HOME"):
+				folder = os.getenv("HOME") + "/" +  "/".join([dir for dir in realpath.split('/')[3:]])
+			else:
+				folder = folder.strip('"')
 			entry.set_text(folder)
 		dialog.destroy()
 

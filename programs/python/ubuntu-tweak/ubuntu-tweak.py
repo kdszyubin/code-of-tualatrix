@@ -22,9 +22,10 @@ import gtk
 import gettext
 import os
 
+from Constants import *
 from SystemInfo import GnomeVersion
 
-gettext.install("ubuntu-tweak", unicode = True)
+gettext.install(App, unicode = True)
 
 def show_error(message, title = _("Error"), parent = None):
 	dialog = gtk.MessageDialog(None, gtk.DIALOG_MODAL, gtk.MESSAGE_ERROR, gtk.BUTTONS_OK)

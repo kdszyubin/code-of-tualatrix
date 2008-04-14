@@ -27,17 +27,17 @@ import os
 import gobject
 import gettext
 
+from Constants import *
 from gnome import url_show
 from SystemInfo import GnomeVersion
 
-VERSION = "0.2.10"
-GNOME = int(GnomeVersion.minor)
+Gnome = int(GnomeVersion.minor)
 
 from Computer import Computer
 from Session import Session
 from AutoStart import AutoStart
 from Icon import Icon
-if GNOME >= 20:
+if Gnome >= 20:
 	from Compiz import Compiz
 	from UserDir import UserDir
 	from Templates import Templates
@@ -57,7 +57,7 @@ from Metacity import Metacity
         ICON_COLUMN,
         NAME_COLUMN,
 	PAGE_COLUMN,
-	VERSION_COLUMN,
+	Version_COLUMN,
         TOTAL_COLUMN,
 ) = range(6)
 
@@ -247,7 +247,7 @@ class MainWindow(gtk.Window):
 			)
 			if item[-1]:
 				for child_item in item[-1]:
-					if  GNOME >= child_item[VERSION_COLUMN]:
+					if  Gnome >= child_item[Version_COLUMN]:
 						i = i + 1
 						icon = gtk.gdk.pixbuf_new_from_file(child_item[ICON_COLUMN])
 						child_iter = model.append(iter)
@@ -309,7 +309,7 @@ class MainWindow(gtk.Window):
 
 			if item[-1]:
 				for child_item in item[-1]:
-					if GNOME >= child_item[VERSION_COLUMN]:
+					if Gnome >= child_item[Version_COLUMN]:
 						page = child_item[PAGE_COLUMN]
 						notebook.append_page(page(), None)
 					else:
@@ -327,7 +327,7 @@ class MainWindow(gtk.Window):
 		about = gtk.AboutDialog()
 		about.set_icon_from_file("pixmaps/ubuntu-tweak.png")
 		about.set_name("Ubuntu Tweak")
-		about.set_version(VERSION)
+		about.set_version(Version)
 		about.set_website("http://ubuntu-tweak.com")
 		about.set_website_label("ubuntu-tweak.com")
 		about.set_logo(self.get_icon())
