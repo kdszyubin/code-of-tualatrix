@@ -40,6 +40,7 @@ class Gnome(gtk.VBox):
 		box = TablePack(_("<b>GNOME Panel and Menu</b>"), [
 			[Factory.create("gconfcheckbutton", _("Confirm before remove panel"), "confirm_panel_remove")],
 			[Factory.create("gconfcheckbutton", _("Complete lockdown of the Panel "), "locked_down")],
+			[Factory.create("gconfcheckbutton", _("Enable panel animations"), "enable_animations")],
 			[Factory.create("gconfcheckbutton", _("Show Input Method menu in the right-click"), "show_input_method_menu")],
 			[Factory.create("gconfcheckbutton", _("Show Unicode Method menu in the right-click"), "show_unicode_menu")],
 			[gtk.Label(_("Notification-daemon popup location")), Factory.create("gconfcombobox", "popup_location", [_("Top Left"), _("Top Right"), _("Bottom Left"), _("Bottom Right")], ["top_left", "top_right", "bottom_left", "bottom_right"])]

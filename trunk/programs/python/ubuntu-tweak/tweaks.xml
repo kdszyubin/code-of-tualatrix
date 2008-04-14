@@ -36,6 +36,7 @@
 
 	<category title="gnome">
 		<item title="confirm_panel_remove" key="/apps/panel/global/confirm_panel_remove"></item>
+		<item title="enable_animations" key="/apps/panel/global/enable_animations" version="22"></item>
 		<item title="locked_down" key="/apps/panel/global/locked_down"></item>
 		<item title="show_input_method_menu" key="/desktop/gnome/interface/show_input_method_menu"></item>
 		<item title="show_unicode_menu" key="/desktop/gnome/interface/show_unicode_menu"></item>
