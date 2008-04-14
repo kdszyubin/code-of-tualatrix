@@ -35,19 +35,22 @@ from Widgets import GconfCheckButton, ItemBox
 
 gettext.install(App, unicode = True)
 
-keys_of_plugins_with_edge = \
-[
-	"/apps/compiz/plugins/expo/allscreens/options/expo_edge",
-	"/apps/compiz/plugins/scale/allscreens/options/initiate_edge",
-	"/apps/compiz/plugins/scale/allscreens/options/initiate_all_edge",
-]
-
-names_of_plugins_with_edge = \
+plugins = \
 [
 	"expo",
-	"initiate",
-	"initiate_all",
+	"scale",
+	"core",
+	"widget",
 ]
+
+plugins_settings = \
+{
+	
+	"expo": "expo_edge",
+	"scale": "initiate_all_edge",
+	"core": "show_desktop_edge",
+	"widget": "toggle_edge",
+}
 
 class CompizSetting:
 	if not DISABLE:
@@ -129,7 +132,7 @@ class SnapWindow(gtk.CheckButton, CompizSetting):
 		self.plugin.Enabled = widget.get_active()
 		self.context.Write()
 
-class Compiz(gtk.VBox):
+class Compiz(gtk.VBox, CompizSetting):
 	"""Compiz Fusion tweak"""
 
 	def __init__(self):
@@ -149,10 +152,10 @@ class Compiz(gtk.VBox):
 		hbox.pack_start(self.create_edge_setting(), True, False, 0)
 
 		button1 = SnapWindow(_("Snapping Windows(DON'T USE with Wobbly Windows)"))
-		button2 = self.create_wobbly_effect_checkbutton(_("Maximize Effect"), "/apps/compiz/plugins/wobbly/screen0/options/maximize_effect")
+#		button2 = self.create_wobbly_effect_checkbutton(_("Maximize Effect"), "/apps/compiz/plugins/wobbly/screen0/options/maximize_effect")
 		button3 = WobblyWindow(_("Wobbly Windows"));
 
-		box = ItemBox(_("<b>Window Effects</b>"), (button1, button2, button3))
+		box = ItemBox(_("<b>Window Effects</b>"), (button1, button3))
 		self.pack_start(box, False, False, 0)
 
 		button1 = OpacityMenu(_("Opacity Menu"))
@@ -162,6 +165,7 @@ class Compiz(gtk.VBox):
 		self.pack_start(box, False, False, 0)
 
 	def combo_box_changed_cb(self, widget, edge):
+		"""If the previous setting is none, then select the add edge"""
 		if widget.previous:
 			self.change_edge(widget, edge)
 		else:
@@ -169,149 +173,49 @@ class Compiz(gtk.VBox):
 			
 	def change_edge(self, widget, edge):
 		previous = widget.previous
-		i = names_of_plugins_with_edge.index(previous)
 
-		self.remove_edge(keys_of_plugins_with_edge[i], edge)
+		plugin = self.context.Plugins[previous]
+		setting = plugin.Display[plugins_settings[previous]]
+		setting.Value = ""
+		self.context.Write()
+
 		self.add_edge(widget, edge)	
 
 	def add_edge(self, widget, edge):
 		i = widget.get_active()
-		if i == 3:
+		if i == 4:
 			widget.previous = None
 		else:
-			if i == 0:
-				if not self.get_active_plugin_with_name("expo"):
-					self.set_active("expo", True)
-			if i == 1 or i == 2:
-				if not self.get_active_plugin_with_name("scale"):
-					self.set_active("scale", True)
-			self.add_edge_base(keys_of_plugins_with_edge[i], edge)
-			widget.previous = names_of_plugins_with_edge[i]
-
-	def add_edge_base(self, element, edge):
-		client = gconf.client_get_default()
-		edge_list = client.get_list(element, gconf.VALUE_STRING)
-		edge_list.append(edge)
-		client.set_list(element, gconf.VALUE_STRING, edge_list)
-			
-	def remove_edge(self, element, edge):
-		client = gconf.client_get_default()
-		edge_list = client.get_list(element, gconf.VALUE_STRING)
-		edge_list.remove(edge)
-		client.set_list(element, gconf.VALUE_STRING, edge_list)
+			plugin = self.context.Plugins[plugins[i]]
+			setting = plugin.Display[plugins_settings[plugins[i]]]
+			setting.Value = edge
+			self.context.Write()
+			widget.previous = plugins[i]
 
 	def create_edge_combo_box(self, edge):
 		combobox = gtk.combo_box_new_text()
 		combobox.append_text(_("Expo"))
 		combobox.append_text(_("Pick Windows"))
-		combobox.append_text(_("Pick All Windows"))
+		combobox.append_text(_("Show Desktop"))
+		combobox.append_text(_("Widget"))
 		combobox.append_text("-")
-		combobox.set_active(3)
+		combobox.set_active(4)
 		combobox.previous = None
 
-		list = self.get_active_plugins()
-		client = gconf.client_get_default()
-
-		if not client.get_string("/apps/compiz/plugins/expo/allscreens/options/expo_key"):
-			client.set_string("/apps/compiz/plugins/expo/allscreens/options/expo_button", "Button0")
-			client.set_int("/apps/compiz/plugins/expo/allscreens/options/expo_edgebutton", 0)
-			client.set_string("/apps/compiz/plugins/expo/allscreens/options/expo_key", "<Super>e")
-
-		for element in keys_of_plugins_with_edge:
-			try:
-				edge_list = client.get_list(element, gconf.VALUE_STRING)
-			except gobject.GError:
-				client.set_list(element, gconf.VALUE_STRING, [])
-				edge_list = client.get_list(element, gconf.VALUE_STRING)
-
-			if edge in edge_list:
-				combobox.set_active(keys_of_plugins_with_edge.index(element))
-				combobox.previous = names_of_plugins_with_edge[keys_of_plugins_with_edge.index(element)]
+		for k, v in plugins_settings.items():
+			plugin = self.context.Plugins[k]
+			if not plugin.Enabled:
+				plugins.Enabled = True
+				self.context.Write()
+			setting = plugin.Display[v]
+			if setting.Value == edge:
+				combobox.previous = k
+				combobox.set_active(plugins.index(k))
 
 		combobox.connect("changed", self.combo_box_changed_cb, edge)
+
 		return combobox
 
-	def create_wobbly_effect_checkbutton(self, label, key):
-		button = gtk.CheckButton(label) 
-		button.connect("toggled", self.wobbly_checkbutton_toggled_cb, key)
-		client = gconf.client_get_default()
-
-		if self.get_active_plugin_with_name("wobbly"):
-			value = client.get(key)
-
-			if value.type == gconf.VALUE_INT:
-				map_effect = value.get_int()
-				match = client.get_string("/apps/compiz/plugins/wobbly/screen0/options/map_window_match")
-
-				if map_effect == 1 and match.__len__() >= 4:
-					button.set_active(True)
-
-			elif value.type == gconf.VALUE_BOOL:
-				if value.get_bool():
-					button.set_active(True)
-
-			elif value.type == gconf.VALUE_STRING:
-				match = value.get_string()
-
-				if match.__len__() >= 4:
-					button.set_active(True)
-
-		return button
-	def wobbly_checkbutton_toggled_cb(self, widget, data = None):
-		client = gconf.client_get_default()
-
-		if widget.get_active():
-			self.set_active("wobbly", True)
-			value = client.get(data)
-
-			if value.type == gconf.VALUE_INT:
-				client.set_int(data, 1)
-				client.set_string("/apps/compiz/plugins/wobbly/screen0/options/map_window_match","Splash | DropdownMenu | PopupMenu | Tooltip | Notification | Combo | Dnd | Unknown")
-			elif value.type == gconf.VALUE_BOOL:
-				client.set_bool(data, True)
-			elif value.type == gconf.VALUE_STRING:
-				client.set_string(data, "Toolbar | Menu | Utility | Dialog | Normal | Unknown")
-		else:
-			self.set_active("wobbly", False)
-			value = client.get(data)
-
-			if value.type == gconf.VALUE_INT:
-				client.set_int(data, 0)
-			elif value.type == gconf.VALUE_BOOL:
-				client.set_bool(data, False)
-			elif value.type == gconf.VALUE_STRING:
-				client.set_string(data, "")
-
-	def create_opacity_menu_checkbutton(self):
-		button = gtk.CheckButton(_("Opacity Menu"))
-		client = gconf.client_get_default()
-		match_list = self.get_active_opacity("matches")
-		value_list = self.get_active_opacity("values")
-
-		for element in match_list:
-			for value in value_list:
-				if element.find("Menu") and value < 100:
-					button.set_active(True)
-		button.connect("toggled", self.opacity_checkbutton_toggled_cb)
-		return button
-
-	def opacity_checkbutton_toggled_cb(self, widget, data = None):
-		client = gconf.client_get_default()
-		bool = widget.get_active()
-		match_list = self.get_active_opacity("matches")
-		value_list = self.get_active_opacity("values")
-
-		if bool:
-			match_list.append("Tooltip | Menu | PopupMenu | DropdownMenu")
-			client.set_list("/apps/compiz/general/screen0/options/opacity_matches", gconf.VALUE_STRING, match_list)
-			value_list.append(90)
-			client.set_list("/apps/compiz/general/screen0/options/opacity_values", gconf.VALUE_INT, value_list)
-		else:
-			match_list.remove("Tooltip | Menu | PopupMenu | DropdownMenu")
-			client.set_list("/apps/compiz/general/screen0/options/opacity_matches", gconf.VALUE_STRING, match_list)
-			value_list.remove(90)
-			client.set_list("/apps/compiz/general/screen0/options/opacity_values", gconf.VALUE_INT, value_list)
-			
 	def create_edge_setting(self):
 		hbox = gtk.HBox(False, 0)
 
@@ -344,39 +248,6 @@ class Compiz(gtk.VBox):
 		vbox.pack_end(combobox, False, False, 0)
 
 		return hbox
-
-	def create_snap_window_checkbutton(self, label):
-		checkbutton = gtk.CheckButton(label)
-		checkbutton.set_active(self.get_active_plugin_with_name("snap"))
-		checkbutton.connect("toggled", self.snap_checkbutton_toggled_cb)
-
-		return checkbutton
-	def snap_checkbutton_toggled_cb(self, widget, data = None):
-		self.set_active("snap", widget.get_active())
-
-	def set_active(self, name, bool):
-		client = gconf.client_get_default()
-		if bool:
-			list = self.get_active_plugins()
-			list.append(name)
-		else:
-			list = self.get_active_plugins()
-			list.remove(name)
-		client.set_list("/apps/compiz/general/allscreens/options/active_plugins", gconf.VALUE_STRING, list)
-			
-	def get_active_plugin_with_name(self, name):
-		return name in self.get_active_plugins()
-
-	def get_active_plugins(self):
-		client = gconf.client_get_default()
-		return client.get_list("/apps/compiz/general/allscreens/options/active_plugins", gconf.VALUE_STRING)
-
-	def get_active_opacity(self, type):
-		client = gconf.client_get_default()
-		if type == "matches":
-			return client.get_list("/apps/compiz/general/screen0/options/opacity_matches", gconf.VALUE_STRING)
-		if type == "values":
-			return client.get_list("/apps/compiz/general/screen0/options/opacity_values", gconf.VALUE_INT)
 
 if __name__ == "__main__":
 	from Utility import Test
