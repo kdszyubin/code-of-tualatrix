@@ -26,11 +26,12 @@ import shutil
 import gobject
 import gettext
 import gnomevfs
+from Constants import *
 from gnome import ui
-from UserDir import UserdirEntry
+from UserDir import UserdirFile
 from Widgets import TweakPage, MessageDialog
 
-gettext.install("ubuntu-tweak", unicode = True)
+gettext.install(App, unicode = True)
 
 (
 	COLUMN_ICON,
@@ -40,7 +41,7 @@ gettext.install("ubuntu-tweak", unicode = True)
 
 class AbstractTempates:
 	systemdir = os.path.join(os.path.expanduser("~"), ".ubuntu-tweak/templates")
-	userdir = os.getenv("HOME") + "/"  + "/".join([dir for dir in UserdirEntry().get('XDG_TEMPLATES_DIR').strip('"').split("/")[1:]])
+	userdir = os.getenv("HOME") + "/"  + "/".join([dir for dir in UserdirFile().get('XDG_TEMPLATES_DIR').strip('"').split("/")[1:]])
 
 class DefaultTemplates(AbstractTempates):
 	"""This class use to create the default templates"""

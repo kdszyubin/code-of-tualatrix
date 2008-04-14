@@ -23,11 +23,12 @@ import gtk
 import shutil
 import gettext
 import gobject
+from Constants import *
 from xdg.DesktopEntry import DesktopEntry
 from Widgets import ItemBox
 from Widgets import show_info
 
-gettext.install("ubuntu-tweak", unicode = True)
+gettext.install(App, unicode = True)
 
 (
 	COLUMN_ACTIVE,

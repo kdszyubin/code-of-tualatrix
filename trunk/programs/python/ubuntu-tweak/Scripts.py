@@ -26,10 +26,11 @@ import shutil
 import gobject
 import gettext
 import gnomevfs
+from Constants import *
 from gnome import ui
 from Widgets import TweakPage, MessageDialog
 
-gettext.install("ubuntu-tweak", unicode = True)
+gettext.install(App, unicode = True)
 
 (
 	COLUMN_ICON,

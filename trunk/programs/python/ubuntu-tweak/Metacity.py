@@ -25,11 +25,12 @@ import os
 import gobject
 import gettext
 
+from Constants import *
 from Factory import Factory
 from Widgets import GconfCheckButton, ItemBox, EntryBox, HScaleBox, ComboboxItem
 from Widgets import TablePack
 
-gettext.install("ubuntu-tweak", unicode = True)
+gettext.install(App, unicode = True)
 
 class Metacity(gtk.VBox):
 	"""Some options about Metacity Window Manager"""

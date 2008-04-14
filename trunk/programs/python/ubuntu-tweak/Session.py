@@ -25,11 +25,12 @@ import os
 import gconf
 import gettext
 
+from Constants import *
 from Widgets import ListPack, SinglePack
 from Widgets import Mediator
 from Factory import Factory
 
-gettext.install("ubuntu-tweak", unicode = True)
+gettext.install(App, unicode = True)
 
 class Session(gtk.VBox, Mediator):
 	"""GNOME Session control"""

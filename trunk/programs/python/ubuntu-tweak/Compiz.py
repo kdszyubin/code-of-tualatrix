@@ -30,9 +30,10 @@ try:
 	DISABLE = False
 except ImportError:
 	DISABLE = True
+from Constants import *
 from Widgets import GconfCheckButton, ItemBox
 
-gettext.install("ubuntu-tweak", unicode = True)
+gettext.install(App, unicode = True)
 
 keys_of_plugins_with_edge = \
 [

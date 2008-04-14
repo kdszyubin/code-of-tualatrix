@@ -25,10 +25,11 @@ import os
 import gconf
 import gettext
 
+from Constants import *
 from Widgets import  TablePack
 from Factory import Factory
 
-gettext.install("ubuntu-tweak", unicode = True)
+gettext.install(App, unicode = True)
 
 class Gnome(gtk.VBox):
 	"""GNOME Settings"""
