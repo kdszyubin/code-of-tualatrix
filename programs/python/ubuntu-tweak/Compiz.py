@@ -205,7 +205,7 @@ class Compiz(gtk.VBox, CompizSetting):
 		for k, v in plugins_settings.items():
 			plugin = self.context.Plugins[k]
 			if not plugin.Enabled:
-				plugins.Enabled = True
+				plugin.Enabled = True
 				self.context.Write()
 			setting = plugin.Display[v]
 			if setting.Value == edge:
