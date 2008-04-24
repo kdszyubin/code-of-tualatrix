@@ -33,7 +33,7 @@ gettext.install(App, unicode = True)
 
 class LockDown(gtk.VBox):
         """Lock down some function"""
-        def __init__(self):
+        def __init__(self, parent = None):
                 gtk.VBox.__init__(self)
 
 		box = ListPack(_("<b>System Security options</b>"), (

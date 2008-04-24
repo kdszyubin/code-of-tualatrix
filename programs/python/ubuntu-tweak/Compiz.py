@@ -143,7 +143,7 @@ class SnapWindow(gtk.CheckButton, CompizSetting):
 class Compiz(gtk.VBox, CompizSetting):
 	"""Compiz Fusion tweak"""
 
-	def __init__(self):
+	def __init__(self, parent = None):
 		gtk.VBox.__init__(self)
 
 		vbox = gtk.VBox(False, 0)

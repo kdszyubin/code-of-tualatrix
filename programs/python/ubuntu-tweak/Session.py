@@ -34,7 +34,7 @@ gettext.install(App, unicode = True)
 
 class Session(gtk.VBox, Mediator):
 	"""GNOME Session control"""
-	def __init__(self):
+	def __init__(self, parent = None):
 		gtk.VBox.__init__(self)
 
 		self.pack_start(self.session_control_box(), False, False, 0)

@@ -34,7 +34,7 @@ gettext.install(App, unicode = True)
 
 class Metacity(gtk.VBox):
 	"""Some options about Metacity Window Manager"""
-	def __init__(self):
+	def __init__(self, parent = None):
 		gtk.VBox.__init__(self)
 
 		box = TablePack(_("<b>Window Decorate Effect</b>"), [

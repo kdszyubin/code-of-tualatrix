@@ -34,7 +34,7 @@ gettext.install(App, unicode = True)
 class Gnome(gtk.VBox):
 	"""GNOME Settings"""
 
-	def __init__(self):
+	def __init__(self, parent = None):
 		gtk.VBox.__init__(self)
 
 		box = TablePack(_("<b>GNOME Panel and Menu</b>"), [

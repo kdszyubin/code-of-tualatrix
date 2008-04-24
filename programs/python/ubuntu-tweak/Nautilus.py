@@ -49,7 +49,7 @@ nautilus_names = \
 class Nautilus(gtk.VBox):
         """Nautilus Settings"""
 
-        def __init__(self):
+        def __init__(self, parent = None):
                 gtk.VBox.__init__(self)
 
                 button = GconfCheckButton(nautilus_names[0], nautilus_keys[0])

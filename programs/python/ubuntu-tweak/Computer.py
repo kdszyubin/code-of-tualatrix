@@ -32,7 +32,7 @@ gettext.install("ubuntu-tweak", unicode = True)
 
 class Computer(gtk.VBox):
 	"""Some options about current user"""
-	def __init__(self):
+	def __init__(self, parent = None):
 		gtk.VBox.__init__(self)
 
 		if os.uname()[4][0:3] == "ppc":

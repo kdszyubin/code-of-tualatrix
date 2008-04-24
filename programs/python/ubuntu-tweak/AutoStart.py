@@ -38,9 +38,9 @@ gettext.install(App, unicode = True)
 
 class AutoStartDialog(gtk.Dialog):
 	"""The dialog used to add or edit the autostart program"""
-	def __init__(self, desktopentry = None):
+	def __init__(self, desktopentry = None, parent = None):
 		"""Init the dialog, if use to edit, pass the desktopentry parameter"""
-		gtk.Dialog.__init__(self)
+		gtk.Dialog.__init__(self, parent = parent)
 		self.set_icon_from_file("pixmaps/ubuntu-tweak.png")
 
 		lbl1 = gtk.Label()
@@ -263,8 +263,10 @@ class AutoStartItem(gtk.TreeView):
 
 class AutoStart(gtk.VBox):
 	"""The box pack the autostart list"""
-	def __init__(self):
+	def __init__(self, parent = None):
 		gtk.VBox.__init__(self)
+
+		self.main_window = parent
 
 		vbox = gtk.VBox(False, 0)
 		vbox.set_border_width(5)
@@ -342,7 +344,7 @@ class AutoStart(gtk.VBox):
 				self.treeview.update_items()
 
 	def on_add_item(self, widget, treeview):
-		dialog = AutoStartDialog()
+		dialog = AutoStartDialog(parent = self.main_window)
 		while dialog.run() == gtk.RESPONSE_OK:
 			name = dialog.pm_name.get_text()
 			cmd = dialog.pm_cmd.get_text()
@@ -389,7 +391,7 @@ class AutoStart(gtk.VBox):
 			if path[1:4] == "etc":
 				shutil.copy(path, treeview.userdir)
 				path = os.path.join(treeview.userdir, os.path.basename(path))
-			dialog = AutoStartDialog(DesktopEntry(path))
+			dialog = AutoStartDialog(DesktopEntry(path), self.main_window)
 			while dialog.run() == gtk.RESPONSE_OK:
 				name = dialog.pm_name.get_text()
 				cmd = dialog.pm_cmd.get_text()

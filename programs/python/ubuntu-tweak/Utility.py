@@ -22,6 +22,10 @@ import pygtk
 pygtk.require("2.0")
 import gtk
 
+def gtk_process_events ():
+    while gtk.events_pending ():
+        gtk.main_iteration ()
+
 class Test:
 	def __init__(self, model):
 		win = gtk.Window()
