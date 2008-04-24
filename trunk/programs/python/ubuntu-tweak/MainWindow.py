@@ -46,6 +46,7 @@ else:
 	UserDir = None
 	Templates = None
 from Scripts import Scripts
+from Keybinding import Keybinding
 from PowerManager import PowerManager
 from Gnome import Gnome
 from Nautilus import Nautilus
@@ -75,6 +76,7 @@ from Metacity import Metacity
 		USERDIR_PAGE,
 		TEMPLATES_PAGE,
 		SCRIPTS_PAGE,
+		KEYBINDING_PAGE,
 	SYSTEM_PAGE,
 		GNOME_PAGE,
 		NAUTILUS_PAGE,
@@ -82,7 +84,7 @@ from Metacity import Metacity
 	SECURITY_PAGE,
 		SECU_OPTIONS_PAGE,
 	TOTAL_PAGE
-) = range(20)
+) = range(21)
 
 icons = \
 [
@@ -99,6 +101,7 @@ icons = \
 	"pixmaps/userdir.png",
 	"pixmaps/template.png",
 	"pixmaps/scripts.png",
+	"pixmaps/keybinding.png",
 	"pixmaps/system.png",
 	"pixmaps/gnome.png",
 	"pixmaps/nautilus.png",
@@ -147,6 +150,7 @@ personal = \
 	[USERDIR_PAGE, icons[USERDIR_PAGE], _("User Folder"), UserDir, 20],
 	[TEMPLATES_PAGE, icons[TEMPLATES_PAGE], _("Templates"), Templates, 20],
 	[SCRIPTS_PAGE, icons[SCRIPTS_PAGE], _("Scripts"), Scripts, 0],
+	[KEYBINDING_PAGE, icons[KEYBINDING_PAGE], _("Keybinding"), Keybinding, 0],
 ]
 
 system = \
@@ -267,15 +271,17 @@ class MainWindow(gtk.Window):
 		if not widget.get_selected():
 			return
 		model, iter = widget.get_selected()
-		path = model.get_path(iter)
-		self.treeview.expand_row(path, True)
 
-		if model.iter_has_child(iter):
-			child_iter = model.iter_children(iter)
-			self.notebook.set_current_page(model.get_value(child_iter, NUM_COLUMN))
-			widget.select_iter(child_iter)
-		else:
-			self.notebook.set_current_page(model.get_value(iter, NUM_COLUMN))
+		if iter:
+			path = model.get_path(iter)
+			self.treeview.expand_row(path, True)
+
+			if model.iter_has_child(iter):
+				child_iter = model.iter_children(iter)
+				self.notebook.set_current_page(model.get_value(child_iter, NUM_COLUMN))
+				widget.select_iter(child_iter)
+			else:
+				self.notebook.set_current_page(model.get_value(iter, NUM_COLUMN))
 
 	def __add_columns(self, treeview):
 		renderer = gtk.CellRendererText()
