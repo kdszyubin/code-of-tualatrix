@@ -70,7 +70,7 @@ class GconfEntry(gtk.Entry, StringSetting):
 		if self.get_string():
 			self.set_text(self.get_string())
 		else:
-			self.set_text("Unset")
+			self.set_text(_("Unset"))
 
 		self.connect("activate", self.on_edit_finished_cb)
 	

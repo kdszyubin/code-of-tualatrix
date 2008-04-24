@@ -27,7 +27,13 @@ import os
 import gobject
 try:
 	import compizconfig as ccs
-	DISABLE = False
+	cmd = os.popen("apt-cache policy compiz")
+	cmd.readline()
+	cf_installed = cmd.readline()
+	if "0.7" in cf_installed:
+		DISABLE = False
+	else:
+		DISABLE = True
 except ImportError:
 	DISABLE = True
 from Constants import *
@@ -94,6 +100,7 @@ class WobblyMenu(gtk.CheckButton, CompizSetting):
 
 	def on_button_toggled(self, widget, data = None):
 		if self.get_active():
+			if not self.plugin.Enabled: self.plugin.Enabled = True
 			self.setting.Reset()
 		else:
 			self.setting.Value = ""
@@ -113,6 +120,7 @@ class WobblyWindow(gtk.CheckButton, CompizSetting):
 
 	def on_button_toggled(self, widget, data = None):
 		if self.get_active():
+			if not self.plugin.Enabled: self.plugin.Enabled = True
 			self.setting.Reset()
 		else:
 			self.setting.Value = ""
