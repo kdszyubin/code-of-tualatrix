@@ -31,13 +31,13 @@ from Constants import *
 from gnome import url_show
 from SystemInfo import GnomeVersion
 
-Gnome = int(GnomeVersion.minor)
+GNOME = int(GnomeVersion.minor)
 
 from Computer import Computer
 from Session import Session
 from AutoStart import AutoStart
 from Icon import Icon
-if Gnome >= 20:
+if GNOME >= 20:
 	from Compiz import Compiz
 	from UserDir import UserDir
 	from Templates import Templates
@@ -251,7 +251,7 @@ class MainWindow(gtk.Window):
 			)
 			if item[-1]:
 				for child_item in item[-1]:
-					if  Gnome >= child_item[Version_COLUMN]:
+					if  GNOME >= child_item[Version_COLUMN]:
 						i = i + 1
 						icon = gtk.gdk.pixbuf_new_from_file(child_item[ICON_COLUMN])
 						child_iter = model.append(iter)
@@ -315,7 +315,7 @@ class MainWindow(gtk.Window):
 
 			if item[-1]:
 				for child_item in item[-1]:
-					if Gnome >= child_item[Version_COLUMN]:
+					if GNOME >= child_item[Version_COLUMN]:
 						page = child_item[PAGE_COLUMN]
 						notebook.append_page(page(self), None)
 					else:
