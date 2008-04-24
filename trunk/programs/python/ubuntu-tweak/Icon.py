@@ -92,7 +92,7 @@ class DesktopIcon(gtk.VBox, Mediator):
 class Icon(gtk.VBox, Mediator):
 	"""Desktop Icon settings"""
 
-	def __init__(self):
+	def __init__(self, parent = None):
 		gtk.VBox.__init__(self, False, 5)
 
 		self.set_border_width(5)

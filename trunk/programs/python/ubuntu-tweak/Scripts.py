@@ -322,7 +322,7 @@ class DisableScripts(ScriptList):
 
 class Scripts(TweakPage, AbstractScripts):
         """Freedom added your docmuent scripts"""
-        def __init__(self):
+        def __init__(self, parent = None):
                 TweakPage.__init__(self)
 
 		self.default = DefaultScripts()

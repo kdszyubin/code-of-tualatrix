@@ -27,7 +27,7 @@ import gettext
 import gobject
 
 from Constants import *
-from Widgets import TweakPage
+from Widgets import TweakPage, Popup, KeyGrabber, KeyModifier
 from Factory import Factory
 
 gettext.install(App, unicode = True)
@@ -44,12 +44,13 @@ gettext.install(App, unicode = True)
 class Keybinding(TweakPage):
 	"""Setting the command of keybinding"""
 
-	def __init__(self):
+	def __init__(self, parent = None):
 		TweakPage.__init__(self)
 		gtk.VBox.__init__(self)
 
+		self.main_window = parent
 		self.set_title(_("Set your keybinding of commands"))
-		self.set_description(_("With the keybinding of commands, you can run applications more quickly"))
+		self.set_description(_("With the keybinding of commands, you can run applications more quickly.\nInput the command and grap your key, it's easy to set a keybinding.\nUse <b>Delete</b> or <b>BackSpace</b> to clean the key."))
 
 		treeview = self.create_treeview()
 
@@ -58,9 +59,9 @@ class Keybinding(TweakPage):
 	def create_treeview(self):
 		treeview = gtk.TreeView()
 
-		model = self.__create_model()
+		self.model = self.__create_model()
 
-		treeview.set_model(model)
+		treeview.set_model(self.model)
 
 		self.__add_columns(treeview)
 
@@ -105,7 +106,6 @@ class Keybinding(TweakPage):
 		model = treeview.get_model()
 
 		column = gtk.TreeViewColumn(_("Title"), gtk.CellRendererText(), text = COLUMN_TITLE)
-		column.set_fixed_width(32)
 		treeview.append_column(column)
 
 		column = gtk.TreeViewColumn(_("Command"))
@@ -124,10 +124,42 @@ class Keybinding(TweakPage):
 		treeview.append_column(column)
 	
 		renderer = gtk.CellRendererText()
+		renderer.connect("editing-started", self.on_editing_started)
 		renderer.connect("edited", self.on_cell_edited, model)
 		renderer.set_data("type", "key")
 		column = gtk.TreeViewColumn(_("Key"), renderer, text = COLUMN_KEY, editable = COLUMN_EDITABLE)
 		treeview.append_column(column)
+
+	def GotKey(self, widget, key, mods, cell):
+		new = gtk.accelerator_name (key, mods)
+		for mod in KeyModifier:
+			if "%s_L" % mod in new:
+				new = new.replace ("%s_L" % mod, "<%s>" % mod)
+			if "%s_R" % mod in new:
+				new = new.replace ("%s_R" % mod, "<%s>" % mod)
+
+		widget.destroy()
+
+		client = gconf.client_get_default()
+		column = cell.get_data("id")
+		iter = self.model.get_iter_from_string(cell.get_data("path_string"))
+
+		id = self.model.get_value(iter, COLUMN_ID)
+
+		if new == "Delete" or new == "BackSpace":
+			client.set_string("/apps/metacity/global_keybindings/run_command_%d" % id, "disabled")
+			self.model.set_value(iter, COLUMN_KEY, _("disabled"))
+		else:
+			client.set_string("/apps/metacity/global_keybindings/run_command_%d" % id, new)
+			self.model.set_value(iter, COLUMN_KEY, new)
+
+	def on_editing_started(self, cell, editable, path):
+		grabber = KeyGrabber(self.main_window, label = _("Grab key combination"))
+		cell.set_data("path_string", path)
+		grabber.hide()
+		grabber.set_no_show_all(True)
+		grabber.connect('changed', self.GotKey, cell)
+		grabber.begin_key_grab(None)
 
 	def on_cell_edited(self, cell, path_string, new_text, model):
 		iter = model.get_iter_from_string(path_string)
@@ -154,6 +186,7 @@ class Keybinding(TweakPage):
 					model.set_value(iter, COLUMN_COMMAND, _("None"))
 		else:
 			old = model.get_value(iter, COLUMN_KEY)
+
 			if old != new_text:
 				if new_text:
 					client.set_string("/apps/metacity/global_keybindings/run_command_%d" % id, new_text)

@@ -46,7 +46,7 @@ class UserDir(TweakPage):
 			"XDG_MUSIC_DIR": _("Music Folder"),
 			"XDG_PICTURES_DIR": _("Pictures Folder"),
 			"XDG_VIDEOS_DIR": _("Videos Folder")}
-        def __init__(self):
+        def __init__(self, parent = None):
 		TweakPage.__init__(self)
 
 		self.set_title(_("Set your document folders"))

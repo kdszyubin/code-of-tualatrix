@@ -305,7 +305,7 @@ class DisableTemplate(TemplateList):
 
 class Templates(TweakPage, AbstractTempates):
         """Freedom added your docmuent templates"""
-        def __init__(self):
+        def __init__(self, parent = None):
                 TweakPage.__init__(self)
 
 		self.default = DefaultTemplates()

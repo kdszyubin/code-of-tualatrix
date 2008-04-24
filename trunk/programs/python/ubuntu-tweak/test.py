@@ -1,71 +1,47 @@
 #!/usr/bin/env python
-# coding: utf-8
 
+import pygtk
+pygtk.require('2.0')
 import gtk
-import gconf
 from Widgets import *
-from Utility import ManyTest, Test
-from xml.sax import make_parser
-from xml.sax.handler import ContentHandler
 
-class Bool(gtk.VBox):
-	def __init__(self, label):
-		gtk.VBox.__init__(self)
+class HelloWorld:
 
-		self.Widget = gtk.HBox ()
-		self.pack_start(self.Widget)
+    def destroy(self, widget, data=None):
+        gtk.main_quit()
 
-		self.CheckButton = gtk.CheckButton ()
-		label = gtk.Label (label)
-		self.align = gtk.Alignment ()
-		self.align.add (label)
-		self.buttonAlign = gtk.Alignment (0, 0.5)
-		self.buttonAlign.set_padding (0, 0, 0, 10)
-		self.buttonAlign.add (self.CheckButton)
-		self.Widget.pack_start (self.align, True, True)
-		self.Widget.pack_start (self.buttonAlign, False, False)
+    def GotKey(self, widget, key, mods):
+        new = gtk.accelerator_name (key, mods)
+        for mod in KeyModifier:
+            if "%s_L" % mod in new:
+                new = new.replace ("%s_L" % mod, "<%s>" % mod)
+            if "%s_R" % mod in new:
+                new = new.replace ("%s_R" % mod, "<%s>" % mod)
 
-		self.show_all()
+        widget.destroy()
+        self.FilterValueCheck.set_active(True)
+        self.FilterEntry.set_text(new)
 
-def ComboboxItem(texts):
-	comboxbox = gtk.combo_box_new_text()
+    def __init__(self):
+        self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
+    
+        self.window.connect("destroy", self.destroy)
+    
+        self.window.set_border_width(10)
+    
+        grabber = KeyGrabber(label = "Grab key combination")
+        grabber.hide()
+        grabber.set_no_show_all(True)
+        grabber.connect('changed', self.GotKey)
+        grabber.begin_key_grab(None)
+    
+        self.window.add(grabber)
+    
+        self.window.show()
 
-	for element in texts:
-		comboxbox.append_text(element)
-
-	return comboxbox
-
-class BoolAndInt(gtk.VBox):
-	def __init__(self, label):
-		gtk.VBox.__init__(self)
-
-		self.Widget = gtk.HBox ()
-		self.pack_start(self.Widget)
-
-		self.CheckButton = gtk.CheckButton (label)
-		self.align = gtk.Alignment (0, 0.5)
-		self.align.add (self.CheckButton)
-
-		self.scale = gtk.HScale()
-		self.buttonAlign = gtk.Alignment (0, 0.5)
-		self.buttonAlign.set_padding (0, 0, 0, 10)
-		self.buttonAlign.add (self.scale)
-		self.Widget.pack_start (self.align, True, True)
-		self.Widget.pack_start (self.buttonAlign, False, False)
-
-		self.show_all()
+    def main(self):
+        gtk.main()
 
 if __name__ == "__main__":
-	win = gtk.Window()
-
-	win.connect('destroy', lambda *w: gtk.main_quit())
-	win.set_position(gtk.WIN_POS_CENTER)
-
-	vbox = gtk.VBox(False, 5)
-	win.add(vbox)
-
-	vbox.pack_start(GconfCombobox("/apps/gwd/mouse_wheel_action", ["None", "Roll up"], ["none", "shade"]).combobox)
-	
-	win.show_all()
-
-	gtk.main()
+    hello = HelloWorld()
+    hello.main()

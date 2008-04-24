@@ -35,7 +35,7 @@ gettext.install(App, unicode = True)
 class PowerManager(gtk.VBox):
         """Advanced Powermanager Settings"""
 
-        def __init__(self):
+        def __init__(self, parent = None):
                 gtk.VBox.__init__(self)
 
 		box = TablePack(_("<b>Advanced Power Management Settings</b>"), [

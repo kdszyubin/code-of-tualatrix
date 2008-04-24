@@ -317,7 +317,7 @@ class MainWindow(gtk.Window):
 				for child_item in item[-1]:
 					if Gnome >= child_item[Version_COLUMN]:
 						page = child_item[PAGE_COLUMN]
-						notebook.append_page(page(), None)
+						notebook.append_page(page(self), None)
 					else:
 						continue
 
@@ -331,6 +331,7 @@ class MainWindow(gtk.Window):
 		gtk.about_dialog_set_email_hook(self.click_website)
 
 		about = gtk.AboutDialog()
+		about.set_transient_for(self)
 		about.set_icon_from_file("pixmaps/ubuntu-tweak.png")
 		about.set_name("Ubuntu Tweak")
 		about.set_version(Version)
