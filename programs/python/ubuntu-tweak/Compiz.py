@@ -35,7 +35,7 @@ try:
 except ImportError:
 	DISABLE = True
 from Constants import *
-from Widgets import GconfCheckButton, ItemBox
+from Widgets import ListPack
 
 gettext.install(App, unicode = True)
 
@@ -194,13 +194,13 @@ class Compiz(gtk.VBox, CompizSetting):
 		self.snap = SnapWindow(_("Snapping Windows"), self)
 		self.wobbly_w = WobblyWindow(_("Wobbly Windows"), self);
 
-		box = ItemBox(_("<b>Window Effects</b>"), (self.snap, self.wobbly_w))
+		box = ListPack(_("<b>Window Effects</b>"), (self.snap, self.wobbly_w))
 		self.pack_start(box, False, False, 0)
 
 		button1 = OpacityMenu(_("Opacity Menu"))
 		self.wobbly_m = WobblyMenu(_("Wobbly Menu"), self)
 
-		box = ItemBox(_("<b>Menu Effects</b>"), (button1, self.wobbly_m))
+		box = ListPack(_("<b>Menu Effects</b>"), (button1, self.wobbly_m))
 		self.pack_start(box, False, False, 0)
 
 	def combo_box_changed_cb(self, widget, edge):

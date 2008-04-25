@@ -27,7 +27,6 @@ import gettext
 
 from Constants import *
 from Factory import Factory
-from Widgets import GconfCheckButton, ItemBox, EntryBox, HScaleBox, ComboboxItem
 from Widgets import TablePack
 
 gettext.install(App, unicode = True)
@@ -39,10 +38,10 @@ class Metacity(gtk.VBox):
 
 		box = TablePack(_("<b>Window Decorate Effect</b>"), [
 			[Factory.create("gconfcheckbutton", _("Use metacity theme"), "use_metacity_theme")],
-			[Factory.create("gconfcheckbutton", _("Metacity theme active window opacity shade"), "metacity_theme_active_shade_opacity")],
+			[Factory.create("gconfcheckbutton", _("Active window opacity shade"), "metacity_theme_active_shade_opacity")],
 			[gtk.Label(_("Active window opacity level")), Factory.create("gconfscale", 0, 1, "metacity_theme_active_opacity", 2)],
-			[Factory.create("gconfcheckbutton", _("Metacity theme opacity shade"), "metacity_theme_shade_opacity")],
-			[gtk.Label(_("Window shade opacity level")), Factory.create("gconfscale", 0, 1, "metacity_theme_opacity", 2)],
+			[Factory.create("gconfcheckbutton", _("Inactive window opacity shade"), "metacity_theme_shade_opacity")],
+			[gtk.Label(_("Inactive window shade opacity level")), Factory.create("gconfscale", 0, 1, "metacity_theme_opacity", 2)],
 			])
 		self.pack_start(box, False, False, 0)
 

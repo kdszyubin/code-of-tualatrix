@@ -25,7 +25,7 @@ import os
 import gobject
 import gettext
 
-from Widgets import ItemBox, EntryBox
+from Widgets import EntryBox, ListPack
 from SystemInfo import SystemInfo
 
 gettext.install("ubuntu-tweak", unicode = True)
@@ -48,7 +48,7 @@ class Computer(gtk.VBox):
 			if element.split(" ")[0] == "MemTotal:":
 				raminfo = element.split(" ")[-2]
 
-		box = ItemBox(_("<b>System information</b>"),(
+		box = ListPack(_("<b>System information</b>"),(
 			EntryBox(_("Hostname"),		os.uname()[1]),
 			EntryBox(_("Distribution"), 	SystemInfo.distro),
 			EntryBox(_("Desktop Environment"), 	SystemInfo.gnome),
@@ -59,7 +59,7 @@ class Computer(gtk.VBox):
 				))
 		self.pack_start(box, False, False, 0)
 
-		box = ItemBox(_("<b>User information</b>"),(
+		box = ListPack(_("<b>User information</b>"),(
 			EntryBox(_("Current User"), 	os.getenv("USER")),
 			EntryBox(_("Home Directory"), 	os.getenv("HOME")),
 			EntryBox(_("Shell"), 		os.getenv("SHELL")),

@@ -74,4 +74,10 @@
 		<item title="policy_battery" key="/apps/gnome-power-manager/cpufreq_battery_policy" version="18"></item>
 		<item title="policy_battery" key="/apps/gnome-power-manager/cpufreq/policy_battery" version="20"></item>
 	</category>
+
+	<category>
+		<item title="show_advanced_permissions" key="/apps/nautilus/preferences/show_advanced_permissions"></item>
+		<item title="burnproof" key="/apps/nautilus-cd-burner/burnproof"></item>
+		<item title="overburn" key="/apps/nautilus-cd-burner/overburn"></item>
+	</category>
 </tweaks>

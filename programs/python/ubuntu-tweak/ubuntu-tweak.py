@@ -36,7 +36,7 @@ def show_error(message, title = _("Error"), parent = None):
 
 if __name__ == "__main__":
 	if GnomeVersion.minor < 18:
-		show_error(_("Sorry!\n\nUbuntu Tweak can only run on <b>Ubuntu 7.04 or 7.10.</b>\n"))
+		show_error(_("Sorry!\n\n%s can only run under <b>GNOME 2.18 or above.</b>\n") % AppDisplay)
 	else:
 		#determine whether the gnome is the default desktop
 		if os.getenv("GNOME_DESKTOP_SESSION_ID"):
