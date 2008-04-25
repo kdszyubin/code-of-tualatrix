@@ -27,10 +27,8 @@ import os
 import gobject
 try:
 	import compizconfig as ccs
-	cmd = os.popen("apt-cache policy compiz")
-	cmd.readline()
-	cf_installed = cmd.readline()
-	if "0.7" in cf_installed:
+	import ccm
+	if ccm.Version == "0.7.4":
 		DISABLE = False
 	else:
 		DISABLE = True
@@ -87,49 +85,72 @@ class OpacityMenu(gtk.CheckButton, CompizSetting):
 		self.context.Write()
 
 class WobblyMenu(gtk.CheckButton, CompizSetting):
-	def __init__(self, label):
+	def __init__(self, label, mediator):
 		gtk.CheckButton.__init__(self, label)
 
+		self.mediator = mediator
 		self.plugin = self.context.Plugins['wobbly']
 		self.setting = self.plugin.Screens[0]['map_window_match']
 		
-		if self.setting.Value == self.setting.DefaultValue:
+		if self.setting.Value == self.setting.DefaultValue and self.plugin.Enabled:
 			self.set_active(True)
 
 		self.connect("toggled", self.on_button_toggled)
 
 	def on_button_toggled(self, widget, data = None):
 		if self.get_active():
-			if not self.plugin.Enabled: self.plugin.Enabled = True
-			self.setting.Reset()
+			conflicts = self.plugin.Enabled and self.plugin.DisableConflicts or self.plugin.EnableConflicts
+			conflict = ccm.PluginConflict(self.plugin, conflicts)
+			if conflict.Resolve():
+				self.mediator.snap.set_active(False)
+				if not self.plugin.Enabled: self.plugin.Enabled = True
+				self.setting.Reset()
 		else:
 			self.setting.Value = ""
+
 		self.context.Write()
 
+		if self.setting.Value == self.setting.DefaultValue and self.plugin.Enabled:
+			self.set_active(True)
+		else:
+			self.set_active(False)
+
 class WobblyWindow(gtk.CheckButton, CompizSetting):
-	def __init__(self, label):
+	def __init__(self, label, mediator):
 		gtk.CheckButton.__init__(self, label)
 
+		self.mediator = mediator
 		self.plugin = self.context.Plugins['wobbly']
 		self.setting = self.plugin.Screens[0]['move_window_match']
 		
-		if self.setting.Value == self.setting.DefaultValue:
+		if self.setting.Value == self.setting.DefaultValue and self.plugin.Enabled:
 			self.set_active(True)
 
 		self.connect("toggled", self.on_button_toggled)
 
 	def on_button_toggled(self, widget, data = None):
 		if self.get_active():
-			if not self.plugin.Enabled: self.plugin.Enabled = True
-			self.setting.Reset()
+			conflicts = self.plugin.Enabled and self.plugin.DisableConflicts or self.plugin.EnableConflicts
+			conflict = ccm.PluginConflict(self.plugin, conflicts)
+			if conflict.Resolve():
+				self.mediator.snap.set_active(False)
+				if not self.plugin.Enabled: self.plugin.Enabled = True
+				self.setting.Reset()
 		else:
 			self.setting.Value = ""
+
 		self.context.Write()
 
+		if self.setting.Value == self.setting.DefaultValue and self.plugin.Enabled:
+			self.set_active(True)
+		else:
+			self.set_active(False)
+
 class SnapWindow(gtk.CheckButton, CompizSetting):
-	def __init__(self, label):
+	def __init__(self, label, mediator):
 		gtk.CheckButton.__init__(self, label)
 
+		self.mediator = mediator
 		self.plugin = self.context.Plugins['snap']
 		
 		self.set_active(self.plugin.Enabled)
@@ -137,8 +158,19 @@ class SnapWindow(gtk.CheckButton, CompizSetting):
 		self.connect("toggled", self.on_button_toggled)
 
 	def on_button_toggled(self, widget, data = None):
-		self.plugin.Enabled = widget.get_active()
+		if self.get_active():
+			conflicts = self.plugin.Enabled and self.plugin.DisableConflicts or self.plugin.EnableConflicts
+			conflict = ccm.PluginConflict(self.plugin, conflicts)
+			if conflict.Resolve():
+				self.plugin.Enabled = True
+				self.mediator.wobbly_w.set_active(False)
+				self.mediator.wobbly_m.set_active(False)
+		else:
+			self.plugin.Enabled = False
+
 		self.context.Write()
+
+		self.set_active(self.plugin.Enabled)
 
 class Compiz(gtk.VBox, CompizSetting):
 	"""Compiz Fusion tweak"""
@@ -159,17 +191,16 @@ class Compiz(gtk.VBox, CompizSetting):
 		self.pack_start(hbox, False, False, 0)
 		hbox.pack_start(self.create_edge_setting(), True, False, 0)
 
-		button1 = SnapWindow(_("Snapping Windows(DON'T USE with Wobbly Windows)"))
-#		button2 = self.create_wobbly_effect_checkbutton(_("Maximize Effect"), "/apps/compiz/plugins/wobbly/screen0/options/maximize_effect")
-		button3 = WobblyWindow(_("Wobbly Windows"));
+		self.snap = SnapWindow(_("Snapping Windows"), self)
+		self.wobbly_w = WobblyWindow(_("Wobbly Windows"), self);
 
-		box = ItemBox(_("<b>Window Effects</b>"), (button1, button3))
+		box = ItemBox(_("<b>Window Effects</b>"), (self.snap, self.wobbly_w))
 		self.pack_start(box, False, False, 0)
 
 		button1 = OpacityMenu(_("Opacity Menu"))
-		button2 = WobblyMenu(_("Wobbly Menu"))
+		self.wobbly_m = WobblyMenu(_("Wobbly Menu"), self)
 
-		box = ItemBox(_("<b>Menu Effects</b>"), (button1, button2))
+		box = ItemBox(_("<b>Menu Effects</b>"), (button1, self.wobbly_m))
 		self.pack_start(box, False, False, 0)
 
 	def combo_box_changed_cb(self, widget, edge):
