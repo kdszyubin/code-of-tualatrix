@@ -26,7 +26,7 @@ import gconf
 import gettext
 from Constants import *
 from IniFile import IniFile
-from Widgets import ItemBox, TweakPage, EntryBox, show_info
+from Widgets import TweakPage, EntryBox, show_info
 
 gettext.install(App, unicode = True)
 

@@ -25,7 +25,6 @@ import gettext
 import gobject
 from Constants import *
 from xdg.DesktopEntry import DesktopEntry
-from Widgets import ItemBox
 from Widgets import show_info
 
 gettext.install(App, unicode = True)
